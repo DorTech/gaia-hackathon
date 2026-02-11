@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { db, domaine, domaineSol, parcelle, zone } from "../src";
+import { db, dispositif, domaine, domaineSol, parcelle, zone } from "../src";
 import { parse } from "csv-parse/sync";
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
@@ -17,9 +17,10 @@ interface ImportConfig {
 const importConfigs: ImportConfig[] = [
 	{
 		category: "contexte",
-		files: ["domaine.csv", "domaine_sol.csv", "parcelle.csv", "zone.csv"],
+		files: ["domaine.csv", "dispositif.csv", "domaine_sol.csv", "parcelle.csv", "zone.csv"],
 		handlers: {
 			"domaine.csv": importDomaines,
+			"dispositif.csv": importDispositifs,
 			"domaine_sol.csv": importDomaineSol,
 			"parcelle.csv": importParcelles,
 			"zone.csv": importZones,
@@ -135,6 +136,27 @@ async function importDomaineSol(records: any[]) {
 		}));
 
 		await db.insert(domaineSol).values(values);
+		console.log(
+			`  Batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(records.length / batchSize)} ✓`,
+		);
+	}
+}
+
+async function importDispositifs(records: any[]) {
+	console.log(`Importing ${records.length} dispositifs...`);
+
+	const batchSize = 1000;
+	for (let i = 0; i < records.length; i += batchSize) {
+		const batch = records.slice(i, i + batchSize);
+		const values = batch.map((record: any) => ({
+			id: record.id,
+			code: record.code,
+			type: record.type,
+			campagne: parseInt(record.campagne, 10),
+			domaineId: record.domaine_id,
+		}));
+
+		await db.insert(dispositif).values(values);
 		console.log(
 			`  Batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(records.length / batchSize)} ✓`,
 		);
