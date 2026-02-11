@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { db, dispositif, domaine, domaineSol, parcelle, parcelleType, sdc, zone } from "../src";
+import { db, dispositif, domaine, domaineSol, parcelle, parcelleType, sdc, synthetise, zone } from "../src";
 import { parse } from "csv-parse/sync";
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
@@ -17,7 +17,7 @@ interface ImportConfig {
 const importConfigs: ImportConfig[] = [
 	{
 		category: "contexte",
-		files: ["domaine.csv", "dispositif.csv", "domaine_sol.csv", "parcelle.csv", "parcelle_type.csv", "sdc.csv", "zone.csv"],
+		files: ["domaine.csv", "dispositif.csv", "domaine_sol.csv", "parcelle.csv", "parcelle_type.csv", "sdc.csv", "synthetise.csv", "zone.csv"],
 		handlers: {
 			"domaine.csv": importDomaines,
 			"dispositif.csv": importDispositifs,
@@ -25,6 +25,7 @@ const importConfigs: ImportConfig[] = [
 			"parcelle.csv": importParcelles,
 			"parcelle_type.csv": importParcelleTypes,
 			"sdc.csv": importSdc,
+			"synthetise.csv": importSynthetise,
 			"zone.csv": importZones,
 		},
 	},
@@ -162,6 +163,80 @@ async function importDispositifs(records: any[]) {
 		console.log(
 			`  Batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(records.length / batchSize)} ✓`,
 		);
+	}
+}
+
+async function importSynthetise(records: any[]) {
+	console.log(`Importing ${records.length} synthetise records...`);
+
+	// Fetch existing IDs to validate foreign keys
+	const existingParcelleTypeIds = new Set(
+		(await db.select({ id: parcelleType.id }).from(parcelleType)).map(p => p.id)
+	);
+	const existingSdcIds = new Set(
+		(await db.select({ id: sdc.id }).from(sdc)).map(s => s.id)
+	);
+
+	const parseBoolOrNull = (val: string) => {
+		if (!val || val === "") return null;
+		return val === "t" || val === "true" || val === "1";
+	};
+
+	const parseStringOrNull = (val: string) => {
+		return (!val || val === "") ? null : val;
+	};
+
+	const erasedParcelleTypeIds = new Set<string>();
+	const erasedSdcIds = new Set<string>();
+
+	const batchSize = 1000;
+	for (let i = 0; i < records.length; i += batchSize) {
+		const batch = records.slice(i, i + batchSize);
+		const values = batch.map((record: any) => {
+			let parcelleTypeId = parseStringOrNull(record.parcelle_type_id);
+			let sdcId = parseStringOrNull(record.sdc_id);
+
+			// Check if foreign key values exist
+			if (parcelleTypeId && !existingParcelleTypeIds.has(parcelleTypeId)) {
+				erasedParcelleTypeIds.add(parcelleTypeId);
+				parcelleTypeId = null;
+			}
+			if (sdcId && !existingSdcIds.has(sdcId)) {
+				erasedSdcIds.add(sdcId);
+				sdcId = null;
+			}
+
+			return {
+				id: record.id,
+				campagnes: record.campagnes,
+				source: record.source,
+				valide: parseBoolOrNull(record.valide),
+				commentaire: record.commentaire,
+				parcelleTypeId,
+				sdcId,
+			};
+		});
+
+		await db.insert(synthetise).values(values);
+		console.log(
+			`  Batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(records.length / batchSize)} ✓`,
+		);
+	}
+
+	// Log erased values
+	if (erasedParcelleTypeIds.size > 0) {
+		console.log(`  ⚠️  Replaced ${erasedParcelleTypeIds.size} non-existent parcelle_type_id values with NULL:`);
+		Array.from(erasedParcelleTypeIds).slice(0, 10).forEach(id => console.log(`    - ${id}`));
+		if (erasedParcelleTypeIds.size > 10) {
+			console.log(`    ... and ${erasedParcelleTypeIds.size - 10} more`);
+		}
+	}
+	if (erasedSdcIds.size > 0) {
+		console.log(`  ⚠️  Replaced ${erasedSdcIds.size} non-existent sdc_id values with NULL:`);
+		Array.from(erasedSdcIds).slice(0, 10).forEach(id => console.log(`    - ${id}`));
+		if (erasedSdcIds.size > 10) {
+			console.log(`    ... and ${erasedSdcIds.size - 10} more`);
+		}
 	}
 }
 
