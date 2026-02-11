@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { db, dispositif, domaine, domaineSol, parcelle, zone } from "../src";
+import { db, dispositif, domaine, domaineSol, parcelle, sdc, zone } from "../src";
 import { parse } from "csv-parse/sync";
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
@@ -17,12 +17,13 @@ interface ImportConfig {
 const importConfigs: ImportConfig[] = [
 	{
 		category: "contexte",
-		files: ["domaine.csv", "dispositif.csv", "domaine_sol.csv", "parcelle.csv", "zone.csv"],
+		files: ["domaine.csv", "dispositif.csv", "domaine_sol.csv", "parcelle.csv", "sdc.csv", "zone.csv"],
 		handlers: {
 			"domaine.csv": importDomaines,
 			"dispositif.csv": importDispositifs,
 			"domaine_sol.csv": importDomaineSol,
 			"parcelle.csv": importParcelles,
+			"sdc.csv": importSdc,
 			"zone.csv": importZones,
 		},
 	},
@@ -249,6 +250,119 @@ async function importParcelles(records: any[]) {
 		}));
 
 		await db.insert(parcelle).values(values);
+		console.log(
+			`  Batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(records.length / batchSize)} ✓`,
+		);
+	}
+}
+
+async function importSdc(records: any[]) {
+	console.log(`Importing ${records.length} sdc records...`);
+
+	const parseFloatOrNull = (val: string) => {
+		const parsed = parseFloat(val);
+		return isNaN(parsed) ? null : parsed;
+	};
+
+	const parseBoolOrNull = (val: string) => {
+		if (!val || val === "") return null;
+		return val === "t" || val === "true" || val === "1";
+	};
+
+	const batchSize = 100; // 80+ fields, so smaller batch size to failures on input queries
+	for (let i = 0; i < records.length; i += batchSize) {
+		const batch = records.slice(i, i + batchSize);
+		const values = batch.map((record: any) => ({
+			id: record.id,
+			filiere: record.filiere,
+			typeAgriculture: record.type_agriculture,
+			partSauDomaine: parseFloatOrNull(record.part_sau_domaine),
+			partMoDomaine: parseFloatOrNull(record.part_mo_domaine),
+			partMaterielDomaine: parseFloatOrNull(record.part_materiel_domaine),
+			cipan: parseBoolOrNull(record.cipan),
+			varPeuSensiblesMaladies: parseBoolOrNull(record.var_peu_sensibles_maladies),
+			broyageBordure: parseBoolOrNull(record.broyage_bordure),
+			gestionBordureDeBois: parseBoolOrNull(record.gestion_bordure_de_bois),
+			codeDephy: record.code_dephy,
+			codesConventionDephy: record.codes_convention_dephy,
+			commentaire: record.commentaire,
+			couvertsAssocies: parseBoolOrNull(record.couverts_associes),
+			culturesPieges: parseBoolOrNull(record.cultures_pieges),
+			decompactageFrequent: parseBoolOrNull(record.decompactage_frequent),
+			decompactageOccasionnel: parseBoolOrNull(record.decompactage_occasionnel),
+			desherbageAutreForm: parseBoolOrNull(record.desherbage_autre_forme),
+			desherbageMecaFrequent: parseBoolOrNull(record.desherbage_meca_frequent),
+			desherbageMecaOccasionnel: parseBoolOrNull(record.desherbage_meca_occasionnel),
+			desherbageThermique: parseBoolOrNull(record.desherbage_thermique),
+			destructionLitiere: parseBoolOrNull(record.destruction_litiere),
+			doseAdapteeSurfFoliaire: parseBoolOrNull(record.dose_adaptee_surf_foliaire),
+			enherbementNaturel: parseBoolOrNull(record.enherbement_naturel),
+			enherbementSeme: parseBoolOrNull(record.enherbement_seme),
+			exportationMenuPailles: parseBoolOrNull(record.exportation_menu_pailles),
+			faibleDensite: parseBoolOrNull(record.faible_densite),
+			faibleEcartement: parseBoolOrNull(record.faible_ecartement),
+			fauxSemisIntensifs: parseBoolOrNull(record.faux_semis_intensifs),
+			fauxSemisPonctuels: parseBoolOrNull(record.faux_semis_ponctuels),
+			filetAntiInsectes: parseBoolOrNull(record.filet_anti_insectes),
+			fortEcartement: parseBoolOrNull(record.fort_ecartement),
+			forteDensite: parseBoolOrNull(record.forte_densite),
+			gestionResidus: parseBoolOrNull(record.gestion_residus),
+			haiesAnciennes: parseBoolOrNull(record.haies_anciennes),
+			haiesJeunes: parseBoolOrNull(record.haies_jeunes),
+			labourFrequent: parseBoolOrNull(record.labour_frequent),
+			labourOccasionnel: parseBoolOrNull(record.labour_occasionnel),
+			labourSystematique: parseBoolOrNull(record.labour_systematique),
+			lutteBioAutre: parseBoolOrNull(record.lutte_bio_autre),
+			lutteBioConfuSexuelle: parseBoolOrNull(record.lutte_bio_confu_sexuelle),
+			melange: parseBoolOrNull(record.melange),
+			modaliteSuiviDephy: record.modalite_suivi_dephy,
+			modesCommercialisation: record.modes_commercialisation,
+			monocultureRotationCourte: parseBoolOrNull(record.monoculture_rotation_courte),
+			optimConditionsApplication: parseBoolOrNull(record.optim_conditions_application),
+			reductionDoseAutresPhyto: parseBoolOrNull(record.reduction_dose_autres_phyto),
+			reductionDoseFongi: parseBoolOrNull(record.reduction_dose_fongi),
+			reductionDoseHerbi: parseBoolOrNull(record.reduction_dose_herbi),
+			reductionDoseInsec: parseBoolOrNull(record.reduction_dose_insec),
+			rotationCulturesRustiques: parseBoolOrNull(record.rotation_cultures_rustiques),
+			rotationDiversifieAvecPt: parseBoolOrNull(record.rotation_diversifiee_avec_pt),
+			rotationDiversifieeIntroUneCulture: parseBoolOrNull(record.rotation_diversifiee_intro_une_culture),
+			rotationDiversifieeSansPt: parseBoolOrNull(record.rotation_diversifiee_sans_pt),
+			adaptationLutteALaParcelle: parseBoolOrNull(record.adaptation_lutte_a_la_parcelle),
+			semiDirectSystematique: parseBoolOrNull(record.semis_direct_systematique),
+			semisPrecoce: parseBoolOrNull(record.semis_precoce),
+			semisTardif: parseBoolOrNull(record.semis_tardif),
+			strategieCategorie: record.strategie_categorie,
+			stripTillFrequent: parseBoolOrNull(record.strip_till_frequent),
+			stripTillOccasionnel: parseBoolOrNull(record.strip_till_occasionnel),
+			tailleLimitantRisquesSanitaires: parseBoolOrNull(record.taille_limitant_risques_sanitaires),
+			tailleOrganesContamines: parseBoolOrNull(record.taille_organes_contamines),
+			tcs: parseBoolOrNull(record.tcs),
+			traitementLocalise: parseBoolOrNull(record.traitement_localise),
+			typeProduction: record.type_production,
+			varPeuSensiblesVerse: parseBoolOrNull(record.var_peu_sensibles_verse),
+			utilisationAdjuvants: parseBoolOrNull(record.utilisation_adjuvants),
+			utilisationOad: parseBoolOrNull(record.utilisation_oad),
+			utilisationSeuils: parseBoolOrNull(record.utilisation_seuils),
+			utilisationStimDefense: parseBoolOrNull(record.utilisation_stim_defense),
+			validite: parseBoolOrNull(record.validite),
+			varCompetitivesAdventic: parseBoolOrNull(record.var_competitives_adventice),
+			varPeuSensiblesRavageurs: parseBoolOrNull(record.var_peu_sensibles_ravageurs),
+			semiDirectOccasionnel: parseBoolOrNull(record.semis_direct_occasionnel),
+			agroforesterie: parseBoolOrNull(record.agroforesterie),
+			ajustementFertilisation: parseBoolOrNull(record.ajustement_fertilisation),
+			ajustementIrrigation: parseBoolOrNull(record.ajustement_irrigation),
+			arbresBordureParcelle: parseBoolOrNull(record.arbres_bordure_parcelle),
+			bandesEnherbees: parseBoolOrNull(record.bandes_enherbees),
+			bandesFleuries: parseBoolOrNull(record.bandes_fleuries),
+			boisBosquet: parseBoolOrNull(record.bois_bosquet),
+			campagne: parseInt(record.campagne, 10),
+			ciAttractivesPourAuxiliaires: parseBoolOrNull(record.ci_attractives_pour_auxiliaires),
+			ciEffetAlleloOuBiocide: parseBoolOrNull(record.ci_effet_allelo_ou_biocide),
+			code: record.code,
+			dispositifId: record.dispositif_id,
+		}));
+
+		await db.insert(sdc).values(values);
 		console.log(
 			`  Batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(records.length / batchSize)} ✓`,
 		);
