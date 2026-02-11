@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { db, dispositif, domaine, domaineSol, parcelle, sdc, zone } from "../src";
+import { db, dispositif, domaine, domaineSol, parcelle, parcelleType, sdc, zone } from "../src";
 import { parse } from "csv-parse/sync";
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
@@ -17,12 +17,13 @@ interface ImportConfig {
 const importConfigs: ImportConfig[] = [
 	{
 		category: "contexte",
-		files: ["domaine.csv", "dispositif.csv", "domaine_sol.csv", "parcelle.csv", "sdc.csv", "zone.csv"],
+		files: ["domaine.csv", "dispositif.csv", "domaine_sol.csv", "parcelle.csv", "parcelle_type.csv", "sdc.csv", "zone.csv"],
 		handlers: {
 			"domaine.csv": importDomaines,
 			"dispositif.csv": importDispositifs,
 			"domaine_sol.csv": importDomaineSol,
 			"parcelle.csv": importParcelles,
+			"parcelle_type.csv": importParcelleTypes,
 			"sdc.csv": importSdc,
 			"zone.csv": importZones,
 		},
@@ -250,6 +251,77 @@ async function importParcelles(records: any[]) {
 		}));
 
 		await db.insert(parcelle).values(values);
+		console.log(
+			`  Batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(records.length / batchSize)} ✓`,
+		);
+	}
+}
+
+async function importParcelleTypes(records: any[]) {
+	console.log(`Importing ${records.length} parcelle_type records...`);
+
+	const parseIntOrNull = (val: string) => {
+		const parsed = parseInt(val, 10);
+		return isNaN(parsed) ? null : parsed;
+	};
+
+	const parseFloatOrNull = (val: string) => {
+		const parsed = parseFloat(val);
+		return isNaN(parsed) ? null : parsed;
+	};
+
+	const parseBoolOrNull = (val: string) => {
+		if (!val || val === "") return null;
+		return val === "t" || val === "true" || val === "1";
+	};
+
+	const batchSize = 1000;
+	for (let i = 0; i < records.length; i += batchSize) {
+		const batch = records.slice(i, i + batchSize);
+		const values = batch.map((record: any) => ({
+			id: record.id,
+			communeId: record.commune_id,
+			surface: parseFloatOrNull(record.surface),
+			numIlotPac: parseIntOrNull(record.num_ilot_pac),
+			latitude: parseFloatOrNull(record.latitude),
+			longitude: parseFloatOrNull(record.longitude),
+			commentaire: record.commentaire,
+			penteMax: record.pente_max,
+			distanceCoursEau: record.distance_cours_eau,
+			bandeEnherbee: record.bande_enherbee,
+			motifFinUtilisation: record.motif_fin_utilisation,
+			dansZonage: record.dans_zonage,
+			commentaireZonage: record.commentaire_zonage,
+			equipementCommentaire: record.equipement_commentaire,
+			systemeIrrigation: parseBoolOrNull(record.systeme_irrigation),
+			systemeIrrigationType: record.systeme_irrigation_type,
+			pompeType: record.pompe_type,
+			positionnementTuyauxArrosage: record.positionnement_tuyaux_arrosage,
+			eauOrigine: record.eau_origine,
+			systemeFertirrigation: parseBoolOrNull(record.systeme_fertirrigation),
+			drainage: parseBoolOrNull(record.drainage),
+			drainageAnneeRealisation: parseIntOrNull(record.drainage_annee_realisation),
+			protectionAntigel: parseBoolOrNull(record.protection_antigel),
+			protectionAntigelType: record.protection_antigel_type,
+			protectionAntigrele: parseBoolOrNull(record.protection_antigrele),
+			protectionAntiinsecte: parseBoolOrNull(record.protection_antiinsecte),
+			protectionAntipluie: parseBoolOrNull(record.protection_antipluie),
+			equipementAutre: record.equipement_autre,
+			commentaireSol: record.commentaire_sol,
+			textureSurfaceId: record.texture_surface_id,
+			textureSousSolId: record.texture_sous_sol_id,
+			pierrositeMoyenne: parseFloatOrNull(record.pierrosite_moyenne),
+			solProfondeurMaxEnracinement: parseFloatOrNull(record.sol_profondeur_max_enracinement),
+			solProfondeurMaxEnracinementClasse: record.sol_profondeur_max_enracinement_classe,
+			teneurMoPct: parseFloatOrNull(record.teneur_mo_pct),
+			battance: parseBoolOrNull(record.battance),
+			ph: parseFloatOrNull(record.ph),
+			hydromorphie: parseBoolOrNull(record.hydromorphie),
+			calcaire: parseBoolOrNull(record.calcaire),
+			proportionCalcaireTotal: parseFloatOrNull(record.proportion_calcaire_total),
+		}));
+
+		await db.insert(parcelleType).values(values);
 		console.log(
 			`  Batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(records.length / batchSize)} ✓`,
 		);
