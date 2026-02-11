@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { db, parcelle, zone } from "../src";
+import { db, domaine, parcelle, zone } from "../src";
 import { parse } from "csv-parse/sync";
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
@@ -17,8 +17,9 @@ interface ImportConfig {
 const importConfigs: ImportConfig[] = [
 	{
 		category: "contexte",
-		files: ["parcelle.csv", "zone.csv"],
+		files: ["domaine.csv", "parcelle.csv", "zone.csv"],
 		handlers: {
+			"domaine.csv": importDomaines,
 			"parcelle.csv": importParcelles,
 			"zone.csv": importZones,
 		},
@@ -34,6 +35,83 @@ const importConfigs: ImportConfig[] = [
 		handlers: {},
 	},
 ];
+
+async function importDomaines(records: any[]) {
+	console.log(`Importing ${records.length} domaines...`);
+
+	const parseIntOrNull = (val: string) => {
+		const parsed = parseInt(val, 10);
+		return isNaN(parsed) ? null : parsed;
+	};
+
+	const parseFloatOrNull = (val: string) => {
+		const parsed = parseFloat(val);
+		return isNaN(parsed) ? null : parsed;
+	};
+
+	const batchSize = 1000;
+	for (let i = 0; i < records.length; i += batchSize) {
+		const batch = records.slice(i, i + batchSize);
+		const values = batch.map((record: any) => ({
+			id: record.id,
+			code: record.code,
+			campagne: parseInt(record.campagne, 10),
+			typeFerme: record.type_ferme,
+			departement: record.departement,
+			commune: record.commune,
+			petiteRegionAgricole: record.petite_region_agricole,
+			communeId: record.commune_id,
+			zonage: record.zonage,
+			stationMeteoDefaut: record.station_meteo_defaut,
+			pctSauZoneVulnerable: parseFloatOrNull(record.pct_sau_zone_vulnerable),
+			pctSauZoneActionsComplementaires: parseFloatOrNull(record.pct_sau_zone_actions_complementaires),
+			pctSauZoneNatura2000: parseFloatOrNull(record.pct_sau_zone_natura_2000),
+			pctSauZoneErosion: parseFloatOrNull(record.pct_sau_zone_erosion),
+			pctSauZoneExcedentStructurel: parseFloatOrNull(record.pct_sau_zone_excedent_structurel),
+			pctSauPerimetreProtectionCaptage: parseFloatOrNull(record.pct_sau_perimetre_protection_captage),
+			description: record.description,
+			statutJuridiqueNom: record.statut_juridique_nom,
+			statutJuridiqueCommentaire: record.statut_juridique_commentaire,
+			sauTotale: parseFloatOrNull(record.sau_totale),
+			culturesCommentaire: record.cultures_commentaire,
+			autresActivitesCommentaire: record.autres_activites_commentaire,
+			moCommentaire: record.mo_commentaire,
+			nombreAssocies: parseIntOrNull(record.nombre_associes),
+			moFamilialeEtAssocies: parseFloatOrNull(record.mo_familiale_et_associes),
+			moPermanente: parseFloatOrNull(record.mo_permanente),
+			moTemporaire: parseFloatOrNull(record.mo_temporaire),
+			moFamilialeRemuneration: parseFloatOrNull(record.mo_familiale_remuneration),
+			chargesSalariales: parseFloatOrNull(record.charges_salariales),
+			moConduiteCulturesDansDomaine: parseFloatOrNull(record.mo_conduite_cultures_dans_domaine_expe),
+			cotisationMsa: parseFloatOrNull(record.cotisation_msa),
+			fermagesMoyen: parseFloatOrNull(record.fermage_moyen),
+			aidesDecouplees: parseFloatOrNull(record.aides_decouplees),
+			otex18Nom: record.otex_18_nom,
+			otex70Nom: record.otex_70_nom,
+			otexCommentaire: record.otex_commentaire,
+			nombreParcelles: parseIntOrNull(record.nombre_parcelles),
+			distanceSiegeParcellMax: parseFloatOrNull(record.distance_siege_parcelle_max),
+			surfaceAutourSiegeExploitation: parseFloatOrNull(record.surface_autour_siege_exploitation),
+			parcellesGroupees: record.parcelles_groupees === "t",
+			parcellesPluTotGroupees: record.parcelles_plutot_groupees === "t",
+			parcellesPluTotDispersees: record.parcelles_plutot_dispersees === "t",
+			parcellesDispersees: record.parcelles_dispersees === "t",
+			parcellesGroupeesDistinctes: record.parcelles_groupees_distinctes === "t",
+			objectifs: record.objectifs,
+			atusDomaine: record.atouts_domaine,
+			contraintesDomaine: record.contraintes_domaine,
+			perspectiveEvolutionDomaine: record.perspective_evolution_domaine,
+			membreCooperative: record.membre_cooperative === "t",
+			membreGroupeDeveloppement: record.membre_groupe_developpement === "t",
+			membreCumul: record.membre_cum === "t",
+		}));
+
+		await db.insert(domaine).values(values);
+		console.log(
+			`  Batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(records.length / batchSize)} ✓`,
+		);
+	}
+}
 
 async function importZones(records: any[]) {
 	console.log(`Importing ${records.length} zones...`);

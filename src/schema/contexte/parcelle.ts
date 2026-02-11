@@ -5,6 +5,7 @@ import {
 	doublePrecision,
 	boolean,
 } from "drizzle-orm/pg-core";
+import { domaine } from "./domaine";
 
 export const parcelle = pgTable("parcelle", {
 	id: text("id").primaryKey(),
@@ -52,7 +53,9 @@ export const parcelle = pgTable("parcelle", {
 	proportionCalcaireTotal: doublePrecision("proportion_calcaire_total"),
 	proportionCalcaireActif: doublePrecision("proportion_calcaire_actif"),
 	battance: boolean("battance"),
-	domaineId: text("domaine_id"),
+	domaineId: text("domaine_id")
+		.notNull()
+		.references(() => domaine.id),
 	sdcId: text("sdc_id"),
 	domaineSolId: text("domaine_sol_id"),
 });
