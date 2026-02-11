@@ -1,0 +1,22 @@
+# Environment files
+env/.env.local
+.env
+
+# Dependencies
+node_modules/
+
+# Build output
+build/
+dist/
+
+# Migration files (generated)
+migration/
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+*.log
+
+# OS files
+.DS_Store

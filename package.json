@@ -1,0 +1,32 @@
+{
+	"name": "@bloomeo/dephy-dataset",
+	"packageManager": "yarn@4.6.0",
+	"main": "./build/index.js",
+	"types": "./build/types.d.ts",
+	"license": "MIT",
+	"version": "1.0.0",
+	"files": [
+		"build"
+	],
+	"private": true,
+	"devDependencies": {
+		"@types/pg": "^8.11.11",
+		"drizzle-kit": "^0.30.5",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.8.3"
+	},
+	"dependencies": {
+		"csv-parse": "^5.6.0",
+		"dotenv": "^16.4.5",
+		"drizzle-orm": "^0.40.0",
+		"pg": "^8.13.3"
+	},
+	"scripts": {
+		"db:start": "docker compose up -d",
+		"db:stop": "docker compose down",
+		"drizzle:generate": "drizzle-kit generate",
+		"drizzle:migrate": "drizzle-kit migrate",
+		"drizzle:studio": "drizzle-kit studio",
+		"import:data": "ts-node scripts/import-data.ts"
+	}
+}
