@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { db, zone } from "../src";
+import { db, parcelle, zone } from "../src";
 import { parse } from "csv-parse/sync";
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
@@ -17,8 +17,9 @@ interface ImportConfig {
 const importConfigs: ImportConfig[] = [
 	{
 		category: "contexte",
-		files: ["zone.csv"],
+		files: ["parcelle.csv", "zone.csv"],
 		handlers: {
+			"parcelle.csv": importParcelles,
 			"zone.csv": importZones,
 		},
 	},
@@ -50,6 +51,76 @@ async function importZones(records: any[]) {
 		}));
 
 		await db.insert(zone).values(values);
+		console.log(
+			`  Batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(records.length / batchSize)} ✓`,
+		);
+	}
+}
+
+async function importParcelles(records: any[]) {
+	console.log(`Importing ${records.length} parcelles...`);
+
+	const parseIntOrNull = (val: string) => {
+		const parsed = parseInt(val, 10);
+		return isNaN(parsed) ? null : parsed;
+	};
+
+	const parseFloatOrNull = (val: string) => {
+		const parsed = parseFloat(val);
+		return isNaN(parsed) ? null : parsed;
+	};
+
+	const batchSize = 1000;
+	for (let i = 0; i < records.length; i += batchSize) {
+		const batch = records.slice(i, i + batchSize);
+		const values = batch.map((record: any) => ({
+			id: record.id,
+			code: record.code,
+			campagne: parseInt(record.campagne, 10),
+			pacilotnumber: parseIntOrNull(record.pacilotnumber),
+			commentaire: record.commentaire,
+			nombreDeZones: parseIntOrNull(record.nombre_de_zones),
+			equipCommentaire: record.equip_commentaire,
+			surface: parseFloatOrNull(record.surface),
+			pente: record.pente,
+			distanceCoursEau: record.distance_cours_eau,
+			bandeEnherbee: record.bande_enherbee,
+			dansZonage: record.dans_zonage,
+			commentaireZonage: record.commentaire_zonage,
+			systemeIrrigation: record.systeme_irrigation === "true",
+			systemeIrrigationType: record.systeme_irrigation_type,
+			pompeType: record.pompe_type,
+			positionnementTuyauxArrosage: record.positionnement_tuyaux_arrosage,
+			systemeFertirrigation: record.systeme_fertirrigation === "true",
+			eauOrigine: record.eau_origine,
+			drainage: record.drainage === "true",
+			drainageAnneeRealisation: parseIntOrNull(record.drainage_annee_realisation),
+			protectionAntigel: record.protection_antigel === "true",
+			protectionAntigrele: record.protection_antigrele === "true",
+			protectionAntipluie: record.protection_antipluie === "true",
+			protectionAntigelType: record.protection_antigel_type,
+			protectionAntiinsecte: record.protection_antiinsecte === "true",
+			equipAutre: record.equip_autre,
+			commentaireSol: record.commentaire_sol,
+			textureSurface: record.texture_surface,
+			textureSousSol: record.texture_sous_sol,
+			solNomRef: record.sol_nom_ref,
+			solPh: parseFloatOrNull(record.sol_ph),
+			solPierrositeMoyenne: parseFloatOrNull(record.sol_pierrosite_moyenne),
+			solProfondeurMaxEnracinementClasse: record.sol_profondeur_max_enracinement_classe,
+			solProfondeurMaxEnracinement: parseFloatOrNull(record.sol_profondeur_max_enracinement),
+			teneurMoPct: parseFloatOrNull(record.teneur_mo_pct),
+			hydromorphie: record.hydromorphie === "true",
+			calcaire: record.calcaire === "true",
+			proportionCalcaireTotal: parseFloatOrNull(record.proportion_calcaire_total),
+			proportionCalcaireActif: parseFloatOrNull(record.proportion_calcaire_actif),
+			battance: record.battance === "true",
+			domaineId: record.domaine_id,
+			sdcId: record.sdc_id,
+			domaineSolId: record.domaine_sol_id,
+		}));
+
+		await db.insert(parcelle).values(values);
 		console.log(
 			`  Batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(records.length / batchSize)} ✓`,
 		);
