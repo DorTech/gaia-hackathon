@@ -24,6 +24,7 @@
 	"scripts": {
 		"db:start": "docker compose up -d",
 		"db:stop": "docker compose down",
+		"db:remove": "docker compose down -v",
 		"drizzle:generate": "drizzle-kit generate",
 		"drizzle:migrate": "drizzle-kit migrate",
 		"drizzle:studio": "drizzle-kit studio",
