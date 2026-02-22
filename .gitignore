@@ -20,3 +20,5 @@ migration/
 
 # OS files
 .DS_Store
+
+machine_learning/.venv/*
