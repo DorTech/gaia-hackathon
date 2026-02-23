@@ -36,25 +36,36 @@ export const PracticeProfileCard: React.FC<PracticeProfileCardProps> = ({ title,
             </Box>
 
             {item.mode === 'quali' &&
-              item.frequencies?.map((frequency) => (
-                <Box key={frequency.label} className="fr">
-                  <Box className="fr-lbl">{frequency.label}</Box>
-                  <Box className="fr-trk">
-                    <Box
-                      className={`fr-fil ${frequency.top ? 'top' : ''}`}
-                      sx={{ width: `${frequency.pct}%` }}
-                    ></Box>
+              item.frequencies?.map((frequency) => {
+                const isMyPosition = item.note && frequency.label === item.note.value;
+                return (
+                  <Box key={frequency.label} className="fr">
+                    <Box className="fr-lbl" sx={{ fontSize: '1rem', minWidth: '120px', flex: '0 0 120px' }}>
+                      {frequency.label}
+                      {isMyPosition && (
+                        <Box
+                          component="span"
+                          sx={{
+                            marginLeft: '6px',
+                            color: 'var(--green-d)',
+                            fontSize: '1.3rem',
+                            fontWeight: 700,
+                          }}
+                        >
+                          ←
+                        </Box>
+                      )}
+                    </Box>
+                    <Box className="fr-trk" sx={{ flex: '1 1 auto' }}>
+                      <Box
+                        className={`fr-fil ${frequency.top ? 'top' : ''}`}
+                        sx={{ width: `${frequency.pct}%` }}
+                      ></Box>
+                    </Box>
+                    <Box className="fr-pct">{frequency.pct}%</Box>
                   </Box>
-                  <Box className="fr-pct">{frequency.pct}%</Box>
-                </Box>
-              ))}
-
-            {item.mode === 'quali' && item.note && (
-              <Box sx={{ fontSize: '.62rem', color: 'var(--text2)', marginTop: '5px' }}>
-                {item.note.label} <b style={{ color: 'var(--green-d)' }}>{item.note.value}</b>
-                {item.note.suffix ? ` ${item.note.suffix}` : ''}
-              </Box>
-            )}
+                );
+              })}
 
             {item.mode === 'quanti' && item.quantitative && (
               <>
@@ -68,34 +79,36 @@ export const PracticeProfileCard: React.FC<PracticeProfileCardProps> = ({ title,
                   (() => {
                     const refVal = parseFloat(item.quantitative.value.replace(',', '.'));
                     const myVal = parseFloat(item.quantitative.myValue.replace(',', '.'));
-                    const diff = ((refVal - myVal) / myVal) * 100;
+                    const diff = ((myVal - refVal) / refVal) * 100;
                     const isPositive = diff < 0; // négatif est bon pour consommation/N
 
                     return (
                       <Box
                         sx={{
-                          fontSize: '1rem',
-                          color: 'var(--text3)',
-                          marginTop: '6px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
+                          fontSize: '0.85rem',
+                          marginTop: '8px',
+                          padding: '8px 12px',
+                          borderRadius: '6px',
+                          backgroundColor: isPositive ? 'rgba(40, 167, 69, 0.1)' : 'rgba(255, 152, 0, 0.1)',
+                          border: isPositive ? '1px solid rgba(40, 167, 69, 0.3)' : '1px solid rgba(255, 152, 0, 0.3)',
                         }}
                       >
-                        <span>vs moi:</span>
-                        <span style={{ fontWeight: 700, color: 'var(--text2)' }}>
-                          {item.quantitative.myValue} {item.quantitative.unit}
-                        </span>
-                        <span
-                          style={{
-                            fontWeight: 700,
-                            color: isPositive ? 'var(--green-d)' : 'var(--orange)',
-                            fontSize: '1rem',
-                          }}
-                        >
-                          ({diff > 0 ? '+' : ''}
-                          {diff.toFixed(0)}%)
-                        </span>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                          <span style={{ color: 'var(--text3)' }}>vs moi:</span>
+                          <span style={{ fontWeight: 700, color: 'var(--text2)' }}>
+                            {item.quantitative.myValue} {item.quantitative.unit}
+                          </span>
+                          <span
+                            style={{
+                              fontWeight: 700,
+                              color: isPositive ? 'var(--green-d)' : 'var(--orange)',
+                              fontSize: '0.9rem',
+                            }}
+                          >
+                            ({diff > 0 ? '+' : ''}
+                            {diff.toFixed(0)}%)
+                          </span>
+                        </Box>
                       </Box>
                     );
                   })()}

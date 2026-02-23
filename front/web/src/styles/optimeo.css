@@ -185,7 +185,7 @@ body {
 .fr-trk { flex: 1; height: 7px; background: #DCF0CC; border-radius: 3px; overflow: hidden; }
 .fr-fil { height: 100%; border-radius: 3px; background: var(--green); transition: width .7s; }
 .fr-fil.top { background: var(--green-d); }
-.fr-pct { font-size: .68rem; color: var(--text3); width: 26px; text-align: right; font-weight: 700; flex-shrink: 0; }
+.fr-pct { font-size: .9rem; color: var(--text3); width: 26px; text-align: right; font-weight: 700; flex-shrink: 0; }
 /* quant */
 .qv { font-size: 2.2rem; font-weight: 800; color: var(--green-d); line-height: 1; letter-spacing: -.02em; }
 .qu { font-size: .6rem; color: var(--text3); margin-top: 1px; }
