@@ -100,8 +100,14 @@ export class QueryService {
     }
 
     const where = this.queryRepository.buildWhere(dto.filters ?? [], columns, dto.table, dto.joins);
-    const data = await this.queryRepository.frequency(table, col, where, dto.asBoolean);
+    const rows = await this.queryRepository.frequency(table, col, where, dto.asBoolean);
 
-    return { table: dto.table, field: dto.field, data };
+    const total = rows.reduce((sum, r) => sum + r.count, 0);
+    const data = rows.map((r) => ({
+      ...r,
+      percentage: total > 0 ? Math.round((r.count / total) * 10000) / 100 : 0,
+    }));
+
+    return { table: dto.table, field: dto.field, total, data };
   }
 }
