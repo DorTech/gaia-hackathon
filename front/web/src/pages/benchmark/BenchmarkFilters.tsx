@@ -49,6 +49,7 @@ export const BenchmarkFilters: React.FC<BenchmarkFiltersProps> = ({
         value={species}
         onChange={setSpecies}
         options={options.species}
+        placeholder="Choisir une espèce"
       />
       <FilterSelectMUI
         label="📍 Département"
@@ -56,6 +57,7 @@ export const BenchmarkFilters: React.FC<BenchmarkFiltersProps> = ({
         value={department}
         onChange={setDepartment}
         options={options.department}
+        placeholder="Choisir un département"
       />
       <FilterSelectMUI
         label="🌿 Type agriculture"
@@ -63,6 +65,7 @@ export const BenchmarkFilters: React.FC<BenchmarkFiltersProps> = ({
         value={agricultureType}
         onChange={setAgricultureType}
         options={options.agricultureType}
+        placeholder="Choisir un type"
       />
       <div className="fg-sep"></div>
       <FilterSelectMUI
@@ -71,8 +74,9 @@ export const BenchmarkFilters: React.FC<BenchmarkFiltersProps> = ({
         value={iftThreshold}
         onChange={setIftThreshold}
         options={options.iftThreshold}
+        placeholder="Choisir un seuil"
       />
-      <button className="btn btn-green" onClick={handleApply}>
+      <button className="btn btn-green" onClick={handleApply} style={{ height: '40px' }}>
         Appliquer
       </button>
     </div>

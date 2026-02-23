@@ -7,6 +7,7 @@ interface FilterSelectMUIProps {
   options: string[];
   ariaLabel: string;
   onChange: (value: string) => void;
+  placeholder?: string;
 }
 
 export const FilterSelectMUI: React.FC<FilterSelectMUIProps> = ({
@@ -15,6 +16,7 @@ export const FilterSelectMUI: React.FC<FilterSelectMUIProps> = ({
   options,
   ariaLabel,
   onChange,
+  placeholder,
 }) => {
   const handleChange = (event: SelectChangeEvent) => {
     onChange(event.target.value as string);
@@ -29,6 +31,12 @@ export const FilterSelectMUI: React.FC<FilterSelectMUIProps> = ({
           onChange={handleChange}
           displayEmpty
           inputProps={{ 'aria-label': ariaLabel }}
+          renderValue={(selected) => {
+            if (!selected) {
+              return <span style={{ color: 'var(--text3)' }}>{placeholder || label}</span>;
+            }
+            return selected;
+          }}
         >
           {options.map((option) => (
             <MenuItem key={option} value={option}>

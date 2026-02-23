@@ -1,6 +1,5 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import React, { useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   fetchDistinctDepartments,
   fetchDistinctSpecies,
@@ -18,6 +17,8 @@ import {
   benchmarkPracticeProfileAtom,
   benchmarkReferenceFarmsAtom,
   enrichedPracticeProfileAtom,
+  flattenedSpeciesListAtom,
+  rawSpeciesListAtom,
   PRACTICE_PROFILE_TEMPLATE,
 } from '../../store/benchmarkAtoms';
 import { predictedIFTAtom } from '../../store/diagnosticAtoms';
@@ -29,9 +30,8 @@ import { MedianKpiRow } from './MedianKpiRow';
 import { PracticeProfileCard } from './PracticeProfileCard';
 
 export const BenchmarkPage: React.FC = () => {
-  const navigate = useNavigate();
-
   const [filterOptions, setFilterOptions] = useAtom(benchmarkFilterOptionsAtom);
+  const flattenedSpecies = useAtomValue(flattenedSpeciesListAtom);
   const medianKpis = useAtomValue(benchmarkMedianKpisAtom);
   const practiceProfile = useAtomValue(enrichedPracticeProfileAtom);
   const [appliedFilters, setAppliedFilters] = useAtom(benchmarkFiltersAtom);
@@ -43,6 +43,7 @@ export const BenchmarkPage: React.FC = () => {
   const setPracticeProfile = useSetAtom(benchmarkPracticeProfileAtom);
   const setReferenceFarms = useSetAtom(benchmarkReferenceFarmsAtom);
   const setMedianIft = useSetAtom(iftMedianValueAtom);
+  const setRawSpecies = useSetAtom(rawSpeciesListAtom);
 
   const loadBenchmarkData = useCallback(
     async (filters: BenchmarkFiltersState) => {
@@ -163,19 +164,21 @@ export const BenchmarkPage: React.FC = () => {
           fetchDistinctDepartments(),
         ]);
 
+        // Store raw species for flattening
+        setRawSpecies(species);
+
         setFilterOptions((prev) => ({
           ...prev,
-          species,
+          species, // Keep raw for now, we'll use flattened in the combobox
           department: departments,
         }));
 
         // Update default filters if current values aren't in the fetched lists
         setAppliedFilters((prev) => ({
           ...prev,
-          species: species.includes(prev.species) ? prev.species : (species[0] ?? prev.species),
-          department: departments.includes(prev.department)
-            ? prev.department
-            : (departments[0] ?? prev.department),
+          species: prev.species && species.includes(prev.species) ? prev.species : '',
+          department:
+            prev.department && departments.includes(prev.department) ? prev.department : '',
         }));
       } catch (err) {
         console.error('Failed to load filter options:', err);
@@ -190,20 +193,24 @@ export const BenchmarkPage: React.FC = () => {
   }, [appliedFilters]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const departmentCode = appliedFilters.department.split(' ')[0];
+  const hasAllFilters =
+    appliedFilters.species &&
+    appliedFilters.department &&
+    appliedFilters.agricultureType &&
+    appliedFilters.iftThreshold;
 
   return (
     <div className="page active" id="page-bench">
-      <BenchmarkHeader
-        departmentCode={departmentCode}
-        species={appliedFilters.species}
-        onGoToDiagnostic={() => navigate('/diagnostic')}
-      />
+      <BenchmarkHeader departmentCode={departmentCode} species={appliedFilters.species} />
 
       {/* FILTRES */}
       <BenchmarkFilters
         initialValues={appliedFilters}
         onApply={setAppliedFilters}
-        options={filterOptions}
+        options={{
+          ...filterOptions,
+          species: flattenedSpecies,
+        }}
       />
 
       {loading && (
@@ -212,14 +219,32 @@ export const BenchmarkPage: React.FC = () => {
         </div>
       )}
 
-      {/* KPIs MÉDIANE */}
-      <MedianKpiRow kpis={medianKpis} />
+      {!hasAllFilters && !loading && (
+        <div
+          style={{
+            textAlign: 'center',
+            padding: '40px',
+            color: 'var(--text3)',
+            fontSize: '1.1rem',
+          }}
+        >
+          Veuillez sélectionner tous les filtres et cliquer sur &quot;Appliquer&quot; pour voir les
+          résultats
+        </div>
+      )}
 
-      {/* PROFIL PRATIQUES */}
-      <PracticeProfileCard
-        title={"Liste des pratiques les plus performantes sur l'IFT"}
-        items={practiceProfile}
-      />
+      {hasAllFilters && (
+        <>
+          {/* KPIs MÉDIANE */}
+          <MedianKpiRow kpis={medianKpis} />
+
+          {/* PROFIL PRATIQUES */}
+          <PracticeProfileCard
+            title={"Liste des pratiques les plus performantes sur l'IFT"}
+            items={practiceProfile}
+          />
+        </>
+      )}
     </div>
   );
 };

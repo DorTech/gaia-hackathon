@@ -10,15 +10,32 @@ import { itkFormAtom, CHIP_OPTIONS } from './diagnosticAtoms';
 
 export const benchmarkLoadingAtom = atom<boolean>(false);
 
+/** Raw species list from the backend (may contain comma-separated values) */
+export const rawSpeciesListAtom = atom<string[]>([]);
+
+/** Flattened species list — splits comma-separated values and removes duplicates */
+export const flattenedSpeciesListAtom = atom<string[]>((get) => {
+  const rawSpecies = get(rawSpeciesListAtom);
+  const speciesSet = new Set<string>();
+
+  rawSpecies.forEach((item) => {
+    // Split by comma and trim each value
+    const parts = item.split(',').map((s) => s.trim());
+    parts.forEach((part) => {
+      if (part && part.length > 0) {
+        speciesSet.add(part);
+      }
+    });
+  });
+
+  // Return sorted array for consistent display
+  return Array.from(speciesSet).sort();
+});
+
 export const benchmarkFilterOptionsAtom = atom<BenchmarkFilterOptions>({
-  species: ['Blé tendre', 'Maïs grain', 'Colza', "Orge d'hiver", 'Tournesol'],
-  department: [
-    '35 — Ille-et-Vilaine',
-    '29 — Finistère',
-    "22 — Côtes-d'Armor",
-    '56 — Morbihan',
-  ],
-  agricultureType: ['Tous (Bio + Conv.)', 'Conventionnel seul', 'Biologique seul'],
+  species: [],
+  department: [],
+  agricultureType: ['JE VIENS PAS DU BACK', 'Tous (Bio + Conv.)', 'Conventionnel seul', 'Biologique seul'],
   iftThreshold: ['−20% vs médiane', '−30% vs médiane', '−40% vs médiane'],
 });
 
@@ -213,10 +230,10 @@ export const benchmarkPracticeProfileAtom = atom<PracticeProfileItem[]>([
 ]);
 
 export const benchmarkFiltersAtom = atom<BenchmarkFiltersState>({
-  species: 'Blé tendre',
-  department: '35 — Ille-et-Vilaine',
-  agricultureType: 'Tous (Bio + Conv.)',
-  iftThreshold: '−30% vs médiane',
+  species: '',
+  department: '',
+  agricultureType: '',
+  iftThreshold: '',
 });
 
 /**
