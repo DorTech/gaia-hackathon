@@ -13,8 +13,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-NUMERIC_COLS = ["nb_cultures_rotation", "nbre_de_passages_desherbage_meca", "sequence_length"]
-CATEGORICAL_COLS = ["recours_macroorganismes", "type_de_travail_du_sol"]
+NUMERIC_COLS = ["nb_cultures_rotation", "nbre_de_passages_desherbage_meca", "sequence_length", "departement"]
+CATEGORICAL_COLS = ["recours_macroorganismes", "type_de_travail_du_sol", "sdc_type_agriculture"]
 SEQUENCE_COL = "sequence_cultures"
 TARGET_COL = "ift_histo_chimique_tot"
 
@@ -106,10 +106,19 @@ SELECT
     spmc.mb_reelle_avec_autoconso,
     spmc.nbre_de_passages_desherbage_meca,
     spmc.recours_aux_moyens_biologiques,
-    spmc.nombre_uth_necessaires
+    spmc.nombre_uth_necessaires,
+    spmc.sdc_type_agriculture,
+    domain.departement,
+    domain.commune
 FROM rotation_cte r
 JOIN synthetise_perf_magasin_can spmc
-    ON r.id = spmc.sdc_id;
+ON r.id = spmc.sdc_id
+JOIN sdc
+    ON sdc.id = r.id
+JOIN dispositif
+    ON dispositif.id = sdc.dispositif_id
+join domain
+	on domain.id = dispositif.domaine_id
     """
     with get_connection() as conn:
         df = pd.read_sql(query, conn)

@@ -21,6 +21,8 @@ class PredictionRequest(BaseModel):
     recours_macroorganismes: str
     nbre_de_passages_desherbage_meca: int
     type_de_travail_du_sol: str
+    departement: int
+    sdc_type_agriculture: str
 
 
 def load_model_and_metadata():
@@ -66,6 +68,8 @@ async def predict(payload: PredictionRequest):
         "recours_macroorganismes": payload.recours_macroorganismes,
         "nbre_de_passages_desherbage_meca": payload.nbre_de_passages_desherbage_meca,
         "type_de_travail_du_sol": payload.type_de_travail_du_sol,
+        "departement": payload.departement,
+        "sdc_type_agriculture": payload.sdc_type_agriculture
     }
     
     # Add binary features for each known crop
