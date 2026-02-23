@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { db, dispositif, domaine, domaineSol, parcelle, parcelleType, sdc, sdcRealisePerfMagasinCan, synthetisePerfMagasinCan, interventionSynthetiseMagasinCan, synthetise, zone } from "../src";
+import { db, dispositif, domaine, domaineSol, parcelle, parcelleType, sdc, sdcRealisePerfMagasinCan, successionAssoleeSynthetiseMagasinCan, synthetisePerfMagasinCan, interventionSynthetiseMagasinCan, synthetise, zone } from "../src";
 import { parse } from "csv-parse/sync";
 import { parse as parseStream } from "csv-parse";
 import { readFileSync, existsSync, createReadStream } from "fs";
@@ -40,10 +40,16 @@ const importConfigs: ImportConfig[] = [
 	},
 	{
 		category: "magasin",
-		files: ["sdc_realise_performance_magasin_can.csv", "synthetise_performance_magasin_can.csv", "intervention_synthetise_magasin_can.csv"],
+		files: [
+			"sdc_realise_performance_magasin_can.csv",
+			"synthetise_performance_magasin_can.csv",
+			"succession_assolee_synthetise_magasin_can.csv",
+			"intervention_synthetise_magasin_can.csv",
+		],
 		handlers: {
 			"sdc_realise_performance_magasin_can.csv": importSdcRealisePerfMagasinCan,
 			"synthetise_performance_magasin_can.csv": importSynthetisePerfMagasinCan,
+			"succession_assolee_synthetise_magasin_can.csv": importSuccessionAssoleeSynthetiseMagasinCan,
 		},
 		streamHandlers: {
 			"intervention_synthetise_magasin_can.csv": importInterventionSynthetiseMagasinCan,
@@ -1354,6 +1360,70 @@ async function importInterventionSynthetiseMagasinCan(filePath: string) {
 
 		parser.on("error", reject);
 	});
+}
+
+async function importSuccessionAssoleeSynthetiseMagasinCan(records: any[]) {
+	console.log(`Importing ${records.length} succession_assolee_synthetise_magasin_can records...`);
+
+	const parseBoolOrNull = (val: string) => {
+		if (!val || val === "") return null;
+		const normalized = val.trim().toLowerCase();
+		if (["t", "true", "1", "oui", "yes", "y"].includes(normalized)) return true;
+		if (["f", "false", "0", "non", "no", "n"].includes(normalized)) return false;
+		return null;
+	};
+
+	const parseIntOrNull = (val: string) => {
+		if (!val || val === "") return null;
+		const parsed = parseInt(val, 10);
+		return isNaN(parsed) ? null : parsed;
+	};
+
+	const parseStringOrNull = (val: string) => {
+		return !val || val === "" ? null : val;
+	};
+
+	const batchSize = 1000;
+	for (let i = 0; i < records.length; i += batchSize) {
+		const batch = records.slice(i, i + batchSize);
+		const values = batch.map((record: any) => ({
+			culturePrecedentRangId: record.culture_precedent_rang_id,
+			domaineCode: parseStringOrNull(record.domaine_code),
+			domaineId: parseStringOrNull(record.domaine_id),
+			domaineNom: parseStringOrNull(record.domaine_nom),
+			domaineCampagne: parseIntOrNull(record.domaine_campagne),
+			sdcCode: parseStringOrNull(record.sdc_code),
+			sdcId: parseStringOrNull(record.sdc_id),
+			sdcNom: parseStringOrNull(record.sdc_nom),
+			systemeSynthetiseId: parseStringOrNull(record.systeme_synthetise_id),
+			systemeSynthetiseNom: parseStringOrNull(record.systeme_synthetise_nom),
+			systemeSynthetiseCampagnes: parseStringOrNull(record.systeme_synthetise_campagnes),
+			cultureRotationId: parseStringOrNull(record.culture_rotation_id),
+			cultureRang: parseIntOrNull(record.culture_rang),
+			cultureIndicateurBranche: parseStringOrNull(record.culture_indicateur_branche),
+			cultureCode: parseStringOrNull(record.culture_code),
+			cultureNom: parseStringOrNull(record.culture_nom),
+			finRotation: parseBoolOrNull(record.fin_rotation),
+			memeCampagneCulturePrecedente: parseBoolOrNull(record.meme_campagne_culture_precedente),
+			cultureAbsente: parseBoolOrNull(record.culture_absente),
+			cultureEspecesEdi: parseStringOrNull(record.culture_especes_edi),
+			ciCode: parseStringOrNull(record.ci_code),
+			ciNom: parseStringOrNull(record.ci_nom),
+			precedentRotationId: parseStringOrNull(record.precedent_rotation_id),
+			precedentRang: parseIntOrNull(record.precedent_rang),
+			precedentIndicateurBranche: parseStringOrNull(record.precedent_indicateur_branche),
+			precedentCode: parseStringOrNull(record.precedent_code),
+			precedentNom: parseStringOrNull(record.precedent_nom),
+			precedentEspecesEdi: parseStringOrNull(record.precedent_especes_edi),
+			frequenceConnexion: parseIntOrNull(record.frequence_connexion),
+			systemeSynthetiseValidation: parseBoolOrNull(record.systeme_synthetise_validation),
+		}));
+
+		await db.insert(successionAssoleeSynthetiseMagasinCan).values(values);
+		console.log(
+			`  Batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(records.length / batchSize)} ✓`,
+		);
+	}
 }
 
 async function importCategory(category: DataCategory) {
