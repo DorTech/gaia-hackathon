@@ -104,9 +104,11 @@ WHERE sac.culture_nom LIKE ${query.culture}
  `);
 
     const row = result[0];
+    if (!row || row?.median_nb_rotation === null) {
+      return { median: null };
+    }
     return {
-      median:
-        row.median_nb_rotation !== null ? Number(row.median_nb_rotation) : null,
+      median: Number(row.median_nb_rotation),
     };
   }
 
