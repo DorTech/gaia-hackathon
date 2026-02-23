@@ -12,20 +12,100 @@
 	],
 	"item": [
 		{
-			"name": "Dephy",
+			"name": "Query",
 			"item": [
 				{
-					"name": "List domaines",
+					"name": "List tables",
 					"request": {
 						"method": "GET",
 						"url": {
-							"raw": "{{baseUrl}}/dephy/domaines?limit=20&offset=0",
+							"raw": "{{baseUrl}}/query/tables",
 							"host": ["{{baseUrl}}"],
-							"path": ["dephy", "domaines"],
-							"query": [
-								{ "key": "limit", "value": "20" },
-								{ "key": "offset", "value": "0" }
-							]
+							"path": ["query", "tables"]
+						}
+					}
+				},
+				{
+					"name": "Query domaine",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/query/data",
+							"host": ["{{baseUrl}}"],
+							"path": ["query", "data"]
+						},
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"domaine\",\n  \"select\": [\"id\", \"code\", \"departement\", \"campagne\"],\n  \"filters\": [\n    { \"field\": \"departement\", \"operator\": \"eq\", \"value\": \"75\" }\n  ],\n  \"limit\": 20,\n  \"offset\": 0\n}"
+						}
+					}
+				},
+				{
+					"name": "Query dispositif",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/query/data",
+							"host": ["{{baseUrl}}"],
+							"path": ["query", "data"]
+						},
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"dispositif\",\n  \"select\": [\"id\", \"code\", \"type\", \"campagne\"],\n  \"limit\": 10,\n  \"offset\": 0\n}"
+						}
+					}
+				},
+				{
+					"name": "Query with filters",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/query/data",
+							"host": ["{{baseUrl}}"],
+							"path": ["query", "data"]
+						},
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"domaine\",\n  \"filters\": [\n    { \"field\": \"campagne\", \"operator\": \"gte\", \"value\": 2020 },\n    { \"field\": \"departement\", \"operator\": \"like\", \"value\": \"7%\" }\n  ],\n  \"limit\": 20,\n  \"offset\": 0\n}"
+						}
+					}
+				},
+				{
+					"name": "Query sdc_realise_perf",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/query/data",
+							"host": ["{{baseUrl}}"],
+							"path": ["query", "data"]
+						},
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"sdc_realise_perf\",\n  \"select\": [\"sdcId\", \"departement\", \"sdcFiliere\"],\n  \"limit\": 10,\n  \"offset\": 0\n}"
 						}
 					}
 				}

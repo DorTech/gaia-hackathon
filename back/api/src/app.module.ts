@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { DephyModule } from "./dephy/dephy.module";
+import { QueryModule } from "./query/query.module";
 
 @Module({
   imports: [
@@ -9,6 +10,7 @@ import { DephyModule } from "./dephy/dephy.module";
       envFilePath: "env/.env",
     }),
     DephyModule,
+    QueryModule,
   ],
 })
 export class AppModule {}
