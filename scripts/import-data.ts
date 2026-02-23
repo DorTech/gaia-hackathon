@@ -1,7 +1,8 @@
 import "dotenv/config";
-import { db, dispositif, domaine, domaineSol, parcelle, parcelleType, sdc, sdcRealisePerfMagasinCan, synthetisePerfMagasinCan, synthetise, zone } from "../src";
+import { db, dispositif, domaine, domaineSol, parcelle, parcelleType, sdc, sdcRealisePerfMagasinCan, synthetisePerfMagasinCan, interventionSynthetiseMagasinCan, synthetise, zone } from "../src";
 import { parse } from "csv-parse/sync";
-import { readFileSync, existsSync } from "fs";
+import { parse as parseStream } from "csv-parse";
+import { readFileSync, existsSync, createReadStream } from "fs";
 import { join } from "path";
 
 type DataCategory = "contexte" | "intervention" | "intrant_et_culture" | "magasin";
@@ -11,6 +12,9 @@ interface ImportConfig {
 	files: string[];
 	handlers: {
 		[file: string]: (records: any[]) => Promise<void>;
+	};
+	streamHandlers?: {
+		[file: string]: (filePath: string) => Promise<void>;
 	};
 }
 
@@ -36,10 +40,13 @@ const importConfigs: ImportConfig[] = [
 	},
 	{
 		category: "magasin",
-		files: ["sdc_realise_performance_magasin_can.csv", "synthetise_performance_magasin_can.csv"],
+		files: ["sdc_realise_performance_magasin_can.csv", "synthetise_performance_magasin_can.csv", "intervention_synthetise_magasin_can.csv"],
 		handlers: {
 			"sdc_realise_performance_magasin_can.csv": importSdcRealisePerfMagasinCan,
 			"synthetise_performance_magasin_can.csv": importSynthetisePerfMagasinCan,
+		},
+		streamHandlers: {
+			"intervention_synthetise_magasin_can.csv": importInterventionSynthetiseMagasinCan,
 		},
 	},
 ];
@@ -1214,6 +1221,141 @@ async function importSynthetisePerfMagasinCan(records: any[]) {
 	}
 }
 
+async function importInterventionSynthetiseMagasinCan(filePath: string) {
+	console.log(`Streaming import of intervention_synthetise_magasin_can from ${filePath}...`);
+
+	const parseFloatOrNull = (val: string) => {
+		if (!val || val === "") return null;
+		const parsed = parseFloat(val);
+		return isNaN(parsed) ? null : parsed;
+	};
+
+	const parseIntOrNull = (val: string) => {
+		if (!val || val === "") return null;
+		const parsed = parseInt(val, 10);
+		return isNaN(parsed) ? null : parsed;
+	};
+
+	const parseStringOrNull = (val: string) => {
+		return (!val || val === "") ? null : val;
+	};
+
+	const mapRecord = (record: any) => ({
+		domaineId: parseStringOrNull(record.domaine_id),
+		domaineNom: parseStringOrNull(record.domaine_nom),
+		domaineCampagne: parseIntOrNull(record.domaine_campagne),
+		domaineCode: parseStringOrNull(record.domaine_code),
+
+		sdcId: parseStringOrNull(record.sdc_id),
+		sdcCode: parseStringOrNull(record.sdc_code),
+		sdcNom: parseStringOrNull(record.sdc_nom),
+
+		systemeSynthetiseId: parseStringOrNull(record.systeme_synthetise_id),
+		systemeSynthetiseNom: parseStringOrNull(record.systeme_synthetise_nom),
+		systemeSynthetiseValidation: parseStringOrNull(record.systeme_synthetise_validation),
+		systemeSynthetiseCampagnes: parseStringOrNull(record.systeme_synthetise_campagnes),
+
+		culturePrecedentRangId: parseStringOrNull(record.culture_precedent_rang_id),
+		phaseId: parseStringOrNull(record.phase_id),
+		phase: parseStringOrNull(record.phase),
+		cultureCode: parseStringOrNull(record.culture_code),
+		cultureNom: parseStringOrNull(record.culture_nom),
+		ciCode: parseStringOrNull(record.ci_code),
+		ciNom: parseStringOrNull(record.ci_nom),
+		concerneLaCi: parseStringOrNull(record.concerne_la_ci),
+		especesDeLIntervention: parseStringOrNull(record.especes_de_l_intervention),
+		precedentCode: parseStringOrNull(record.precedent_code),
+		precedentNom: parseStringOrNull(record.precedent_nom),
+		precedentEspecesEdi: parseStringOrNull(record.precedent_especes_edi),
+		cultureRang: parseIntOrNull(record.culture_rang),
+
+		interventionId: parseStringOrNull(record.intervention_id),
+		interventionType: parseStringOrNull(record.intervention_type),
+		interventionsActions: parseStringOrNull(record.interventions_actions),
+		interventionNom: parseStringOrNull(record.intervention_nom),
+		interventionComment: parseStringOrNull(record.intervention_comment),
+		combinaisonOutilsCode: parseStringOrNull(record.combinaison_outils_code),
+		combinaisonOutilsNom: parseStringOrNull(record.combinaison_outils_nom),
+		tracteurOuAutomoteur: parseStringOrNull(record.tracteur_ou_automoteur),
+		rangIntervention: parseIntOrNull(record.rang_intervention),
+		outils: parseStringOrNull(record.outils),
+
+		dateDebut: parseStringOrNull(record.date_debut),
+		dateFin: parseStringOrNull(record.date_fin),
+
+		freqSpatiale: parseFloatOrNull(record.freq_spatiale),
+		freqTemporelle: parseFloatOrNull(record.freq_temporelle),
+		psci: parseFloatOrNull(record.psci),
+		proportionSurfaceTraiteePhyto: parseFloatOrNull(record.proportion_surface_traitee_phyto),
+		psciPhyto: parseFloatOrNull(record.psci_phyto),
+		proportionSurfaceTraiteeLutteBio: parseFloatOrNull(record.proportion_surface_traitee_lutte_bio),
+		psciLutteBio: parseFloatOrNull(record.psci_lutte_bio),
+
+		debitDeChantier: parseFloatOrNull(record.debit_de_chantier),
+		debitDeChantierUnite: parseStringOrNull(record.debit_de_chantier_unite),
+		nbPersonneMobili: parseFloatOrNull(record.nb_personne_mobili),
+		quantiteEauMm: parseFloatOrNull(record.quantite_eau_mm),
+
+		especesSemees: parseStringOrNull(record.especes_semees),
+		densiteSemis: parseStringOrNull(record.densite_semis),
+		uniteSemis: parseStringOrNull(record.unite_semis),
+		traitementChimiqueSemis: parseStringOrNull(record.traitement_chimique_semis),
+		inoculationBiologiqueSemis: parseStringOrNull(record.inoculation_biologique_semis),
+		typeSemence: parseStringOrNull(record.type_semence),
+	});
+
+	const batchSize = 500;
+	let batch: any[] = [];
+	let totalRows = 0;
+	let batchCount = 0;
+
+	await new Promise<void>((resolve, reject) => {
+		const parser = createReadStream(filePath).pipe(
+			parseStream({ columns: true, skip_empty_lines: true })
+		);
+
+		parser.on("data", async (record: any) => {
+			batch.push(mapRecord(record));
+
+			if (batch.length >= batchSize) {
+				parser.pause();
+				const toInsert = batch;
+				batch = [];
+				batchCount++;
+				totalRows += toInsert.length;
+
+				try {
+					await db.insert(interventionSynthetiseMagasinCan).values(toInsert);
+					if (batchCount % 200 === 0) {
+						console.log(`  ${totalRows} rows inserted...`);
+					}
+				} catch (err) {
+					parser.destroy();
+					reject(err);
+					return;
+				}
+
+				parser.resume();
+			}
+		});
+
+		parser.on("end", async () => {
+			try {
+				if (batch.length > 0) {
+					await db.insert(interventionSynthetiseMagasinCan).values(batch);
+					totalRows += batch.length;
+				}
+				console.log(`  Total: ${totalRows} rows inserted ✓`);
+				resolve();
+			} catch (err) {
+				reject(err);
+			}
+		});
+
+		parser.on("error", reject);
+	});
+}
+
 async function importCategory(category: DataCategory) {
 	const config = importConfigs.find((c) => c.category === category);
 
@@ -1235,18 +1377,31 @@ async function importCategory(category: DataCategory) {
 		}
 
 		console.log(`  📂 Processing ${file}...`);
-		const csvContent = readFileSync(filePath, "utf-8");
-		const records = parse(csvContent, {
-			columns: true,
-			skip_empty_lines: true,
-		});
 
+		const streamHandler = config.streamHandlers?.[file];
 		const handler = config.handlers[file];
-		if (handler) {
-			await handler(records);
-			console.log(`  ✅ ${file} imported successfully`);
-		} else {
-			console.log(`  ⚠️  No handler for ${file}`);
+
+		try {
+			if (streamHandler) {
+				await streamHandler(filePath);
+				console.log(`  ✅ ${file} imported successfully (streamed)`);
+			} else if (handler) {
+				const csvContent = readFileSync(filePath, "utf-8");
+				const records = parse(csvContent, {
+					columns: true,
+					skip_empty_lines: true,
+				});
+				await handler(records);
+				console.log(`  ✅ ${file} imported successfully`);
+			} else {
+				console.log(`  ⚠️  No handler for ${file}`);
+			}
+		} catch (error: any) {
+			if (error?.code === "23505") {
+				console.log(`  ⏭️  ${file} already imported (duplicate key), skipping`);
+			} else {
+				throw error;
+			}
 		}
 	}
 }
