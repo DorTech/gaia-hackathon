@@ -20,10 +20,10 @@ export const MedianKpiRow: React.FC<MedianKpiRowProps> = ({ kpis }) => {
               component="span"
               sx={{ fontSize: '.9rem', fontWeight: 500, color: 'var(--text3)' }}
             >
-              {kpi.unit}
+              {'   ' + kpi.unit}
             </Box>
           </Box>
-          <Typography className="kpi-sub" component="div">
+          <Typography className="kpi-sub" component="div" paddingTop={'5px'} paddingBottom={'5px'}>
             {kpi.sub}
           </Typography>
           <Typography className={`kpi-delta ${kpi.deltaClass}`} component="div">
