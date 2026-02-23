@@ -1,9 +1,9 @@
-import React from 'react';
 import { Box, Card, Stack, Typography } from '@mui/material';
 import { useAtomValue } from 'jotai';
-import { SummaryBarProps } from '../types';
-import { iftReferenceValueAtom, iftMedianValueAtom } from '../../../store/referenceAtoms';
+import React from 'react';
+import { iftMedianValueAtom } from '../../../store/referenceAtoms';
 import { getIFTColor } from '../../../utils/ift';
+import { SummaryBarProps } from '../types';
 
 export const SummaryBar: React.FC<SummaryBarProps> = ({
   baseIFT,
@@ -12,7 +12,6 @@ export const SummaryBar: React.FC<SummaryBarProps> = ({
   gainPct,
   activeLeverCount,
 }) => {
-  const iftRef = useAtomValue(iftReferenceValueAtom);
   const iftMedian = useAtomValue(iftMedianValueAtom);
 
   return (
@@ -73,7 +72,7 @@ export const SummaryBar: React.FC<SummaryBarProps> = ({
             fontWeight: 800,
             letterSpacing: '-0.03em',
             lineHeight: 1,
-            color: getIFTColor(simulatedIFT, iftRef, iftMedian),
+            color: getIFTColor(simulatedIFT, iftMedian),
           }}
         >
           {simulatedIFT.toFixed(2)}
@@ -139,29 +138,7 @@ export const SummaryBar: React.FC<SummaryBarProps> = ({
             {iftMedian.toFixed(2).replace('.', ',')}
           </Typography>
         </Box>
-        <Box sx={{ textAlign: 'center' }}>
-          <Typography
-            sx={{
-              fontSize: '0.62rem',
-              fontWeight: 600,
-              color: 'var(--text2)',
-              marginBottom: '3px',
-            }}
-          >
-            Cible référence
-          </Typography>
-          <Typography
-            sx={{
-              fontSize: '1.45rem',
-              fontWeight: 800,
-              letterSpacing: '-0.03em',
-              lineHeight: 1,
-              color: 'var(--green-d)',
-            }}
-          >
-            {iftRef.toFixed(2).replace('.', ',')}
-          </Typography>
-        </Box>
+
         <Box sx={{ textAlign: 'center' }}>
           <Typography
             sx={{

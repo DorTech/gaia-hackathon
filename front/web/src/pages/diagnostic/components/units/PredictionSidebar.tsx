@@ -1,11 +1,7 @@
 import { Box, LinearProgress, Paper, Typography } from '@mui/material';
 import { useAtomValue } from 'jotai';
 import React from 'react';
-import {
-  iftMaxGaugeAtom,
-  iftMedianValueAtom,
-  iftReferenceValueAtom,
-} from '../../../../store/referenceAtoms';
+import { iftMaxGaugeAtom, iftMedianValueAtom } from '../../../../store/referenceAtoms';
 import { getGaugePct, getIFTColor } from '../../../../utils/ift';
 
 interface PredictionSidebarProps {
@@ -13,7 +9,6 @@ interface PredictionSidebarProps {
 }
 
 export const PredictionSidebar: React.FC<PredictionSidebarProps> = ({ predictedIFT }) => {
-  const iftRef = useAtomValue(iftReferenceValueAtom);
   const iftMedian = useAtomValue(iftMedianValueAtom);
   const iftMax = useAtomValue(iftMaxGaugeAtom);
 
@@ -21,12 +16,12 @@ export const PredictionSidebar: React.FC<PredictionSidebarProps> = ({ predictedI
     <Box>
       <Paper className="ift-card" elevation={0} sx={{ p: 1.5, borderRadius: 2, mb: 1.25 }}>
         <Typography className="ift-card-lbl" sx={{ fontSize: '.7rem', color: 'var(--muted)' }}>
-          IFT total prédit · Modèle RF
+          IFT total prédit
         </Typography>
         <Typography
           className="ift-card-val"
           sx={{
-            color: getIFTColor(predictedIFT, iftRef, iftMedian),
+            color: getIFTColor(predictedIFT, iftMedian),
             fontSize: '1.55rem',
             fontWeight: 900,
           }}
@@ -50,7 +45,7 @@ export const PredictionSidebar: React.FC<PredictionSidebarProps> = ({ predictedI
               borderRadius: 4,
               bgcolor: 'var(--line)',
               '& .MuiLinearProgress-bar': {
-                backgroundColor: getIFTColor(predictedIFT, iftRef, iftMedian),
+                backgroundColor: getIFTColor(predictedIFT, iftMedian),
               },
             }}
           />
@@ -65,7 +60,6 @@ export const PredictionSidebar: React.FC<PredictionSidebarProps> = ({ predictedI
             }}
           >
             <span>0</span>
-            <span>Réf {iftRef.toFixed(2).replace('.', ',')}</span>
             <span>Méd {iftMedian.toFixed(1).replace('.', ',')}</span>
             <span>{iftMax}+</span>
           </Box>
