@@ -3,12 +3,15 @@ import { useAtom, useAtomValue } from 'jotai';
 import {
   itkFormAtom,
   predictedIFTAtom,
-  ITK_FORM_DEFAULTS,
   CHIP_OPTIONS,
   FIELD_REFERENCES,
   type ITKFormState,
 } from '../store/diagnosticAtoms';
-import { iftReferenceValueAtom, iftMedianValueAtom, iftMaxGaugeAtom } from '../store/referenceAtoms';
+import {
+  iftReferenceValueAtom,
+  iftMedianValueAtom,
+  iftMaxGaugeAtom,
+} from '../store/referenceAtoms';
 import { getIFTColor, getGaugePct } from '../utils/ift';
 
 export const DiagnosticPage: React.FC = () => {
@@ -18,10 +21,10 @@ export const DiagnosticPage: React.FC = () => {
   const iftMedian = useAtomValue(iftMedianValueAtom);
   const iftMax = useAtomValue(iftMaxGaugeAtom);
 
-  const handleFieldChange = (field: keyof ITKFormState, value: any) => {
-    setForm(prev => ({
+  const handleFieldChange = (field: keyof ITKFormState, value: unknown) => {
+    setForm((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -29,43 +32,21 @@ export const DiagnosticPage: React.FC = () => {
     handleFieldChange(field, value);
   };
 
-  const resetForm = () => {
-    setForm(ITK_FORM_DEFAULTS);
-  };
-
-  const vmed = ((predictedIFT - iftMedian) / iftMedian * 100).toFixed(1);
-  const vref = ((predictedIFT - iftRef) / iftRef * 100).toFixed(1);
-
   return (
     <div className="page active" id="page-itk">
       <div className="page-hd">
         <div>
           <h1>Mon diagnostic ITK</h1>
-          <p>Renseignez votre itinéraire technique · Le modèle Random Forest prédit votre IFT en temps réel</p>
-        </div>
-        <div className="page-hd-right">
-          <div className="steps">
-            <div className="step done">
-              <div className="step-n">✓</div>Benchmark
-            </div>
-            <span className="step-sep">›</span>
-            <div className="step active">
-              <div className="step-n">2</div>Mon ITK
-            </div>
-            <span className="step-sep">›</span>
-            <div className="step">
-              <div className="step-n">3</div>Simulation
-            </div>
-          </div>
-          <button className="btn btn-outline" onClick={resetForm}>↺ Reset</button>
-          <button className="btn btn-green">Simuler →</button>
+          <p>
+            Renseignez votre itinéraire technique · Le modèle Random Forest prédit votre IFT en
+            temps réel
+          </p>
         </div>
       </div>
 
       <div className="itk-layout">
         {/* FORM */}
         <div className="card" style={{ padding: '16px 18px' }}>
-
           {/* Rotation & assolement */}
           <div className="fsec">
             <div className="fsec-title">🌾 Rotation & assolement</div>
@@ -366,7 +347,6 @@ export const DiagnosticPage: React.FC = () => {
               </div>
             </div>
           </div>
-
         </div>
 
         {/* SIDEBAR RESULT */}
@@ -387,7 +367,7 @@ export const DiagnosticPage: React.FC = () => {
                   className="gauge-fil"
                   style={{
                     width: getGaugePct(predictedIFT, iftMax) + '%',
-                    background: getIFTColor(predictedIFT, iftRef, iftMedian)
+                    background: getIFTColor(predictedIFT, iftRef, iftMedian),
                   }}
                 ></div>
               </div>
@@ -400,71 +380,7 @@ export const DiagnosticPage: React.FC = () => {
             </div>
             <div className="ift-card-sub">IFT chimique + IFT biocontrôle</div>
           </div>
-
-          {/* Décomposition */}
-          <div className="card" style={{ marginBottom: '10px' }}>
-            <div className="card-title" style={{ marginBottom: '10px' }}>📉 Décomposition IFT</div>
-            <div className="cr">
-              <span className="k">IFT Chimique</span>
-              <span className="v v-warn">{form.chemiIFT.toFixed(2)}</span>
-            </div>
-            <div className="cr">
-              <span className="k">IFT Biocontrôle</span>
-              <span className="v v-teal">{form.biocontrolIFT.toFixed(2)}</span>
-            </div>
-            <div className="cr">
-              <span className="k">vs médiane ({iftMedian.toFixed(2).replace('.', ',')})</span>
-              <span className="v" style={{ color: parseFloat(vmed) > 0 ? 'var(--orange)' : 'var(--green-d)' }}>
-                {parseFloat(vmed) > 0 ? '+' : ''}{vmed}%
-              </span>
-            </div>
-            <div className="cr">
-              <span className="k">vs référence ({iftRef.toFixed(2).replace('.', ',')})</span>
-              <span className="v v-bad">
-                {parseFloat(vref) > 0 ? '+' : ''}{vref}%
-              </span>
-            </div>
-            <div className="cr">
-              <span className="k">Potentiel estimé</span>
-              <span className="v v-good">−40 à −45%</span>
-            </div>
-          </div>
-
-          {/* Autres indicateurs */}
-          <div className="card card-bg-green">
-            <div className="card-title" style={{ marginBottom: '10px' }}>
-              🌍 Indicateurs complémentaires
-            </div>
-            <div className="cr">
-              <span className="k">⏱ Temps de travail</span>
-              <span className="v v-warn">{form.workTime} h/ha</span>
-            </div>
-            <div className="cr">
-              <span className="k">€ Marge brute</span>
-              <span className="v" style={{ color: 'var(--violet)' }}>
-                {form.grossMargin.toLocaleString('fr')} €/ha
-              </span>
-            </div>
-            <div className="cr">
-              <span className="k">⛽ Carburant</span>
-              <span className="v v-warn">{form.fuel} L/ha</span>
-            </div>
-          </div>
-
-          <button
-            className="btn btn-green"
-            style={{
-              width: '100%',
-              padding: '9px',
-              marginTop: '10px',
-              fontSize: '.78rem',
-              justifyContent: 'center'
-            }}
-          >
-            ⚡ Simuler les leviers →
-          </button>
         </div>
-
       </div>
     </div>
   );

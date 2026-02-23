@@ -1,42 +1,40 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import { MedianKpiRow } from './MedianKpiRow';
-import { BenchmarkFilters } from './BenchmarkFilters';
-import { BenchmarkHeader } from './BenchmarkHeader';
-import { PracticeProfileCard } from './PracticeProfileCard';
+import React, { useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  fetchDistinctDepartments,
+  fetchDistinctSpecies,
+  fetchFrequency,
+  fetchMedianField,
+  fetchMedianIFT,
+  fetchTopFarms,
+  PRACTICE_API_MAP,
+} from '../../api/benchmark';
 import {
   benchmarkFilterOptionsAtom,
-  benchmarkReferenceFarmsAtom,
-  benchmarkMedianKpisAtom,
-  benchmarkPracticeProfileAtom,
   benchmarkFiltersAtom,
   benchmarkLoadingAtom,
+  benchmarkMedianKpisAtom,
+  benchmarkPracticeProfileAtom,
+  benchmarkReferenceFarmsAtom,
   enrichedPracticeProfileAtom,
   PRACTICE_PROFILE_TEMPLATE,
 } from '../../store/benchmarkAtoms';
-import { iftMedianValueAtom } from '../../store/referenceAtoms';
 import { predictedIFTAtom } from '../../store/diagnosticAtoms';
+import { iftMedianValueAtom } from '../../store/referenceAtoms';
 import type { BenchmarkFiltersState, PracticeProfileItem } from '../../types/benchmark';
-import {
-  fetchMedianIFT,
-  fetchFrequency,
-  fetchMedianField,
-  fetchTopFarms,
-  fetchDistinctSpecies,
-  fetchDistinctDepartments,
-  PRACTICE_API_MAP,
-} from '../../api/benchmark';
+import { BenchmarkFilters } from './BenchmarkFilters';
+import { BenchmarkHeader } from './BenchmarkHeader';
+import { MedianKpiRow } from './MedianKpiRow';
+import { PracticeProfileCard } from './PracticeProfileCard';
 
 export const BenchmarkPage: React.FC = () => {
   const navigate = useNavigate();
 
   const [filterOptions, setFilterOptions] = useAtom(benchmarkFilterOptionsAtom);
-  const referenceFarms = useAtomValue(benchmarkReferenceFarmsAtom);
   const medianKpis = useAtomValue(benchmarkMedianKpisAtom);
   const practiceProfile = useAtomValue(enrichedPracticeProfileAtom);
   const [appliedFilters, setAppliedFilters] = useAtom(benchmarkFiltersAtom);
-  const medianIft = useAtomValue(iftMedianValueAtom);
   const userIFT = useAtomValue(predictedIFTAtom);
   const loading = useAtomValue(benchmarkLoadingAtom);
 
@@ -58,7 +56,7 @@ export const BenchmarkPage: React.FC = () => {
         setMedianIft(medianValue);
 
         const formattedMedian = medianValue.toFixed(2).replace('.', ',');
-        const deltaPct = ((medianValue - userIFT) / userIFT * 100).toFixed(1);
+        const deltaPct = (((medianValue - userIFT) / userIFT) * 100).toFixed(1);
         const deltaSign = parseFloat(deltaPct) > 0 ? '↑ +' : '↓ ';
 
         setMedianKpis([
@@ -83,9 +81,10 @@ export const BenchmarkPage: React.FC = () => {
 
         setReferenceFarms(
           sortedFarms.map((f, i) => {
-            const gap = medianValue > 0
-              ? (((f.iftHistoChimiqueTot - medianValue) / medianValue) * 100).toFixed(0)
-              : '0';
+            const gap =
+              medianValue > 0
+                ? (((f.iftHistoChimiqueTot - medianValue) / medianValue) * 100).toFixed(0)
+                : '0';
             return {
               rank: i + 1,
               name: f.domaineNom || `Exploitation ${i + 1}`,
@@ -105,11 +104,7 @@ export const BenchmarkPage: React.FC = () => {
 
             try {
               if (apiConfig.type === 'frequency') {
-                const res = await fetchFrequency(
-                  apiConfig.field,
-                  filters,
-                  apiConfig.asBoolean,
-                );
+                const res = await fetchFrequency(apiConfig.field, filters, apiConfig.asBoolean);
                 const total = res.data.reduce((sum, r) => sum + r.count, 0);
                 if (total === 0) return item;
 
@@ -156,14 +151,7 @@ export const BenchmarkPage: React.FC = () => {
         setLoading(false);
       }
     },
-    [
-      setLoading,
-      setMedianIft,
-      setMedianKpis,
-      setPracticeProfile,
-      setReferenceFarms,
-      userIFT,
-    ],
+    [setLoading, setMedianIft, setMedianKpis, setPracticeProfile, setReferenceFarms, userIFT],
   );
 
   // Fetch filter options (species + departments) from API on mount
@@ -184,8 +172,10 @@ export const BenchmarkPage: React.FC = () => {
         // Update default filters if current values aren't in the fetched lists
         setAppliedFilters((prev) => ({
           ...prev,
-          species: species.includes(prev.species) ? prev.species : species[0] ?? prev.species,
-          department: departments.includes(prev.department) ? prev.department : departments[0] ?? prev.department,
+          species: species.includes(prev.species) ? prev.species : (species[0] ?? prev.species),
+          department: departments.includes(prev.department)
+            ? prev.department
+            : (departments[0] ?? prev.department),
         }));
       } catch (err) {
         console.error('Failed to load filter options:', err);
@@ -198,22 +188,6 @@ export const BenchmarkPage: React.FC = () => {
   useEffect(() => {
     loadBenchmarkData(appliedFilters);
   }, [appliedFilters]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const getThresholdMultiplier = (value: string) => {
-    if (value.includes('−20')) return 0.8;
-    if (value.includes('−30')) return 0.7;
-    if (value.includes('−40')) return 0.6;
-    return 1;
-  };
-
-  const thresholdValue = useMemo(() => {
-    const multiplier = getThresholdMultiplier(appliedFilters.iftThreshold);
-    return Math.round(medianIft * multiplier * 100) / 100;
-  }, [appliedFilters.iftThreshold, medianIft]);
-
-  const filteredFarms = useMemo(() => {
-    return referenceFarms.filter((farm) => farm.ift <= thresholdValue);
-  }, [thresholdValue, referenceFarms]);
 
   const departmentCode = appliedFilters.department.split(' ')[0];
 
@@ -244,7 +218,6 @@ export const BenchmarkPage: React.FC = () => {
       {/* PROFIL PRATIQUES */}
       <PracticeProfileCard
         title={"Liste des pratiques les plus performantes sur l'IFT"}
-        tagLabel={`IFT ${appliedFilters.iftThreshold}`}
         items={practiceProfile}
       />
     </div>

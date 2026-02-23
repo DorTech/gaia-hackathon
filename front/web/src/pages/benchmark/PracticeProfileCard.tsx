@@ -4,24 +4,16 @@ import type { PracticeProfileItem } from '../../types/benchmark';
 
 interface PracticeProfileCardProps {
   title: string;
-  tagLabel: string;
   items: PracticeProfileItem[];
 }
 
-export const PracticeProfileCard: React.FC<PracticeProfileCardProps> = ({
-  title,
-  tagLabel,
-  items,
-}) => {
+export const PracticeProfileCard: React.FC<PracticeProfileCardProps> = ({ title, items }) => {
   return (
     <Box className="card">
       <Box className="card-h">
         <Typography className="card-title" component="div">
           {title}
         </Typography>
-        <Box component="span" className="tag tag-teal">
-          {tagLabel}
-        </Box>
       </Box>
       <Box className="lev-grid">
         {items.map((item) => (
