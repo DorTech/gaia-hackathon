@@ -22,13 +22,15 @@ import {
   fetchFrequency,
   fetchMedianField,
   fetchTopFarms,
+  fetchDistinctSpecies,
+  fetchDistinctDepartments,
   PRACTICE_API_MAP,
 } from '../../api/benchmark';
 
 export const BenchmarkPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const filterOptions = useAtomValue(benchmarkFilterOptionsAtom);
+  const [filterOptions, setFilterOptions] = useAtom(benchmarkFilterOptionsAtom);
   const referenceFarms = useAtomValue(benchmarkReferenceFarmsAtom);
   const medianKpis = useAtomValue(benchmarkMedianKpisAtom);
   const rawPracticeProfile = useAtomValue(benchmarkPracticeProfileAtom);
@@ -164,6 +166,34 @@ export const BenchmarkPage: React.FC = () => {
       rawPracticeProfile,
     ],
   );
+
+  // Fetch filter options (species + departments) from API on mount
+  useEffect(() => {
+    async function loadFilterOptions() {
+      try {
+        const [species, departments] = await Promise.all([
+          fetchDistinctSpecies(),
+          fetchDistinctDepartments(),
+        ]);
+
+        setFilterOptions((prev) => ({
+          ...prev,
+          species,
+          department: departments,
+        }));
+
+        // Update default filters if current values aren't in the fetched lists
+        setAppliedFilters((prev) => ({
+          ...prev,
+          species: species.includes(prev.species) ? prev.species : species[0] ?? prev.species,
+          department: departments.includes(prev.department) ? prev.department : departments[0] ?? prev.department,
+        }));
+      } catch (err) {
+        console.error('Failed to load filter options:', err);
+      }
+    }
+    loadFilterOptions();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch on mount and when filters change
   useEffect(() => {
