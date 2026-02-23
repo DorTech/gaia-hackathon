@@ -97,8 +97,8 @@ export async function fetchMedianField(
   field: string,
   filters: BenchmarkFiltersState,
 ): Promise<number> {
-  // Special route for nbRotation
-  if (field === 'nbRotation') {
+  // Special route for nbCulturesRotation
+  if (field === 'nbCulturesRotation') {
     const deptCode = filters.department.split(' ')[0];
     const { data } = await apiClient.post<{ nbRotation: number }>('/query/median_nb_rotation', {
       culture: filters.species,

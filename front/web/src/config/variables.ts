@@ -52,6 +52,7 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     type: 'Quantitatif',
     unit: 'cultures',
     slider: { min: 1, max: 8, minLabel: '1 culture', maxLabel: '8+' },
+    benchmarkApi: { type: 'median', field: 'nbCulturesRotation' },
   },
   {
     id: 'sequence-cultures',
