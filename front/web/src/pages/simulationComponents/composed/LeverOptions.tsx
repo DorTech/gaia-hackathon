@@ -67,7 +67,7 @@ export const LeverOptions: React.FC<LeverOptionsProps> = ({
               color: isSelected ? "white" : "var(--text2)",
               backgroundColor: isSelected ? "var(--green)" : "white",
               boxShadow: isSelected
-                ? "0 0 8px rgba(77, 168, 107, 0.3)"
+                ? "0 0 8px rgba(122, 229, 140, 0.3)"
                 : "none",
               display: "flex",
               alignItems: "center",
