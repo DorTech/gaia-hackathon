@@ -177,14 +177,18 @@ export const BenchmarkPage: React.FC = () => {
         }));
 
         // Update default filters if current values aren't in the fetched lists
-        setAppliedFilters((prev) => ({
-          ...prev,
-          species: prev.species && species.includes(prev.species) ? prev.species : '',
-          department:
-            prev.department && departments.includes(prev.department) ? prev.department : '',
-          agricultureType:
-            prev.agricultureType && agricultureTypes.includes(prev.agricultureType) ? prev.agricultureType : '',
-        }));
+        setAppliedFilters(
+          (prev: { species: string; department: string; agricultureType: string }) => ({
+            ...prev,
+            species: prev.species && species.includes(prev.species) ? prev.species : '',
+            department:
+              prev.department && departments.includes(prev.department) ? prev.department : '',
+            agricultureType:
+              prev.agricultureType && agricultureTypes.includes(prev.agricultureType)
+                ? prev.agricultureType
+                : '',
+          }),
+        );
       } catch (err) {
         console.error('Failed to load filter options:', err);
       }
@@ -199,11 +203,7 @@ export const BenchmarkPage: React.FC = () => {
 
   const departmentCode = appliedFilters.department.split(' ')[0];
   const hasAllFilters =
-    appliedFilters.species &&
-    appliedFilters.department &&
-    appliedFilters.agricultureType &&
-    appliedFilters.iftThreshold;
-
+    appliedFilters.species && appliedFilters.department && appliedFilters.agricultureType;
   return (
     <div className="page active" id="page-bench">
       <BenchmarkHeader departmentCode={departmentCode} species={appliedFilters.species} />

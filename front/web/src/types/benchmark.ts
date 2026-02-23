@@ -21,7 +21,6 @@ export interface BenchmarkFilterOptions {
   species: string[];
   department: string[];
   agricultureType: string[];
-  iftThreshold: string[];
 }
 
 export interface PracticeFrequencyRow {
@@ -59,5 +58,4 @@ export interface BenchmarkFiltersState {
   species: string;
   department: string;
   agricultureType: string;
-  iftThreshold: string;
 }

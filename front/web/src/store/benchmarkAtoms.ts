@@ -36,7 +36,6 @@ export const benchmarkFilterOptionsAtom = atom<BenchmarkFilterOptions>({
   species: [],
   department: [],
   agricultureType: ['JE VIENS PAS DU BACK', 'Tous (Bio + Conv.)', 'Conventionnel seul', 'Biologique seul'],
-  iftThreshold: ['−20% vs médiane', '−30% vs médiane', '−40% vs médiane'],
 });
 
 export const benchmarkReferenceFarmsAtom = atom<BenchmarkFarm[]>([
@@ -233,7 +232,6 @@ export const benchmarkFiltersAtom = atom<BenchmarkFiltersState>({
   species: '',
   department: '',
   agricultureType: '',
-  iftThreshold: '',
 });
 
 /**

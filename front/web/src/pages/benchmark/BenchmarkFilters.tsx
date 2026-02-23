@@ -11,7 +11,6 @@ interface BenchmarkFiltersProps {
     species: string[];
     department: string[];
     agricultureType: string[];
-    iftThreshold: string[];
   };
 }
 
@@ -23,13 +22,11 @@ export const BenchmarkFilters: React.FC<BenchmarkFiltersProps> = ({
   const [species, setSpecies] = useState(initialValues.species);
   const [department, setDepartment] = useState(initialValues.department);
   const [agricultureType, setAgricultureType] = useState(initialValues.agricultureType);
-  const [iftThreshold, setIftThreshold] = useState(initialValues.iftThreshold);
 
   useEffect(() => {
     setSpecies(initialValues.species);
     setDepartment(initialValues.department);
     setAgricultureType(initialValues.agricultureType);
-    setIftThreshold(initialValues.iftThreshold);
   }, [initialValues]);
 
   const handleApply = () => {
@@ -37,7 +34,6 @@ export const BenchmarkFilters: React.FC<BenchmarkFiltersProps> = ({
       species,
       department,
       agricultureType,
-      iftThreshold,
     });
   };
 
@@ -68,14 +64,6 @@ export const BenchmarkFilters: React.FC<BenchmarkFiltersProps> = ({
         placeholder="Choisir un type"
       />
       <div className="fg-sep"></div>
-      <FilterSelectMUI
-        label="🎯 Seuil de performance IFT"
-        ariaLabel="Seuil de performance IFT"
-        value={iftThreshold}
-        onChange={setIftThreshold}
-        options={options.iftThreshold}
-        placeholder="Choisir un seuil"
-      />
       <button className="btn btn-green" onClick={handleApply} style={{ height: '40px' }}>
         Appliquer
       </button>
