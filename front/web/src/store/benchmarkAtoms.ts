@@ -35,7 +35,7 @@ export const flattenedSpeciesListAtom = atom<string[]>((get) => {
 export const benchmarkFilterOptionsAtom = atom<BenchmarkFilterOptions>({
   species: [],
   department: [],
-  agricultureType: ['JE VIENS PAS DU BACK', 'Tous (Bio + Conv.)', 'Conventionnel seul', 'Biologique seul'],
+  agricultureType: [],
 });
 
 export const benchmarkReferenceFarmsAtom = atom<BenchmarkFarm[]>([
