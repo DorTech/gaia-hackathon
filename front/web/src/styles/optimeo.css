@@ -55,8 +55,13 @@ body {
 
 /* ══ CONTENT ══ */
 .content { flex: 1; overflow-y: auto; padding: 18px 20px; }
-.page { display: block; }
-.page.active { display: block; }
+.page { 
+  display: block !important; 
+  width: 100% !important;
+  background: var(--bg) !important;
+  color: var(--text) !important;
+  min-height: 100%;
+}
 
 /* ══ PAGE HEADER ══ */
 .page-hd {

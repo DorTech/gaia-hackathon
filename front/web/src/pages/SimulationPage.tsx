@@ -128,7 +128,7 @@ export const SimulationPage: React.FC = () => {
   const vref = ((simulatedIFT - 1.61) / 1.61 * 100).toFixed(1);
 
   return (
-    <div className="page" id="page-sim">
+    <div className="page active" id="page-sim">
       <div className="page-hd">
         <div>
           <h1>Simulation des leviers agronomiques</h1>

@@ -108,7 +108,7 @@ export const DiagnosticPage: React.FC = () => {
   const vref = ((predictedIFT - 1.61) / 1.61 * 100).toFixed(1);
 
   return (
-    <div className="page" id="page-itk">
+    <div className="page active" id="page-itk">
       <div className="page-hd">
         <div>
           <h1>Mon diagnostic ITK</h1>
