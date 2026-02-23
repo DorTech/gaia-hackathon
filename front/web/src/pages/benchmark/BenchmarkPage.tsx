@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { MedianKpiRow } from './MedianKpiRow';
 import { BenchmarkFilters } from './BenchmarkFilters';
 import { BenchmarkHeader } from './BenchmarkHeader';
@@ -11,8 +11,19 @@ import {
   benchmarkMedianKpisAtom,
   benchmarkPracticeProfileAtom,
   benchmarkFiltersAtom,
+  benchmarkLoadingAtom,
+  enrichedPracticeProfileAtom,
 } from '../../store/benchmarkAtoms';
 import { iftMedianValueAtom } from '../../store/referenceAtoms';
+import { predictedIFTAtom } from '../../store/diagnosticAtoms';
+import type { BenchmarkFiltersState, PracticeProfileItem } from '../../types/benchmark';
+import {
+  fetchMedianIFT,
+  fetchFrequency,
+  fetchMedianField,
+  fetchTopFarms,
+  PRACTICE_API_MAP,
+} from '../../api/benchmark';
 
 export const BenchmarkPage: React.FC = () => {
   const navigate = useNavigate();
@@ -20,9 +31,144 @@ export const BenchmarkPage: React.FC = () => {
   const filterOptions = useAtomValue(benchmarkFilterOptionsAtom);
   const referenceFarms = useAtomValue(benchmarkReferenceFarmsAtom);
   const medianKpis = useAtomValue(benchmarkMedianKpisAtom);
-  const practiceProfile = useAtomValue(benchmarkPracticeProfileAtom);
+  const rawPracticeProfile = useAtomValue(benchmarkPracticeProfileAtom);
+  const practiceProfile = useAtomValue(enrichedPracticeProfileAtom);
   const [appliedFilters, setAppliedFilters] = useAtom(benchmarkFiltersAtom);
   const medianIft = useAtomValue(iftMedianValueAtom);
+  const userIFT = useAtomValue(predictedIFTAtom);
+  const loading = useAtomValue(benchmarkLoadingAtom);
+
+  const setLoading = useSetAtom(benchmarkLoadingAtom);
+  const setMedianKpis = useSetAtom(benchmarkMedianKpisAtom);
+  const setPracticeProfile = useSetAtom(benchmarkPracticeProfileAtom);
+  const setReferenceFarms = useSetAtom(benchmarkReferenceFarmsAtom);
+  const setMedianIft = useSetAtom(iftMedianValueAtom);
+
+  const loadBenchmarkData = useCallback(
+    async (filters: BenchmarkFiltersState) => {
+      setLoading(true);
+      try {
+        // 1. Fetch median IFT
+        const medianRes = await fetchMedianIFT(filters);
+        const medianValue = medianRes.median ?? 2.3;
+        const count = medianRes.count;
+
+        setMedianIft(medianValue);
+
+        const formattedMedian = medianValue.toFixed(2).replace('.', ',');
+        const deltaPct = ((medianValue - userIFT) / userIFT * 100).toFixed(1);
+        const deltaSign = parseFloat(deltaPct) > 0 ? '↑ +' : '↓ ';
+
+        setMedianKpis([
+          {
+            id: 'ift',
+            label: '📉 Médiane IFT total',
+            value: formattedMedian,
+            unit: 'IFT',
+            variant: 'violet',
+            sub: `${count} exploitations · ${filters.species}`,
+            delta: `${deltaSign}${Math.abs(parseFloat(deltaPct)).toFixed(1)}% vs votre exploitation (${userIFT.toFixed(2).replace('.', ',')})`,
+            deltaClass: parseFloat(deltaPct) > 0 ? 'warn' : 'good',
+          },
+        ]);
+
+        // 2. Fetch top farms
+        const farmsRes = await fetchTopFarms(filters);
+        const sortedFarms = farmsRes.data
+          .filter((f) => f.iftHistoChimiqueTot != null)
+          .sort((a, b) => a.iftHistoChimiqueTot - b.iftHistoChimiqueTot)
+          .slice(0, 10);
+
+        setReferenceFarms(
+          sortedFarms.map((f, i) => {
+            const gap = medianValue > 0
+              ? (((f.iftHistoChimiqueTot - medianValue) / medianValue) * 100).toFixed(0)
+              : '0';
+            return {
+              rank: i + 1,
+              name: f.domaineNom || `Exploitation ${i + 1}`,
+              type: f.sdcTypeAgriculture || '',
+              ift: Math.round(f.iftHistoChimiqueTot * 100) / 100,
+              gap: `${parseInt(gap) <= 0 ? '' : '+'}${gap}%`,
+            };
+          }),
+        );
+
+        // 3. Fetch practice profile data
+        const currentProfile = rawPracticeProfile;
+        const updatedProfile: PracticeProfileItem[] = await Promise.all(
+          currentProfile.map(async (item) => {
+            const apiConfig = PRACTICE_API_MAP[item.id];
+            if (!apiConfig) return item; // keep mock for items not in the API
+
+            try {
+              if (apiConfig.type === 'frequency') {
+                const res = await fetchFrequency(
+                  apiConfig.field,
+                  filters,
+                  apiConfig.asBoolean,
+                );
+                const total = res.data.reduce((sum, r) => sum + r.count, 0);
+                if (total === 0) return item;
+
+                const frequencies = res.data
+                  .filter((r) => r.value !== null)
+                  .map((r, idx) => ({
+                    label: String(r.value),
+                    pct: Math.round((r.count / total) * 100),
+                    top: idx === 0,
+                  }));
+
+                return { ...item, frequencies };
+              }
+
+              if (apiConfig.type === 'median') {
+                const res = await fetchMedianField(apiConfig.field, filters);
+                if (res.median === null) return item;
+
+                const formatted =
+                  res.median % 1 === 0
+                    ? String(res.median)
+                    : res.median.toFixed(1).replace('.', ',');
+
+                return {
+                  ...item,
+                  quantitative: {
+                    ...item.quantitative!,
+                    value: formatted,
+                  },
+                };
+              }
+            } catch {
+              return item; // fallback to mock on error
+            }
+
+            return item;
+          }),
+        );
+
+        setPracticeProfile(updatedProfile);
+      } catch (err) {
+        console.error('Failed to load benchmark data:', err);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [
+      setLoading,
+      setMedianIft,
+      setMedianKpis,
+      setPracticeProfile,
+      setReferenceFarms,
+      userIFT,
+      rawPracticeProfile,
+    ],
+  );
+
+  // Fetch on mount and when filters change
+  useEffect(() => {
+    loadBenchmarkData(appliedFilters);
+  }, [appliedFilters]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const getThresholdMultiplier = (value: string) => {
     if (value.includes('−20')) return 0.8;
@@ -40,9 +186,7 @@ export const BenchmarkPage: React.FC = () => {
     return referenceFarms.filter((farm) => farm.ift <= thresholdValue);
   }, [thresholdValue, referenceFarms]);
 
-  const formatIft = (value: number) => value.toFixed(2).replace('.', ',');
   const departmentCode = appliedFilters.department.split(' ')[0];
-  const totalReferenceFarms = referenceFarms.length;
 
   return (
     <div className="page active" id="page-bench">
@@ -58,6 +202,12 @@ export const BenchmarkPage: React.FC = () => {
         onApply={setAppliedFilters}
         options={filterOptions}
       />
+
+      {loading && (
+        <div style={{ textAlign: 'center', padding: '20px', color: 'var(--text2)' }}>
+          Chargement des données...
+        </div>
+      )}
 
       {/* KPIs MÉDIANE */}
       <MedianKpiRow kpis={medianKpis} />

@@ -6,6 +6,9 @@ import type {
   PracticeProfileItem,
   BenchmarkFiltersState,
 } from '../types/benchmark';
+import { itkFormAtom, CHIP_OPTIONS } from './diagnosticAtoms';
+
+export const benchmarkLoadingAtom = atom<boolean>(false);
 
 export const benchmarkFilterOptionsAtom = atom<BenchmarkFilterOptions>({
   species: ['Blé tendre', 'Maïs grain', 'Colza', "Orge d'hiver", 'Tournesol'],
@@ -146,4 +149,71 @@ export const benchmarkFiltersAtom = atom<BenchmarkFiltersState>({
   department: '35 — Ille-et-Vilaine',
   agricultureType: 'Tous (Bio + Conv.)',
   iftThreshold: '−30% vs médiane',
+});
+
+/**
+ * Derived atom: enriches practice profile with the user's actual ITK form values.
+ * "myValue" for quantitative items and current choice for qualitative items
+ * come from itkFormAtom so benchmark and diagnostic always stay in sync.
+ */
+export const enrichedPracticeProfileAtom = atom<PracticeProfileItem[]>((get) => {
+  const profile = get(benchmarkPracticeProfileAtom);
+  const form = get(itkFormAtom);
+
+  return profile.map((item) => {
+    switch (item.id) {
+      // Quantitative — inject myValue from diagnostic form
+      case 'rotation-count':
+        return {
+          ...item,
+          quantitative: item.quantitative
+            ? { ...item.quantitative, myValue: String(form.rotation) }
+            : item.quantitative,
+        };
+      case 'nitrogen':
+        return {
+          ...item,
+          quantitative: item.quantitative
+            ? { ...item.quantitative, myValue: String(form.nitrogenTotal) }
+            : item.quantitative,
+        };
+      case 'fuel-consumption':
+        return {
+          ...item,
+          quantitative: item.quantitative
+            ? { ...item.quantitative, myValue: String(form.fuel) }
+            : item.quantitative,
+        };
+
+      // Qualitative — attach user's current choice as a note
+      case 'soil-work':
+        return {
+          ...item,
+          note: { label: 'Mon choix :', value: CHIP_OPTIONS.soilType[form.soilType] },
+        };
+      case 'mechanical-weeding':
+        return {
+          ...item,
+          note: { label: 'Mon choix :', value: CHIP_OPTIONS.mechanicalWeeding[form.mechanicalWeeding] },
+        };
+      case 'biocontrol':
+        return {
+          ...item,
+          note: { label: 'Mon choix :', value: CHIP_OPTIONS.biocontrolUse[form.biocontrolUse] },
+        };
+      case 'resistant-variety':
+        return {
+          ...item,
+          note: { label: 'Mon choix :', value: CHIP_OPTIONS.resistantVariety[form.resistantVariety] },
+        };
+      case 'winter-cover':
+        return {
+          ...item,
+          note: { label: 'Mon choix :', value: CHIP_OPTIONS.coverCrops[form.coverCrops] },
+        };
+
+      default:
+        return item;
+    }
+  });
 });
