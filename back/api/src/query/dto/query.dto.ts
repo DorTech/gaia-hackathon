@@ -105,7 +105,7 @@ export class MedianDto implements IMedianRequest {
   joins?: JoinFilterDto[];
 }
 
-export class NbRotationDto {
+export class NewFilterDto {
   @ApiProperty({ example: "blé", description: "Crop type" })
   @IsString()
   culture: string;

@@ -4,7 +4,7 @@ import {
   QueryDto,
   MedianDto,
   FrequencyDto,
-  NbRotationDto,
+  NewFilterDto,
 } from "./dto/query.dto";
 import { QueryRepository } from "./query.repository";
 import {
@@ -149,9 +149,17 @@ export class QueryService {
   }
 
   async getMedianNbRotation(
-    dto: NbRotationDto,
+    dto: NewFilterDto,
   ): Promise<{ medianNbRotation: number | null }> {
     const nbRotation = await this.queryRepository.medianNbRotation(dto);
     return { medianNbRotation: nbRotation.median };
+  }
+
+  async getMedianNbWeedingPasses(
+    dto: NewFilterDto,
+  ): Promise<{ medianNbWeedingPasses: number | null }> {
+    const nbWeedingPasses =
+      await this.queryRepository.medianNbWeedingPasses(dto);
+    return { medianNbWeedingPasses: nbWeedingPasses.median };
   }
 }

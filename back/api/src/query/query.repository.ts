@@ -16,7 +16,7 @@ import {
 } from "drizzle-orm";
 import { PgTable } from "drizzle-orm/pg-core";
 import { DephyService } from "../dephy/dephy.service";
-import { FilterDto, JoinFilterDto, NbRotationDto } from "./dto/query.dto";
+import { NewFilterDto, JoinFilterDto, FilterDto } from "./dto/query.dto";
 import { getTableEntry } from "./table-registry";
 
 @Injectable()
@@ -71,7 +71,7 @@ export class QueryRepository {
   }
 
   async medianNbRotation(
-    query: NbRotationDto,
+    query: NewFilterDto,
   ): Promise<{ median: number | null }> {
     const result = await this.dephyService.db.execute(sql`
 WITH rotation_cte AS (
@@ -119,6 +119,14 @@ WHERE unaccent(sac.culture_nom) ILIKE unaccent('%' || ${query.culture} || '%')
     }
     return {
       median: Number(row.median_nb_rotation),
+    };
+  }
+
+  async medianNbWeedingPasses(
+    query: NewFilterDto,
+  ): Promise<{ median: number | null }> {
+    return {
+      median: null,
     };
   }
 

@@ -5,7 +5,7 @@ import {
   QueryDto,
   MedianDto,
   FrequencyDto,
-  NbRotationDto,
+  NewFilterDto,
 } from "./dto/query.dto";
 import {
   ITableInfo,
@@ -56,8 +56,19 @@ export class QueryController {
       "Get the median number of rotations for a culture, department and type of agriculture",
   })
   async getNbRotation(
-    @Body() body: NbRotationDto,
+    @Body() body: NewFilterDto,
   ): Promise<{ medianNbRotation: number | null }> {
     return this.queryService.getMedianNbRotation(body);
+  }
+
+  @Post("median_nb_weeding_passes")
+  @ApiOperation({
+    summary:
+      "Get the median number of mechanical weeding passes for a culture, department and type of agriculture",
+  })
+  async getNbWeedingPasses(
+    @Body() body: NewFilterDto,
+  ): Promise<{ medianNbWeedingPasses: number | null }> {
+    return this.queryService.getMedianNbWeedingPasses(body);
   }
 }
