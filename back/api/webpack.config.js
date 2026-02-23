@@ -7,6 +7,11 @@ module.exports = (args) => ({
   },
   resolve: {
     ...args.resolve,
+    modules: [
+      ...(args.resolve.modules || []),
+      path.resolve("../../node_modules"),
+      "node_modules",
+    ],
     alias: {
       ...args.resolve.alias,
       "class-transformer/cjs/storage": path.resolve(

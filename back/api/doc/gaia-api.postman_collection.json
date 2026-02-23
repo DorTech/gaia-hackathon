@@ -1,0 +1,35 @@
+{
+	"info": {
+		"name": "GAIA Hackathon API",
+		"description": "API for the GAIA 2026 hackathon - Dephy dataset",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3001/api"
+		}
+	],
+	"item": [
+		{
+			"name": "Dephy",
+			"item": [
+				{
+					"name": "List domaines",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/dephy/domaines?limit=20&offset=0",
+							"host": ["{{baseUrl}}"],
+							"path": ["dephy", "domaines"],
+							"query": [
+								{ "key": "limit", "value": "20" },
+								{ "key": "offset", "value": "0" }
+							]
+						}
+					}
+				}
+			]
+		}
+	]
+}

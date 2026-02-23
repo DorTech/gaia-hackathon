@@ -8,9 +8,6 @@
     "libs/*"
   ],
   "scripts": {
-    "db:up": "docker compose up -d postgres",
-    "db:down": "docker compose down",
-    "db:init": "yarn workspace @gaia/api run db:init",
     "api:dev": "yarn workspace @gaia/api run dev",
     "web:dev": "yarn workspace @gaia/web run dev",
     "build": "yarn workspaces foreach -A --topological --include '@gaia/*' run build"
