@@ -98,13 +98,23 @@ JOIN domain
     ON domain.id = dispositif.domaine_id
 JOIN succession_assolee_synthetise_magasin_can sac
     ON sac.sdc_id = sdc.id
-WHERE sac.culture_nom LIKE ${query.culture}
+WHERE unaccent(sac.culture_nom) ILIKE unaccent('%' || ${query.culture} || '%')
   AND domain.departement LIKE ${query.department}
   AND sdc.type_agriculture LIKE ${query.agricultureType};
  `);
 
-    const row = result[0];
+    if (result.rows.length === 0) {
+      console.warn(
+        `No data found for culture="${query.culture}", department="${query.department}", agricultureType="${query.agricultureType}"`,
+      );
+      return { median: null };
+    }
+
+    const row = result.rows[0];
     if (!row || row?.median_nb_rotation === null) {
+      console.warn(
+        `Median number of rotations is null for culture="${query.culture}", department="${query.department}", agricultureType="${query.agricultureType}"`,
+      );
       return { median: null };
     }
     return {
