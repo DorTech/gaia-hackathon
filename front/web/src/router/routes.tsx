@@ -2,7 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import App from "../App";
 import MainLayout from "../layouts/MainLayout";
 import { BenchmarkPage } from "../pages/benchmark/BenchmarkPage";
-import { DiagnosticPage } from "../pages/DiagnosticPage";
+import { DiagnosticPage } from "../pages/diagnostic/DiagnosticPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import { SimulationPage } from "../pages/SimulationPage";
 
