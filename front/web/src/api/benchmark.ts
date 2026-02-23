@@ -201,6 +201,16 @@ export async function fetchDistinctDepartments(): Promise<string[]> {
     .sort();
 }
 
+export async function fetchDistinctAgricultureTypes(): Promise<string[]> {
+  const { data } = await apiClient.post<FrequencyResponse>(
+    "/query/frequency",
+    { table: 'sdc', field: "typeAgriculture" },
+  );
+  return data.data
+    .filter((r) => r.value != null && r.value !== "")
+    .map((r) => String(r.value));
+}
+
 // ── Practice profile helpers ──
 
 /** Maps practice IDs to their API config */

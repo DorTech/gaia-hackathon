@@ -1,6 +1,7 @@
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import React, { useCallback, useEffect } from 'react';
 import {
+  fetchDistinctAgricultureTypes,
   fetchDistinctDepartments,
   fetchDistinctSpecies,
   fetchFrequency,
@@ -159,9 +160,10 @@ export const BenchmarkPage: React.FC = () => {
   useEffect(() => {
     async function loadFilterOptions() {
       try {
-        const [species, departments] = await Promise.all([
+        const [species, departments, agricultureTypes] = await Promise.all([
           fetchDistinctSpecies(),
           fetchDistinctDepartments(),
+          fetchDistinctAgricultureTypes(),
         ]);
 
         // Store raw species for flattening
@@ -171,6 +173,7 @@ export const BenchmarkPage: React.FC = () => {
           ...prev,
           species, // Keep raw for now, we'll use flattened in the combobox
           department: departments,
+          agricultureType: agricultureTypes,
         }));
 
         // Update default filters if current values aren't in the fetched lists
@@ -179,6 +182,8 @@ export const BenchmarkPage: React.FC = () => {
           species: prev.species && species.includes(prev.species) ? prev.species : '',
           department:
             prev.department && departments.includes(prev.department) ? prev.department : '',
+          agricultureType:
+            prev.agricultureType && agricultureTypes.includes(prev.agricultureType) ? prev.agricultureType : '',
         }));
       } catch (err) {
         console.error('Failed to load filter options:', err);
