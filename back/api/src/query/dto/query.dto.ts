@@ -58,12 +58,11 @@ export class QueryDto {
   @Type(() => FilterDto)
   filters?: FilterDto[];
 
-  @ApiPropertyOptional({ example: 20 })
+  @ApiPropertyOptional({ example: 20, description: "Omit or set to 0 to fetch all rows" })
   @IsOptional()
   @IsInt()
-  @Min(1)
-  @Max(1000)
-  limit?: number = 20;
+  @Min(0)
+  limit?: number;
 
   @ApiPropertyOptional({ example: 0 })
   @IsOptional()

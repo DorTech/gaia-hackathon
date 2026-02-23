@@ -37,7 +37,7 @@ export class QueryService {
       selectColumns = columns;
     }
 
-    const limit = query.limit ?? 20;
+    const limit = query.limit || undefined;
     const offset = query.offset ?? 0;
     const where = this.queryRepository.buildWhere(query.filters ?? [], columns, query.table);
 

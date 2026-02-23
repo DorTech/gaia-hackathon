@@ -12,15 +12,16 @@ export class QueryRepository {
     table: PgTable,
     selectColumns: Record<string, any>,
     where: SQL | undefined,
-    limit: number,
+    limit: number | undefined,
     offset: number,
   ) {
-    return this.dephyService.db
+    const qb = this.dephyService.db
       .select(selectColumns)
       .from(table)
       .where(where)
-      .limit(limit)
       .offset(offset);
+
+    return limit ? qb.limit(limit) : qb;
   }
 
   async count(table: PgTable, where: SQL | undefined): Promise<number> {
