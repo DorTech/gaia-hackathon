@@ -21,7 +21,10 @@ export const PredictionSidebar: React.FC<PredictionSidebarProps> = ({
         <Typography className="ift-card-lbl" sx={{ fontSize: '.7rem', color: 'var(--muted)' }}>
           IFT total prédit · Modèle RF
         </Typography>
-        <Typography className="ift-card-val" sx={{ color: getIFTColor(predictedIFT), fontSize: '1.55rem', fontWeight: 900 }}>
+        <Typography
+          className="ift-card-val"
+          sx={{ color: getIFTColor(predictedIFT), fontSize: '1.55rem', fontWeight: 900 }}
+        >
           {predictedIFT.toFixed(2)}
           <Box component="span" className="ift-card-unit" sx={{ ml: 0.5, fontSize: '.78rem', fontWeight: 700 }}>
             IFT
@@ -36,11 +39,16 @@ export const PredictionSidebar: React.FC<PredictionSidebarProps> = ({
               height: 8,
               borderRadius: 4,
               bgcolor: 'var(--line)',
-              '& .MuiLinearProgress-bar': { backgroundColor: getIFTColor(predictedIFT) },
+              '& .MuiLinearProgress-bar': {
+                backgroundColor: getIFTColor(predictedIFT),
+              },
             }}
           />
           <Box className="gauge-tks" sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5, fontSize: '.62rem', color: 'var(--muted)' }}>
-            <span>0</span><span>Réf 1,61</span><span>Méd 2,3</span><span>4+</span>
+            <span>0</span>
+            <span>Réf 1,61</span>
+            <span>Méd 2,3</span>
+            <span>4+</span>
           </Box>
         </Box>
         <Typography className="ift-card-sub" sx={{ mt: 1, fontSize: '.68rem', color: 'var(--muted)' }}>

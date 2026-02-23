@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { CHIP_OPTIONS, INITIAL_ITK_FORM } from './constants';
 import { ChipGroup } from './components/atoms/ChipGroup';
 import { SliderControl } from './components/atoms/SliderControl';
 import { DiagnosticHeader } from './components/units/DiagnosticHeader';
 import { Field } from './components/units/Field';
 import { PredictionSidebar } from './components/units/PredictionSidebar';
 import { Section } from './components/units/Section';
+import { CHIP_OPTIONS, INITIAL_ITK_FORM } from './constants';
 import type { ITKFormState } from './types';
 import { calculatePredictedIFT } from './utils';
 

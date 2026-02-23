@@ -196,7 +196,6 @@ export const BenchmarkPage: React.FC = () => {
       <BenchmarkHeader
         departmentCode={departmentCode}
         species={appliedFilters.species}
-        onGoToDiagnostic={() => navigate('/diagnostic')}
       />
 
       {/* FILTRES */}
