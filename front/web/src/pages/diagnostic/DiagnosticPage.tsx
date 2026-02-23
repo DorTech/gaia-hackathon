@@ -118,7 +118,7 @@ export const DiagnosticPage: React.FC = () => {
           </Section>
         </div>
 
-        <PredictionSidebar predictedIFT={predictedIFT} form={form} />
+        <PredictionSidebar predictedIFT={predictedIFT} />
       </div>
     </div>
   );
