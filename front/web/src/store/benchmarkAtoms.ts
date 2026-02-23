@@ -46,6 +46,74 @@ export const benchmarkMedianKpisAtom = atom<MedianKpi[]>([
   },
 ]);
 
+/** Fixed template — structure never changes, API fills in frequencies/values */
+export const PRACTICE_PROFILE_TEMPLATE: PracticeProfileItem[] = [
+  {
+    id: 'soil-work',
+    name: 'Travail du sol',
+    variable: 'type_de_travail_du_sol',
+    type: 'Qualitatif',
+    mode: 'quali',
+    frequencies: [],
+  },
+  {
+    id: 'mechanical-weeding',
+    name: 'Désherbage mécanique',
+    variable: 'utili_desherbage_meca',
+    type: 'Qualitatif',
+    mode: 'quali',
+    frequencies: [],
+  },
+  {
+    id: 'rotation-count',
+    name: 'NB Rotation',
+    variable: 'nb_rotation',
+    type: 'Quantitatif',
+    mode: 'quanti',
+    quantitative: { value: '—', unit: 'cultures', myValue: '—' },
+  },
+  {
+    id: 'biocontrol',
+    name: 'Recours Biocontrôle',
+    variable: 'recours_biocontrole',
+    type: 'Qualitatif',
+    mode: 'quali',
+    frequencies: [],
+  },
+  {
+    id: 'nitrogen',
+    name: 'Fertilisation N',
+    variable: 'ferti_n_tot',
+    type: 'Quantitatif',
+    mode: 'quanti',
+    quantitative: { value: '—', unit: 'kgN/ha', myValue: '—' },
+  },
+  {
+    id: 'resistant-variety',
+    name: 'Variété résistante',
+    variable: 'variete_resistante',
+    type: 'Qualitatif',
+    mode: 'quali',
+    frequencies: [],
+  },
+  {
+    id: 'winter-cover',
+    name: 'Couverts hivernaux',
+    variable: 'couvert_hivernaux',
+    type: 'Qualitatif',
+    mode: 'quali',
+    frequencies: [],
+  },
+  {
+    id: 'fuel-consumption',
+    name: 'Consommation carburant',
+    variable: 'conso_carburant',
+    type: 'Quantitatif',
+    mode: 'quanti',
+    quantitative: { value: '—', unit: 'L/ha', myValue: '—' },
+  },
+];
+
 export const benchmarkPracticeProfileAtom = atom<PracticeProfileItem[]>([
   {
     id: 'soil-work',

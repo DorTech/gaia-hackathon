@@ -13,6 +13,7 @@ import {
   benchmarkFiltersAtom,
   benchmarkLoadingAtom,
   enrichedPracticeProfileAtom,
+  PRACTICE_PROFILE_TEMPLATE,
 } from '../../store/benchmarkAtoms';
 import { iftMedianValueAtom } from '../../store/referenceAtoms';
 import { predictedIFTAtom } from '../../store/diagnosticAtoms';
@@ -33,7 +34,6 @@ export const BenchmarkPage: React.FC = () => {
   const [filterOptions, setFilterOptions] = useAtom(benchmarkFilterOptionsAtom);
   const referenceFarms = useAtomValue(benchmarkReferenceFarmsAtom);
   const medianKpis = useAtomValue(benchmarkMedianKpisAtom);
-  const rawPracticeProfile = useAtomValue(benchmarkPracticeProfileAtom);
   const practiceProfile = useAtomValue(enrichedPracticeProfileAtom);
   const [appliedFilters, setAppliedFilters] = useAtom(benchmarkFiltersAtom);
   const medianIft = useAtomValue(iftMedianValueAtom);
@@ -97,7 +97,7 @@ export const BenchmarkPage: React.FC = () => {
         );
 
         // 3. Fetch practice profile data
-        const currentProfile = rawPracticeProfile;
+        const currentProfile = PRACTICE_PROFILE_TEMPLATE;
         const updatedProfile: PracticeProfileItem[] = await Promise.all(
           currentProfile.map(async (item) => {
             const apiConfig = PRACTICE_API_MAP[item.id];
@@ -163,7 +163,6 @@ export const BenchmarkPage: React.FC = () => {
       setPracticeProfile,
       setReferenceFarms,
       userIFT,
-      rawPracticeProfile,
     ],
   );
 
