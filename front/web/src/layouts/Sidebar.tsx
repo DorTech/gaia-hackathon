@@ -1,3 +1,4 @@
+import AgricultureIcon from '@mui/icons-material/Agriculture';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
@@ -16,6 +17,7 @@ const DRAWER_WIDTH = 240;
 const DRAWER_WIDTH_CLOSED = 64;
 
 const NAV_ITEMS = [
+  { label: 'Itinéraire Technique', icon: <AgricultureIcon />, path: '/itineraire' },
   { label: 'Benchmark régional', icon: <BarChartIcon />, path: '/benchmark' },
   { label: 'Mon diagnostic ITK', icon: <AssignmentIcon />, path: '/diagnostic' },
   { label: 'Simulation leviers', icon: <PlayCircleFilledIcon />, path: '/simulation' },
