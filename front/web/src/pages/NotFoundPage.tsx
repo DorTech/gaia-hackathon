@@ -13,8 +13,8 @@ export default function NotFoundPage() {
         <Typography color="text.secondary" gutterBottom>
           The page you are looking for does not exist.
         </Typography>
-        <Button variant="contained" onClick={() => navigate("/dashboard")}>
-          Go to Dashboard
+        <Button variant="contained" onClick={() => navigate("/benchmark")}>
+          Go to Benchmark
         </Button>
       </Paper>
     </>
