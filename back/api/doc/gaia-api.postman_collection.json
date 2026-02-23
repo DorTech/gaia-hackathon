@@ -89,7 +89,7 @@
 					}
 				},
 				{
-					"name": "Query sdc_realise_perf",
+					"name": "Query sdc_realise_perf_magasin_can",
 					"request": {
 						"method": "POST",
 						"url": {
@@ -105,7 +105,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"table\": \"sdc_realise_perf\",\n  \"select\": [\"sdcId\", \"departement\", \"sdcFiliere\"],\n  \"limit\": 10,\n  \"offset\": 0\n}"
+							"raw": "{\n  \"table\": \"sdc_realise_perf_magasin_can\",\n  \"select\": [\"sdcId\", \"departement\", \"sdcFiliere\"],\n  \"limit\": 10,\n  \"offset\": 0\n}"
 						}
 					}
 				},
@@ -126,7 +126,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"table\": \"sdc_realise_perf\",\n  \"field\": \"iftHistoChimiqueTot\"\n}"
+							"raw": "{\n  \"table\": \"sdc_realise_perf_magasin_can\",\n  \"field\": \"iftHistoChimiqueTot\"\n}"
 						}
 					}
 				},
@@ -147,7 +147,49 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"table\": \"sdc_realise_perf\",\n  \"field\": \"iftHistoChimiqueTot\",\n  \"joins\": [\n    {\n      \"table\": \"domaine\",\n      \"field\": \"id\",\n      \"targetField\": \"domaineId\",\n      \"filters\": [\n        { \"field\": \"departement\", \"operator\": \"eq\", \"value\": \"75\" }\n      ]\n    },\n    {\n      \"table\": \"sdc\",\n      \"field\": \"id\",\n      \"targetField\": \"sdcId\",\n      \"filters\": [\n        { \"field\": \"typeAgriculture\", \"operator\": \"eq\", \"value\": \"Bio\" }\n      ]\n    }\n  ]\n}"
+							"raw": "{\n  \"table\": \"sdc_realise_perf_magasin_can\",\n  \"field\": \"iftHistoChimiqueTot\",\n  \"joins\": [\n    {\n      \"table\": \"domaine\",\n      \"field\": \"id\",\n      \"targetField\": \"domaineId\",\n      \"filters\": [\n        { \"field\": \"departement\", \"operator\": \"eq\", \"value\": \"75\" }\n      ]\n    },\n    {\n      \"table\": \"sdc\",\n      \"field\": \"id\",\n      \"targetField\": \"sdcId\",\n      \"filters\": [\n        { \"field\": \"typeAgriculture\", \"operator\": \"eq\", \"value\": \"Bio\" }\n      ]\n    }\n  ]\n}"
+						}
+					}
+				},
+				{
+					"name": "Frequency desherbage meca by species",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/query/frequency",
+							"host": ["{{baseUrl}}"],
+							"path": ["query", "frequency"]
+						},
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"sdc_realise_perf_magasin_can\",\n  \"field\": \"utiliDesherbageMeca\",\n  \"filters\": [\n    { \"field\": \"especes\", \"operator\": \"eq\", \"value\": \"Blé tendre\" },\n    { \"field\": \"departement\", \"operator\": \"eq\", \"value\": \"75\" }\n  ]\n}"
+						}
+					}
+				},
+				{
+					"name": "Frequency recours biocontrole (as boolean)",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/query/frequency",
+							"host": ["{{baseUrl}}"],
+							"path": ["query", "frequency"]
+						},
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"sdc_realise_perf_magasin_can\",\n  \"field\": \"recoursAuxMoyensBiologiques\",\n  \"asBoolean\": true,\n  \"filters\": [\n    { \"field\": \"especes\", \"operator\": \"eq\", \"value\": \"Blé tendre\" },\n    { \"field\": \"departement\", \"operator\": \"eq\", \"value\": \"02\" }\n  ]\n}"
 						}
 					}
 				}

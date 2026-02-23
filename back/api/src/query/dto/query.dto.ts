@@ -3,6 +3,7 @@ import {
   IsOptional,
   IsArray,
   IsInt,
+  IsBoolean,
   Min,
   Max,
   ValidateNested,
@@ -82,6 +83,35 @@ export class MedianDto {
   @ValidateNested({ each: true })
   @Type(() => JoinFilterDto)
   joins?: JoinFilterDto[];
+}
+
+export class FrequencyDto {
+  @ApiProperty({ example: "domaine" })
+  @IsString()
+  table: string;
+
+  @ApiProperty({ example: "typeFerme" })
+  @IsString()
+  field: string;
+
+  @ApiPropertyOptional({ type: [FilterDto] })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FilterDto)
+  filters?: FilterDto[];
+
+  @ApiPropertyOptional({ type: [JoinFilterDto], description: "Cross-table subquery filters" })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => JoinFilterDto)
+  joins?: JoinFilterDto[];
+
+  @ApiPropertyOptional({ example: false, description: "Treat numeric field as boolean (0 = false, > 0 = true)" })
+  @IsOptional()
+  @IsBoolean()
+  asBoolean?: boolean;
 }
 
 export class QueryDto {

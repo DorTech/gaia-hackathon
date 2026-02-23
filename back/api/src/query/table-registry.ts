@@ -16,11 +16,11 @@ const registry: Record<string, TableEntry> = {
   zone: { table: schema.zone, columns: getTableColumns(schema.zone) },
   domaine_sol: { table: schema.domaineSol, columns: getTableColumns(schema.domaineSol) },
   synthetise: { table: schema.synthetise, columns: getTableColumns(schema.synthetise) },
-  sdc_realise_perf: {
+  sdc_realise_perf_magasin_can: {
     table: schema.sdcRealisePerfMagasinCan,
     columns: getTableColumns(schema.sdcRealisePerfMagasinCan),
   },
-  synthetise_perf: {
+  synthetise_perf_magasin_can: {
     table: schema.synthetisePerfMagasinCan,
     columns: getTableColumns(schema.synthetisePerfMagasinCan),
   },

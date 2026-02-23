@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from "@nestjs/common";
 import { getTableEntry, listTables } from "./table-registry";
-import { QueryDto, MedianDto } from "./dto/query.dto";
+import { QueryDto, MedianDto, FrequencyDto } from "./dto/query.dto";
 import { QueryRepository } from "./query.repository";
 
 @Injectable()
@@ -75,5 +75,33 @@ export class QueryService {
     const result = await this.queryRepository.median(table, col, where);
 
     return { table: dto.table, field: dto.field, ...result };
+  }
+
+  async getFrequency(dto: FrequencyDto) {
+    const entry = getTableEntry(dto.table);
+    if (!entry) {
+      throw new BadRequestException(
+        `Unknown table "${dto.table}". Available: ${listTables().map((t) => t.name).join(", ")}`,
+      );
+    }
+
+    const { table, columns } = entry;
+    const col = columns[dto.field];
+    if (!col) {
+      throw new BadRequestException(
+        `Unknown column "${dto.field}" in table "${dto.table}". Available: ${Object.keys(columns).join(", ")}`,
+      );
+    }
+
+    if (dto.asBoolean && col.dataType !== "number") {
+      throw new BadRequestException(
+        `asBoolean can only be used on numeric columns. "${dto.field}" is of type ${col.dataType}.`,
+      );
+    }
+
+    const where = this.queryRepository.buildWhere(dto.filters ?? [], columns, dto.table, dto.joins);
+    const data = await this.queryRepository.frequency(table, col, where, dto.asBoolean);
+
+    return { table: dto.table, field: dto.field, data };
   }
 }

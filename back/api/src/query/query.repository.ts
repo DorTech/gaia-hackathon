@@ -54,6 +54,46 @@ export class QueryRepository {
     };
   }
 
+  async frequency(
+    table: PgTable,
+    column: any,
+    where: SQL | undefined,
+    asBoolean?: boolean,
+  ): Promise<{ value: string | boolean | null; count: number }[]> {
+    if (asBoolean) {
+      const boolExpr = sql<boolean>`CASE WHEN ${column} > 0 THEN true ELSE false END`;
+      const rows = await this.dephyService.db
+        .select({
+          value: boolExpr,
+          count: sql<number>`count(*)`,
+        })
+        .from(table)
+        .where(where)
+        .groupBy(boolExpr)
+        .orderBy(sql`count(*) desc`);
+
+      return rows.map((r: any) => ({
+        value: r.value ?? null,
+        count: Number(r.count),
+      }));
+    }
+
+    const rows = await this.dephyService.db
+      .select({
+        value: column,
+        count: sql<number>`count(*)`,
+      })
+      .from(table)
+      .where(where)
+      .groupBy(column)
+      .orderBy(sql`count(*) desc`);
+
+    return rows.map((r: any) => ({
+      value: r.value ?? null,
+      count: Number(r.count),
+    }));
+  }
+
   buildWhere(
     filters: FilterDto[],
     columns: Record<string, any>,

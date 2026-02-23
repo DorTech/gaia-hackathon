@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
 import { ApiOperation, ApiTags } from "@nestjs/swagger";
 import { QueryService } from "./query.service";
-import { QueryDto, MedianDto } from "./dto/query.dto";
+import { QueryDto, MedianDto, FrequencyDto } from "./dto/query.dto";
 
 @ApiTags("query")
 @Controller("query")
@@ -24,5 +24,11 @@ export class QueryController {
   @ApiOperation({ summary: "Compute the median of a numeric column with optional filters" })
   async getMedian(@Body() body: MedianDto) {
     return this.queryService.getMedian(body);
+  }
+
+  @Post("frequency")
+  @ApiOperation({ summary: "Get value frequency distribution for a qualitative column" })
+  async getFrequency(@Body() body: FrequencyDto) {
+    return this.queryService.getFrequency(body);
   }
 }
