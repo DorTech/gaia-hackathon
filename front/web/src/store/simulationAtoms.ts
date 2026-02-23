@@ -1,0 +1,93 @@
+import { atom } from 'jotai';
+import type { Lever, LeverDeltas } from '../pages/simulationComponents/types';
+import { itkFormAtom, predictedIFTAtom, CHIP_OPTIONS } from './diagnosticAtoms';
+
+/**
+ * Derived atom: builds lever definitions from the current ITK form state.
+ * The "current" label for each lever reflects the user's actual form values.
+ */
+export const leversAtom = atom<Lever[]>((get) => {
+  const form = get(itkFormAtom);
+
+  return [
+    {
+      id: 'rot',
+      name: '🌾 NB Rotation',
+      type: 'Quantitatif',
+      current: `${form.rotation} cultures · actuel`,
+      options: [
+        { label: '4 cultures', delta: -0.22 },
+        { label: '5+ cultures', delta: -0.38, isReference: true },
+      ],
+    },
+    {
+      id: 'sol',
+      name: '🚜 Travail du sol',
+      type: 'Qualitatif',
+      current: `${CHIP_OPTIONS.soilType[form.soilType]} · actuel`,
+      options: [
+        { label: 'TCS', delta: -0.28 },
+        { label: 'Semis direct', delta: -0.45, isReference: true },
+      ],
+    },
+    {
+      id: 'desh',
+      name: '⚙️ Désherbage mécanique',
+      type: 'Qualitatif',
+      current: `${CHIP_OPTIONS.mechanicalWeeding[form.mechanicalWeeding]} · actuel`,
+      options: [
+        { label: 'Oui — partiel (2 pass.)', delta: -0.3 },
+        { label: 'Oui — complet', delta: -0.52, isReference: true },
+      ],
+    },
+    {
+      id: 'var',
+      name: '🧬 Variété résistante',
+      type: 'Qualitatif',
+      current: `${CHIP_OPTIONS.resistantVariety[form.resistantVariety]} · actuel`,
+      options: [
+        { label: 'Résistance partielle', delta: -0.18 },
+        { label: 'Très résistante', delta: -0.35, isReference: true },
+      ],
+    },
+    {
+      id: 'bio',
+      name: '🌿 Recours Biocontrôle',
+      type: 'Qualitatif',
+      current: `${CHIP_OPTIONS.biocontrolUse[form.biocontrolUse]} · actuel`,
+      options: [
+        { label: 'Partiel', delta: -0.2 },
+        { label: 'Systématique', delta: -0.42, isReference: true },
+      ],
+    },
+    {
+      id: 'couv',
+      name: '🌱 Couverts hivernaux',
+      type: 'Qualitatif',
+      current: `${CHIP_OPTIONS.coverCrops[form.coverCrops]} · actuel`,
+      options: [{ label: 'Systématique', delta: -0.14, isReference: true }],
+    },
+    {
+      id: 'n',
+      name: '🧪 Fertilisation N',
+      type: 'Quantitatif',
+      current: `${form.nitrogenTotal} kgN/ha · actuel`,
+      options: [
+        { label: '160 kgN/ha', delta: -0.1 },
+        { label: '142 kgN/ha', delta: -0.18, isReference: true },
+      ],
+    },
+  ];
+});
+
+export const leverDeltasAtom = atom<LeverDeltas>({});
+
+/**
+ * Derived atom: simulated IFT = predicted IFT + sum of selected deltas.
+ */
+export const simulatedIFTAtom = atom<number>((get) => {
+  const base = get(predictedIFTAtom);
+  const deltas = get(leverDeltasAtom);
+  const total = Object.values(deltas).reduce((sum: number, d: number) => sum + d, 0);
+  return Math.max(0.05, Math.round((base + total) * 100) / 100);
+});

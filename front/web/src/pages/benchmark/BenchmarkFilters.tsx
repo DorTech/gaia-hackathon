@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { FilterSelectMUI } from '../../components/FilterSelectMUI';
 
-export interface BenchmarkFiltersState {
-  species: string;
-  department: string;
-  agricultureType: string;
-  iftThreshold: string;
-}
+import type { BenchmarkFiltersState } from '../../types/benchmark';
+export type { BenchmarkFiltersState };
 
 interface BenchmarkFiltersProps {
   initialValues: BenchmarkFiltersState;

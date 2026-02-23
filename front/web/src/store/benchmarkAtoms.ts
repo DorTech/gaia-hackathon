@@ -1,61 +1,13 @@
-export interface BenchmarkFarm {
-  rank: number;
-  name: string;
-  type: string;
-  ift: number;
-  gap: string;
-}
+import { atom } from 'jotai';
+import type {
+  BenchmarkFilterOptions,
+  BenchmarkFarm,
+  MedianKpi,
+  PracticeProfileItem,
+  BenchmarkFiltersState,
+} from '../types/benchmark';
 
-export interface MedianKpi {
-  id: string;
-  label: string;
-  value: string;
-  unit: string;
-  variant: 'green' | 'teal' | 'violet';
-  sub: string;
-  delta: string;
-  deltaClass: 'warn' | 'good';
-}
-
-export interface BenchmarkFilterOptions {
-  species: string[];
-  department: string[];
-  agricultureType: string[];
-  iftThreshold: string[];
-}
-
-export interface PracticeFrequencyRow {
-  label: string;
-  pct: number;
-  top?: boolean;
-}
-
-export interface PracticeQuantBar {
-  label: string;
-  width: number;
-  color: string;
-}
-
-export interface PracticeProfileItem {
-  id: string;
-  name: string;
-  variable: string;
-  type: 'Qualitatif' | 'Quantitatif';
-  mode: 'quali' | 'quanti';
-  frequencies?: PracticeFrequencyRow[];
-  note?: {
-    label: string;
-    value: string;
-    suffix?: string;
-  };
-  quantitative?: {
-    value: string;
-    unit: string;
-    myValue?: string;
-  };
-}
-
-export const BENCHMARK_FILTER_OPTIONS: BenchmarkFilterOptions = {
+export const benchmarkFilterOptionsAtom = atom<BenchmarkFilterOptions>({
   species: ['Blé tendre', 'Maïs grain', 'Colza', "Orge d'hiver", 'Tournesol'],
   department: [
     '35 — Ille-et-Vilaine',
@@ -65,9 +17,9 @@ export const BENCHMARK_FILTER_OPTIONS: BenchmarkFilterOptions = {
   ],
   agricultureType: ['Tous (Bio + Conv.)', 'Conventionnel seul', 'Biologique seul'],
   iftThreshold: ['−20% vs médiane', '−30% vs médiane', '−40% vs médiane'],
-};
+});
 
-export const BENCHMARK_REFERENCE_FARMS: BenchmarkFarm[] = [
+export const benchmarkReferenceFarmsAtom = atom<BenchmarkFarm[]>([
   { rank: 1, name: 'GAEC Kervran', type: 'Bio · 89 ha · SD', ift: 0.82, gap: '−64%' },
   { rank: 2, name: 'EARL Tanguy', type: 'Conv. · 124 ha', ift: 0.98, gap: '−57%' },
   { rank: 3, name: 'SAS Morvan', type: 'Conv. · 67 ha · TCS', ift: 1.10, gap: '−52%' },
@@ -76,9 +28,9 @@ export const BENCHMARK_REFERENCE_FARMS: BenchmarkFarm[] = [
   { rank: 6, name: 'EARL Jouan', type: 'Conv. · 98 ha', ift: 1.35, gap: '−41%' },
   { rank: 7, name: 'SAS Penglaou', type: 'Conv. · 78 ha', ift: 1.41, gap: '−39%' },
   { rank: 8, name: 'EARL Beaudouin', type: 'Conv. · 190 ha', ift: 1.48, gap: '−36%' },
-];
+]);
 
-export const BENCHMARK_MEDIAN_KPIS: MedianKpi[] = [
+export const benchmarkMedianKpisAtom = atom<MedianKpi[]>([
   {
     id: 'ift',
     label: '📉 Médiane IFT total',
@@ -89,10 +41,9 @@ export const BENCHMARK_MEDIAN_KPIS: MedianKpi[] = [
     delta: '↑ +21,7% vs votre exploitation (2,80)',
     deltaClass: 'warn',
   },
+]);
 
-];
-
-export const BENCHMARK_PRACTICE_PROFILE: PracticeProfileItem[] = [
+export const benchmarkPracticeProfileAtom = atom<PracticeProfileItem[]>([
   {
     id: 'soil-work',
     name: 'Travail du sol',
@@ -115,7 +66,6 @@ export const BENCHMARK_PRACTICE_PROFILE: PracticeProfileItem[] = [
       { label: 'Oui — systématique', pct: 82, top: true },
       { label: 'Non', pct: 18 },
     ],
-   
   },
   {
     id: 'rotation-count',
@@ -189,4 +139,11 @@ export const BENCHMARK_PRACTICE_PROFILE: PracticeProfileItem[] = [
       myValue: '92',
     },
   },
-];
+]);
+
+export const benchmarkFiltersAtom = atom<BenchmarkFiltersState>({
+  species: 'Blé tendre',
+  department: '35 — Ille-et-Vilaine',
+  agricultureType: 'Tous (Bio + Conv.)',
+  iftThreshold: '−30% vs médiane',
+});

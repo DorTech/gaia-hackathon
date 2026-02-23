@@ -1,6 +1,9 @@
 import React from "react";
 import { Box, Card, Stack, Typography } from "@mui/material";
+import { useAtomValue } from "jotai";
 import { SummaryBarProps } from "../types";
+import { iftReferenceValueAtom, iftMedianValueAtom } from "../../../store/referenceAtoms";
+import { getIFTColor } from "../../../utils/ift";
 
 export const SummaryBar: React.FC<SummaryBarProps> = ({
   baseIFT,
@@ -9,11 +12,8 @@ export const SummaryBar: React.FC<SummaryBarProps> = ({
   gainPct,
   activeLeverCount,
 }) => {
-  const getIFTColor = (ift: number) => {
-    if (ift <= 1.61) return "var(--green-d)";
-    if (ift <= 2.3) return "var(--teal)";
-    return "var(--orange)";
-  };
+  const iftRef = useAtomValue(iftReferenceValueAtom);
+  const iftMedian = useAtomValue(iftMedianValueAtom);
 
   return (
     <Card
@@ -75,7 +75,7 @@ export const SummaryBar: React.FC<SummaryBarProps> = ({
             fontWeight: 800,
             letterSpacing: "-0.03em",
             lineHeight: 1,
-            color: getIFTColor(simulatedIFT),
+            color: getIFTColor(simulatedIFT, iftRef, iftMedian),
           }}
         >
           {simulatedIFT.toFixed(2)}
@@ -140,7 +140,7 @@ export const SummaryBar: React.FC<SummaryBarProps> = ({
               color: "var(--text2)",
             }}
           >
-            2,30
+            {iftMedian.toFixed(2).replace('.', ',')}
           </Typography>
         </Box>
         <Box sx={{ textAlign: "center" }}>
@@ -163,7 +163,7 @@ export const SummaryBar: React.FC<SummaryBarProps> = ({
               color: "var(--green-d)",
             }}
           >
-            1,61
+            {iftRef.toFixed(2).replace('.', ',')}
           </Typography>
         </Box>
         <Box sx={{ textAlign: "center" }}>

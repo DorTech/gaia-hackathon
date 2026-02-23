@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import type { PracticeProfileItem } from '../../data/benchmark';
+import type { PracticeProfileItem } from '../../types/benchmark';
 
 interface PracticeProfileCardProps {
   title: string;

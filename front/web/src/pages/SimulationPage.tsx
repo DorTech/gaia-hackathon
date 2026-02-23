@@ -1,88 +1,19 @@
-import React, { useState } from "react";
+import React from "react";
 import { Box, Grid } from "@mui/material";
+import { useAtom, useAtomValue } from "jotai";
 import {
   PageHeader,
   SummaryBar,
   LeversList,
-  Lever,
-  LeverDeltas,
 } from "./simulationComponents";
-
-// ============ COMPOSANT PRINCIPAL ============
+import { predictedIFTAtom } from "../store/diagnosticAtoms";
+import { leversAtom, leverDeltasAtom, simulatedIFTAtom } from "../store/simulationAtoms";
 
 export const SimulationPage: React.FC = () => {
-  const baseIFT = 2.8;
-  const [deltas, setDeltas] = useState<LeverDeltas>({});
-
-  const levers: Lever[] = [
-    {
-      id: "rot",
-      name: "🌾 NB Rotation",
-      type: "Quantitatif",
-      current: "3 cultures · actuel",
-      options: [
-        { label: "4 cultures", delta: -0.22 },
-        { label: "5+ cultures", delta: -0.38, isReference: true },
-      ],
-    },
-    {
-      id: "sol",
-      name: "🚜 Travail du sol",
-      type: "Qualitatif",
-      current: "Labour · actuel",
-      options: [
-        { label: "TCS", delta: -0.28 },
-        { label: "Semis direct", delta: -0.45, isReference: true },
-      ],
-    },
-    {
-      id: "desh",
-      name: "⚙️ Désherbage mécanique",
-      type: "Qualitatif",
-      current: "Non · actuel",
-      options: [
-        { label: "Oui — partiel (2 pass.)", delta: -0.3 },
-        { label: "Oui — complet", delta: -0.52, isReference: true },
-      ],
-    },
-    {
-      id: "var",
-      name: "🧬 Variété résistante",
-      type: "Qualitatif",
-      current: "Standard · actuel",
-      options: [
-        { label: "Résistance partielle", delta: -0.18 },
-        { label: "Très résistante", delta: -0.35, isReference: true },
-      ],
-    },
-    {
-      id: "bio",
-      name: "🌿 Recours Biocontrôle",
-      type: "Qualitatif",
-      current: "Aucun · actuel",
-      options: [
-        { label: "Partiel", delta: -0.2 },
-        { label: "Systématique", delta: -0.42, isReference: true },
-      ],
-    },
-    {
-      id: "couv",
-      name: "🌱 Couverts hivernaux",
-      type: "Qualitatif",
-      current: "Partiel · actuel",
-      options: [{ label: "Systématique", delta: -0.14, isReference: true }],
-    },
-    {
-      id: "n",
-      name: "🧪 Fertilisation N",
-      type: "Quantitatif",
-      current: "185 kgN/ha · actuel",
-      options: [
-        { label: "160 kgN/ha", delta: -0.1 },
-        { label: "142 kgN/ha", delta: -0.18, isReference: true },
-      ],
-    },
-  ];
+  const baseIFT = useAtomValue(predictedIFTAtom);
+  const levers = useAtomValue(leversAtom);
+  const [deltas, setDeltas] = useAtom(leverDeltasAtom);
+  const simulatedIFT = useAtomValue(simulatedIFTAtom);
 
   const handlePickOption = (leverId: string, delta: number) => {
     setDeltas((prev) => ({
@@ -91,15 +22,6 @@ export const SimulationPage: React.FC = () => {
     }));
   };
 
-  const calculateSimulatedIFT = () => {
-    let ift = baseIFT;
-    Object.values(deltas).forEach((delta) => {
-      ift += delta;
-    });
-    return Math.max(0.05, Math.round(ift * 100) / 100);
-  };
-
-  const simulatedIFT = calculateSimulatedIFT();
   const activeLeverCount = Object.values(deltas).filter((d) => d !== 0).length;
   const gained = baseIFT - simulatedIFT;
   const gainPct = gained > 0 ? ((gained / baseIFT) * 100).toFixed(1) : "0";

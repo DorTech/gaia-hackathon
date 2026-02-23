@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import type { MedianKpi } from '../../data/benchmark';
+import type { MedianKpi } from '../../types/benchmark';
 
 interface MedianKpiRowProps {
   kpis: MedianKpi[];
