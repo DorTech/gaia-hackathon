@@ -13,9 +13,9 @@ export const PredictionSidebar: React.FC<PredictionSidebarProps> = ({ predictedI
   const iftMax = useAtomValue(iftMaxGaugeAtom);
 
   return (
-    <Box>
-      <Paper className="ift-card" elevation={0} sx={{ p: 1.5, borderRadius: 2, mb: 1.25 }}>
-        <Typography className="ift-card-lbl" sx={{ fontSize: '.7rem', color: 'var(--muted)' }}>
+    <Box sx={{ position: 'sticky', top: 16 }}>
+      <Paper className="ift-card" elevation={0} sx={{ p: 2, borderRadius: 2, mb: 1.25 }}>
+        <Typography className="ift-card-lbl" sx={{ fontSize: '.7rem', color: 'var(--text2)' }}>
           IFT total prédit
         </Typography>
         <Typography
@@ -43,7 +43,7 @@ export const PredictionSidebar: React.FC<PredictionSidebarProps> = ({ predictedI
             sx={{
               height: 8,
               borderRadius: 4,
-              bgcolor: 'var(--line)',
+              bgcolor: 'var(--border2)',
               '& .MuiLinearProgress-bar': {
                 backgroundColor: getIFTColor(predictedIFT, iftMedian),
               },
@@ -56,7 +56,7 @@ export const PredictionSidebar: React.FC<PredictionSidebarProps> = ({ predictedI
               justifyContent: 'space-between',
               mt: 0.5,
               fontSize: '.62rem',
-              color: 'var(--muted)',
+              color: 'var(--text3)',
             }}
           >
             <span>0</span>
@@ -66,7 +66,7 @@ export const PredictionSidebar: React.FC<PredictionSidebarProps> = ({ predictedI
         </Box>
         <Typography
           className="ift-card-sub"
-          sx={{ mt: 1, fontSize: '.68rem', color: 'var(--muted)' }}
+          sx={{ mt: 1, fontSize: '.68rem', color: 'var(--text2)' }}
         >
           Prédiction basée sur les variables ITK saisies
         </Typography>

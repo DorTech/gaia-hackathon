@@ -11,7 +11,7 @@ export const DiagnosticHeader: React.FC = () => {
         <Typography component="h1" sx={{ fontSize: '1.25rem', fontWeight: 800, mb: 0.5 }}>
           Mon diagnostic ITK
         </Typography>
-        <Typography sx={{ fontSize: '.78rem', color: 'var(--muted)' }}>
+        <Typography sx={{ fontSize: '.78rem', color: 'var(--text2)' }}>
           Renseignez votre itinéraire technique · Le modèle Random Forest prédit votre IFT en temps
           réel
         </Typography>

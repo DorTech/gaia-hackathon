@@ -28,8 +28,8 @@ export const ChipGroup: React.FC<ChipGroupProps> = ({
         gap: 0.75,
         '& .MuiToggleButtonGroup-grouped': {
           borderRadius: '999px !important',
-          border: '1px solid var(--line)',
-          color: 'var(--txt)',
+          border: '1px solid var(--border2)',
+          color: 'var(--text2)',
           px: 1.25,
           py: 0.5,
           textTransform: 'none',
@@ -47,9 +47,12 @@ export const ChipGroup: React.FC<ChipGroupProps> = ({
             selected={selectedIndex === idx}
             sx={{
               '&.Mui-selected': {
-                bgcolor: 'var(--green-bg)',
+                bgcolor: 'var(--green-l)',
                 borderColor: 'var(--green)',
                 color: 'var(--green-d)',
+              },
+              '&.Mui-selected:hover': {
+                bgcolor: 'var(--green-l)',
               },
             }}
           >
