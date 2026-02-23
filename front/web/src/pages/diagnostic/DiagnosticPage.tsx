@@ -1,21 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useAtom, useAtomValue } from 'jotai';
 import { ChipGroup } from './components/atoms/ChipGroup';
 import { SliderControl } from './components/atoms/SliderControl';
 import { DiagnosticHeader } from './components/units/DiagnosticHeader';
 import { Field } from './components/units/Field';
 import { PredictionSidebar } from './components/units/PredictionSidebar';
 import { Section } from './components/units/Section';
-import { CHIP_OPTIONS, INITIAL_ITK_FORM } from './constants';
-import type { ITKFormState } from './types';
-import { calculatePredictedIFT } from './utils';
+import {
+  itkFormAtom,
+  predictedIFTAtom,
+  ITK_FORM_DEFAULTS,
+  CHIP_OPTIONS,
+  type ITKFormState,
+} from '../../store/diagnosticAtoms';
 
 export const DiagnosticPage: React.FC = () => {
-  const [form, setForm] = useState<ITKFormState>(INITIAL_ITK_FORM);
-  const [predictedIFT, setPredictedIFT] = useState(2.8);
-
-  useEffect(() => {
-    setPredictedIFT(calculatePredictedIFT(form));
-  }, [form]);
+  const [form, setForm] = useAtom(itkFormAtom);
+  const predictedIFT = useAtomValue(predictedIFTAtom);
 
   const handleFieldChange = <K extends keyof ITKFormState>(field: K, value: ITKFormState[K]) => {
     setForm((prev) => ({
@@ -25,7 +26,7 @@ export const DiagnosticPage: React.FC = () => {
   };
 
   const resetForm = () => {
-    setForm(INITIAL_ITK_FORM);
+    setForm(ITK_FORM_DEFAULTS);
   };
 
   return (

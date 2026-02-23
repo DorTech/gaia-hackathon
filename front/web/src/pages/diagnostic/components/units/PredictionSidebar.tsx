@@ -1,7 +1,13 @@
 import React from 'react';
+import { useAtomValue } from 'jotai';
 import { Box, Button, LinearProgress, Paper, Typography } from '@mui/material';
-import type { ITKFormState } from '../../types';
-import { getGaugePct, getIFTColor, getPercentDiff } from '../../utils';
+import {
+  iftReferenceValueAtom,
+  iftMedianValueAtom,
+  iftMaxGaugeAtom,
+} from '../../../../store/referenceAtoms';
+import { getIFTColor, getGaugePct } from '../../../../utils/ift';
+import type { ITKFormState } from '../../../../store/diagnosticAtoms';
 
 interface PredictionSidebarProps {
   predictedIFT: number;
@@ -12,8 +18,12 @@ export const PredictionSidebar: React.FC<PredictionSidebarProps> = ({
   predictedIFT,
   form,
 }) => {
-  const vmed = getPercentDiff(predictedIFT, 2.3);
-  const vref = getPercentDiff(predictedIFT, 1.61);
+  const iftRef = useAtomValue(iftReferenceValueAtom);
+  const iftMedian = useAtomValue(iftMedianValueAtom);
+  const iftMax = useAtomValue(iftMaxGaugeAtom);
+
+  const vmed = (((predictedIFT - iftMedian) / iftMedian) * 100).toFixed(1);
+  const vref = (((predictedIFT - iftRef) / iftRef) * 100).toFixed(1);
 
   return (
     <Box>
@@ -23,7 +33,7 @@ export const PredictionSidebar: React.FC<PredictionSidebarProps> = ({
         </Typography>
         <Typography
           className="ift-card-val"
-          sx={{ color: getIFTColor(predictedIFT), fontSize: '1.55rem', fontWeight: 900 }}
+          sx={{ color: getIFTColor(predictedIFT, iftRef, iftMedian), fontSize: '1.55rem', fontWeight: 900 }}
         >
           {predictedIFT.toFixed(2)}
           <Box component="span" className="ift-card-unit" sx={{ ml: 0.5, fontSize: '.78rem', fontWeight: 700 }}>
@@ -33,22 +43,22 @@ export const PredictionSidebar: React.FC<PredictionSidebarProps> = ({
         <Box className="gauge-wrap" sx={{ mt: 1 }}>
           <LinearProgress
             variant="determinate"
-            value={getGaugePct(predictedIFT)}
+            value={getGaugePct(predictedIFT, iftMax)}
             className="gauge-trk"
             sx={{
               height: 8,
               borderRadius: 4,
               bgcolor: 'var(--line)',
               '& .MuiLinearProgress-bar': {
-                backgroundColor: getIFTColor(predictedIFT),
+                backgroundColor: getIFTColor(predictedIFT, iftRef, iftMedian),
               },
             }}
           />
           <Box className="gauge-tks" sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5, fontSize: '.62rem', color: 'var(--muted)' }}>
             <span>0</span>
-            <span>Réf 1,61</span>
-            <span>Méd 2,3</span>
-            <span>4+</span>
+            <span>Réf {iftRef.toFixed(2).replace('.', ',')}</span>
+            <span>Méd {iftMedian.toFixed(1).replace('.', ',')}</span>
+            <span>{iftMax}+</span>
           </Box>
         </Box>
         <Typography className="ift-card-sub" sx={{ mt: 1, fontSize: '.68rem', color: 'var(--muted)' }}>
@@ -63,10 +73,10 @@ export const PredictionSidebar: React.FC<PredictionSidebarProps> = ({
         <Box className="cr" sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.6 }}><span className="k">Travail du sol</span><span className="v">{['Labour', 'TCS', 'Semis direct'][form.soilWork] ?? 'Labour'}</span></Box>
         <Box className="cr" sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.6 }}><span className="k">Désherbage</span><span className="v">{form.hasWeeding === 1 ? `Oui (${form.weedingPassages} passages)` : 'Non'}</span></Box>
         <Box className="cr" sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.6 }}>
-          <span className="k">vs médiane (2,30)</span>
+          <span className="k">vs médiane ({iftMedian.toFixed(2).replace('.', ',')})</span>
           <span className="v" style={{ color: parseFloat(vmed) > 0 ? 'var(--orange)' : 'var(--green-d)' }}>{parseFloat(vmed) > 0 ? '+' : ''}{vmed}%</span>
         </Box>
-        <Box className="cr" sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.6 }}><span className="k">vs référence (1,61)</span><span className="v v-bad">{parseFloat(vref) > 0 ? '+' : ''}{vref}%</span></Box>
+        <Box className="cr" sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.6 }}><span className="k">vs référence ({iftRef.toFixed(2).replace('.', ',')})</span><span className="v v-bad">{parseFloat(vref) > 0 ? '+' : ''}{vref}%</span></Box>
         <Box className="cr" sx={{ display: 'flex', justifyContent: 'space-between' }}><span className="k">Potentiel estimé</span><span className="v v-good">−40 à −45%</span></Box>
       </Paper>
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { Stack, ToggleButton, ToggleButtonGroup } from '@mui/material';
 
 interface ChipGroupProps {
-  options: string[];
+  options: readonly string[];
   selectedIndex: number;
   onSelect: (index: number) => void;
 }

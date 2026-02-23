@@ -259,14 +259,7 @@ export const enrichedPracticeProfileAtom = atom<PracticeProfileItem[]>((get) => 
         return {
           ...item,
           quantitative: item.quantitative
-            ? { ...item.quantitative, myValue: String(form.nitrogenTotal) }
-            : item.quantitative,
-        };
-      case 'fuel-consumption':
-        return {
-          ...item,
-          quantitative: item.quantitative
-            ? { ...item.quantitative, myValue: String(form.fuel) }
+            ? { ...item.quantitative, myValue: String(form.fertilization) }
             : item.quantitative,
         };
 
@@ -274,27 +267,17 @@ export const enrichedPracticeProfileAtom = atom<PracticeProfileItem[]>((get) => 
       case 'soil-work':
         return {
           ...item,
-          note: { label: 'Mon choix :', value: CHIP_OPTIONS.soilType[form.soilType] },
+          note: { label: 'Mon choix :', value: CHIP_OPTIONS.soilWork[form.soilWork] },
         };
       case 'mechanical-weeding':
         return {
           ...item,
-          note: { label: 'Mon choix :', value: CHIP_OPTIONS.mechanicalWeeding[form.mechanicalWeeding] },
+          note: { label: 'Mon choix :', value: form.hasWeeding === 1 ? 'Oui' : 'Non' },
         };
       case 'biocontrol':
         return {
           ...item,
-          note: { label: 'Mon choix :', value: CHIP_OPTIONS.biocontrolUse[form.biocontrolUse] },
-        };
-      case 'resistant-variety':
-        return {
-          ...item,
-          note: { label: 'Mon choix :', value: CHIP_OPTIONS.resistantVariety[form.resistantVariety] },
-        };
-      case 'winter-cover':
-        return {
-          ...item,
-          note: { label: 'Mon choix :', value: CHIP_OPTIONS.coverCrops[form.coverCrops] },
+          note: { label: 'Mon choix :', value: form.biologicalControl === 1 ? 'Oui' : 'Non' },
         };
 
       default:
