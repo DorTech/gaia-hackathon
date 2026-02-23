@@ -15,6 +15,7 @@ import {
 } from '../../store/diagnosticAtoms';
 import { DIAGNOSTIC_VARIABLES } from '../../config/variables';
 import { predictIFT } from '../../api/predict';
+import { ItineraireComponent } from '../ItinerairePage';
 
 export const DiagnosticPage: React.FC = () => {
   const [form, setForm] = useAtom(itkFormAtom);
@@ -52,6 +53,9 @@ export const DiagnosticPage: React.FC = () => {
 
   return (
     <div className="page active" id="page-itk">
+      <div>
+        <ItineraireComponent />
+      </div>
       <DiagnosticHeader />
 
       <div className="itk-layout">
@@ -59,7 +63,7 @@ export const DiagnosticPage: React.FC = () => {
           <Section title="🌾 Variables du diagnostic" className="itk-last-section">
             <div className="fgrid">
               {DIAGNOSTIC_VARIABLES.map((v) => (
-                <Field key={v.id} label={v.label} reference={v.reference}>
+                <Field key={v.id} label={v.label}>
                   {v.slider ? (
                     <SliderControl
                       minLabel={v.slider.minLabel}
@@ -67,13 +71,20 @@ export const DiagnosticPage: React.FC = () => {
                       value={form[v.formKey] as number}
                       min={v.slider.min}
                       max={v.slider.max}
-                      onChange={(value) => handleFieldChange(v.formKey, Math.round(value) as ITKFormState[typeof v.formKey])}
+                      onChange={(value) =>
+                        handleFieldChange(
+                          v.formKey,
+                          Math.round(value) as ITKFormState[typeof v.formKey],
+                        )
+                      }
                     />
                   ) : v.chips ? (
                     <ChipGroup
                       options={v.chips.options}
                       selectedIndex={form[v.formKey] as number}
-                      onSelect={(index) => handleFieldChange(v.formKey, index as ITKFormState[typeof v.formKey])}
+                      onSelect={(index) =>
+                        handleFieldChange(v.formKey, index as ITKFormState[typeof v.formKey])
+                      }
                     />
                   ) : v.input ? (
                     <InputControl
@@ -82,7 +93,9 @@ export const DiagnosticPage: React.FC = () => {
                       placeholder={v.input.placeholder}
                       min={v.input.min}
                       max={v.input.max}
-                      onChange={(val) => handleFieldChange(v.formKey, val as ITKFormState[typeof v.formKey])}
+                      onChange={(val) =>
+                        handleFieldChange(v.formKey, val as ITKFormState[typeof v.formKey])
+                      }
                     />
                   ) : null}
                 </Field>

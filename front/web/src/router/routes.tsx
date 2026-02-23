@@ -3,7 +3,6 @@ import App from '../App';
 import MainLayout from '../layouts/MainLayout';
 import { BenchmarkPage } from '../pages/benchmark/BenchmarkPage';
 import { DiagnosticPage } from '../pages/diagnostic/DiagnosticPage';
-import ItinerairePage from '../pages/ItinerairePage';
 import NotFoundPage from '../pages/NotFoundPage';
 import { SimulationPage } from '../pages/SimulationPage';
 
@@ -15,7 +14,6 @@ export const router = createBrowserRouter([
         element: <MainLayout />,
         children: [
           { index: true, element: <Navigate to="/benchmark" replace /> },
-          { path: 'itineraire', element: <ItinerairePage /> },
           { path: 'benchmark', element: <BenchmarkPage /> },
           { path: 'diagnostic', element: <DiagnosticPage /> },
           { path: 'simulation', element: <SimulationPage /> },

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Typography,
   Paper,
@@ -8,17 +8,14 @@ import {
   Box,
   CircularProgress,
   Alert,
-} from "@mui/material";
-import { generateRotation } from "../api/rotation";
+} from '@mui/material';
+import { generateRotation } from '../api/rotation';
 
-export default function ItinerairePage() {
-  const [prompt, setPrompt] = useState("");
+export const ItineraireComponent: React.FC = () => {
+  const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [rotationData, setRotationData] = useState<Record<
-    string,
-    unknown
-  > | null>(null);
+  const [rotationData, setRotationData] = useState<Record<string, unknown> | null>(null);
 
   const chartRef = useRef<HTMLDivElement>(null);
 
@@ -32,36 +29,39 @@ export default function ItinerairePage() {
       const data = await generateRotation({ prompt: prompt.trim() });
       setRotationData(data);
     } catch (err: unknown) {
-      const message =
-        err instanceof Error ? err.message : "Failed to generate rotation";
+      const message = err instanceof Error ? err.message : 'Failed to generate rotation';
       setError(message);
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(() => {    
+  useEffect(() => {
     if (!rotationData || !chartRef.current) return;
 
     // Clear previous render
-    chartRef.current.innerHTML = "";
+    chartRef.current.innerHTML = '';
 
     // RotationRenderer is a global from chart-render.js loaded in index.html
-    type RotationRendererCtor = new (divId: string, data: Record<string, unknown>) => {
+    type RotationRendererCtor = new (
+      divId: string,
+      data: Record<string, unknown>,
+    ) => {
       render: () => void;
     };
-    const Renderer = (window as unknown as { RotationRenderer?: RotationRendererCtor }).RotationRenderer;
+    const Renderer = (window as unknown as { RotationRenderer?: RotationRendererCtor })
+      .RotationRenderer;
     if (!Renderer) {
       setError("Le moteur de rendu du graphique n'est pas chargé.");
       return;
     }
 
-    const renderer = new Renderer("rotation-chart", rotationData);
+    const renderer = new Renderer('rotation-chart', rotationData);
     renderer.render();
 
     return () => {
       if (chartRef.current) {
-        chartRef.current.innerHTML = "";
+        chartRef.current.innerHTML = '';
       }
     };
   }, [rotationData]);
@@ -94,7 +94,7 @@ export default function ItinerairePage() {
               disabled={loading || !prompt.trim()}
               startIcon={loading ? <CircularProgress size={20} /> : undefined}
             >
-              {loading ? "Génération en cours..." : "Générer la rotation"}
+              {loading ? 'Génération en cours...' : 'Générer la rotation'}
             </Button>
           </Box>
         </Stack>
@@ -111,13 +111,9 @@ export default function ItinerairePage() {
           <Typography variant="h6" gutterBottom>
             Rotation générée
           </Typography>
-          <Box
-            id="rotation-chart"
-            ref={chartRef}
-            sx={{ width: "100%", minHeight: 500 }}
-          />
+          <Box id="rotation-chart" ref={chartRef} sx={{ width: '100%', minHeight: 500 }} />
         </Paper>
       )}
     </>
   );
-}
+};
