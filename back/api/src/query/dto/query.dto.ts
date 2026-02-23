@@ -40,6 +40,50 @@ export class FilterDto {
   value?: string | number | boolean | (string | number)[];
 }
 
+export class JoinFilterDto {
+  @ApiProperty({ example: "domaine", description: "Source table to filter from" })
+  @IsString()
+  table: string;
+
+  @ApiProperty({ example: "id", description: "Column to select from source table" })
+  @IsString()
+  field: string;
+
+  @ApiProperty({ example: "domaineId", description: "Column on the target table to match against" })
+  @IsString()
+  targetField: string;
+
+  @ApiProperty({ type: [FilterDto], description: "Filters applied to the source table" })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FilterDto)
+  filters: FilterDto[];
+}
+
+export class MedianDto {
+  @ApiProperty({ example: "sdc_realise_perf" })
+  @IsString()
+  table: string;
+
+  @ApiProperty({ example: "iftHistoChimiqueTot" })
+  @IsString()
+  field: string;
+
+  @ApiPropertyOptional({ type: [FilterDto] })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => FilterDto)
+  filters?: FilterDto[];
+
+  @ApiPropertyOptional({ type: [JoinFilterDto], description: "Cross-table subquery filters" })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => JoinFilterDto)
+  joins?: JoinFilterDto[];
+}
+
 export class QueryDto {
   @ApiProperty({ example: "domaine" })
   @IsString()
@@ -69,4 +113,11 @@ export class QueryDto {
   @IsInt()
   @Min(0)
   offset?: number = 0;
+
+  @ApiPropertyOptional({ type: [JoinFilterDto], description: "Cross-table subquery filters" })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => JoinFilterDto)
+  joins?: JoinFilterDto[];
 }

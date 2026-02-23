@@ -2,7 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { sql, eq, ne, gt, gte, lt, lte, like, inArray, isNull, isNotNull, and, SQL } from "drizzle-orm";
 import { PgTable } from "drizzle-orm/pg-core";
 import { DephyService } from "../dephy/dephy.service";
-import { FilterDto } from "./dto/query.dto";
+import { FilterDto, JoinFilterDto } from "./dto/query.dto";
+import { getTableEntry } from "./table-registry";
 
 @Injectable()
 export class QueryRepository {
@@ -33,11 +34,80 @@ export class QueryRepository {
     return Number(result[0].count);
   }
 
-  buildWhere(filters: FilterDto[], columns: Record<string, any>, tableName: string): SQL | undefined {
-    if (filters.length === 0) return undefined;
+  async median(
+    table: PgTable,
+    column: any,
+    where: SQL | undefined,
+  ): Promise<{ median: number | null; count: number }> {
+    const result = await this.dephyService.db
+      .select({
+        median: sql<number | null>`percentile_cont(0.5) WITHIN GROUP (ORDER BY ${column})`,
+        count: sql<number>`count(${column})`,
+      })
+      .from(table)
+      .where(where);
 
-    const conditions = filters.map((f) => this.buildCondition(f, columns, tableName));
+    const row = result[0];
+    return {
+      median: row.median !== null ? Number(row.median) : null,
+      count: Number(row.count),
+    };
+  }
+
+  buildWhere(
+    filters: FilterDto[],
+    columns: Record<string, any>,
+    tableName: string,
+    joins?: JoinFilterDto[],
+  ): SQL | undefined {
+    const conditions: SQL[] = [];
+
+    for (const f of filters) {
+      conditions.push(this.buildCondition(f, columns, tableName));
+    }
+
+    for (const join of joins ?? []) {
+      conditions.push(this.buildJoinSubquery(join, columns, tableName));
+    }
+
+    if (conditions.length === 0) return undefined;
     return and(...conditions);
+  }
+
+  private buildJoinSubquery(
+    join: JoinFilterDto,
+    targetColumns: Record<string, any>,
+    targetTableName: string,
+  ): SQL {
+    const sourceEntry = getTableEntry(join.table);
+    if (!sourceEntry) {
+      throw new Error(`Unknown join table "${join.table}"`);
+    }
+
+    const sourceCol = sourceEntry.columns[join.field];
+    if (!sourceCol) {
+      throw new Error(
+        `Unknown column "${join.field}" in join table "${join.table}". Available: ${Object.keys(sourceEntry.columns).join(", ")}`,
+      );
+    }
+
+    const targetCol = targetColumns[join.targetField];
+    if (!targetCol) {
+      throw new Error(
+        `Unknown column "${join.targetField}" in table "${targetTableName}". Available: ${Object.keys(targetColumns).join(", ")}`,
+      );
+    }
+
+    const sourceWhere = join.filters.length > 0
+      ? and(...join.filters.map((f) => this.buildCondition(f, sourceEntry.columns, join.table)))
+      : undefined;
+
+    const subquery = this.dephyService.db
+      .select({ val: sourceCol })
+      .from(sourceEntry.table)
+      .where(sourceWhere);
+
+    return inArray(targetCol, subquery);
   }
 
   private buildCondition(filter: FilterDto, columns: Record<string, any>, tableName: string) {
