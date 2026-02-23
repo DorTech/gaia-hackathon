@@ -1,11 +1,7 @@
+import { Box, Typography } from '@mui/material';
 import React from 'react';
-import { Box, Button, Chip, Stack, Typography } from '@mui/material';
 
-interface DiagnosticHeaderProps {
-  onReset: () => void;
-}
-
-export const DiagnosticHeader: React.FC<DiagnosticHeaderProps> = ({ onReset }) => {
+export const DiagnosticHeader: React.FC = () => {
   return (
     <Box
       className="page-hd"

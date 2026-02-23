@@ -9,7 +9,6 @@ import { Section } from './components/units/Section';
 import {
   itkFormAtom,
   predictedIFTAtom,
-  ITK_FORM_DEFAULTS,
   CHIP_OPTIONS,
   type ITKFormState,
 } from '../../store/diagnosticAtoms';
@@ -25,13 +24,9 @@ export const DiagnosticPage: React.FC = () => {
     }));
   };
 
-  const resetForm = () => {
-    setForm(ITK_FORM_DEFAULTS);
-  };
-
   return (
     <div className="page active" id="page-itk">
-      <DiagnosticHeader onReset={resetForm} />
+      <DiagnosticHeader />
 
       <div className="itk-layout">
         <div className="card" style={{ padding: '16px 18px' }}>
