@@ -1,5 +1,6 @@
-import { apiClient } from './client';
-import type { BenchmarkFiltersState } from '../types/benchmark';
+import { apiClient } from "./client";
+import type { BenchmarkFiltersState } from "../types/benchmark";
+import { buildPracticeApiMap } from "../config/variables";
 
 // ── Types for API responses ──
 
@@ -280,27 +281,5 @@ export async function fetchDistinctAgricultureTypes(): Promise<string[]> {
     .concat('Tous (Bio + Conv.)'); // Add combined option
 }
 
-// ── Practice profile helpers ──
-
-/** Maps practice IDs to their API config */
-export const PRACTICE_API_MAP: Record<
-  string,
-  { type: 'frequency'; field: string; asBoolean?: boolean } | { type: 'median'; field: string }
-> = {
-  'soil-work': { type: 'frequency', field: 'typeDeTravailDuSol' },
-  'mechanical-weeding': {
-    type: 'frequency',
-    field: 'utiliDesherbageMeca',
-    asBoolean: true,
-  },
-  biocontrol: {
-    type: 'frequency',
-    field: 'recoursAuxMoyensBiologiques',
-    asBoolean: true,
-  },
-  'rotation-count': { type: 'median', field: 'nbRotation' },
-  nitrogen: { type: 'median', field: 'fertiNTot' },
-  'resistant-variety': { type: 'frequency', field: 'varieteResistante' },
-  'winter-cover': { type: 'frequency', field: 'couvertHivernaux' },
-  'fuel-consumption': { type: 'median', field: 'consoCarburant' },
-};
+/** Maps practice IDs to their API config — derived from centralized variable definitions */
+export const PRACTICE_API_MAP = buildPracticeApiMap();

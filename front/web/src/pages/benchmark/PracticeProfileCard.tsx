@@ -75,12 +75,16 @@ export const PracticeProfileCard: React.FC<PracticeProfileCardProps> = ({ title,
                     {item.quantitative.unit}
                   </span>
                 </Typography>
-                {item.quantitative.myValue &&
-                  (() => {
+                {(() => {
                     const refVal = parseFloat(item.quantitative.value.replace(',', '.'));
-                    const myVal = parseFloat(item.quantitative.myValue.replace(',', '.'));
+                    const myVal = item.quantitative.myValue
+                      ? parseFloat(item.quantitative.myValue.replace(',', '.'))
+                      : NaN;
+
+                    if (isNaN(refVal) || isNaN(myVal)) return null;
+
                     const diff = ((myVal - refVal) / refVal) * 100;
-                    const isPositive = diff < 0; // négatif est bon pour consommation/N
+                    const isPositive = diff < 0;
 
                     return (
                       <Box
