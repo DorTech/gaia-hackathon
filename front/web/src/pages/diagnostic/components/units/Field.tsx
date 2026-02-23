@@ -10,7 +10,7 @@ interface FieldProps {
 
 export const Field: React.FC<FieldProps> = ({ label, reference, children }) => {
   return (
-    <Box className="fld" sx={{ display: 'grid', gap: 0.6 }}>
+    <Box className="fld">
       <FieldLabel label={label} reference={reference} />
       {children}
     </Box>

@@ -52,27 +52,44 @@ export const BenchmarkPage: React.FC = () => {
       try {
         // 1. Fetch median IFT
         const medianRes = await fetchMedianIFT(filters);
-        const medianValue = medianRes.median ?? 2.3;
         const count = medianRes.count;
 
-        setMedianIft(medianValue);
+        if (medianRes.median != null && count > 0) {
+          const medianValue = medianRes.median;
+          setMedianIft(medianValue);
 
-        const formattedMedian = medianValue.toFixed(2).replace('.', ',');
-        const deltaPct = (((medianValue - userIFT) / userIFT) * 100).toFixed(1);
-        const deltaSign = parseFloat(deltaPct) > 0 ? '↑ +' : '↓ ';
+          const formattedMedian = medianValue.toFixed(2).replace('.', ',');
+          const deltaPct = (((medianValue - userIFT) / userIFT) * 100).toFixed(1);
+          const deltaSign = parseFloat(deltaPct) > 0 ? '↑ +' : '↓ ';
 
-        setMedianKpis([
-          {
-            id: 'ift',
-            label: '📉 Médiane IFT total',
-            value: formattedMedian,
-            unit: 'IFT',
-            variant: 'violet',
-            sub: `${count} exploitations · ${filters.species}`,
-            delta: `${deltaSign}${Math.abs(parseFloat(deltaPct)).toFixed(1)}% vs votre exploitation (${userIFT.toFixed(2).replace('.', ',')})`,
-            deltaClass: parseFloat(deltaPct) > 0 ? 'warn' : 'good',
-          },
-        ]);
+          setMedianKpis([
+            {
+              id: 'ift',
+              label: '📉 Médiane IFT total',
+              value: formattedMedian,
+              unit: 'IFT',
+              variant: 'violet',
+              sub: `${count} exploitations · ${filters.species}`,
+              delta: `${deltaSign}${Math.abs(parseFloat(deltaPct)).toFixed(1)}% vs votre exploitation (${userIFT.toFixed(2).replace('.', ',')})`,
+              deltaClass: parseFloat(deltaPct) > 0 ? 'warn' : 'good',
+            },
+          ]);
+        } else {
+          setMedianKpis([
+            {
+              id: 'ift',
+              label: '📉 Médiane IFT total',
+              value: '—',
+              unit: '',
+              variant: 'violet',
+              sub: `Aucune exploitation trouvée · ${filters.species}`,
+              delta: '',
+              deltaClass: 'good',
+            },
+          ]);
+        }
+
+        const medianValue = medianRes.median ?? 0;
 
         // 2. Fetch farms
         const farmsRes = await fetchTopFarms(filters);
@@ -234,7 +251,7 @@ export const BenchmarkPage: React.FC = () => {
         </div>
       )}
 
-      {hasAllFilters && (
+      {hasAllFilters && !loading && (
         <>
           {/* KPIs MÉDIANE */}
           <MedianKpiRow kpis={medianKpis} />

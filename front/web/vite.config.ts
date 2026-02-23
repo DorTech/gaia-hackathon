@@ -14,6 +14,11 @@ export default defineConfig(({ mode }) => {
           target: env.VITE_API_URL || "http://localhost:3001",
           changeOrigin: true,
         },
+        "/ml": {
+          target: env.VITE_ML_URL || "http://localhost:8000",
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/ml/, ''),
+        },
       },
     },
   };

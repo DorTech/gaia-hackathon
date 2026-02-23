@@ -14,7 +14,7 @@ export const leversAtom = atom<Lever[]>((get) => {
       id: 'rot',
       name: '🌾 NB Rotation',
       type: 'Quantitatif',
-      current: `${form.rotation} cultures · actuel`,
+      current: `${form.nbCulturesRotation} cultures · actuel`,
       options: [
         { label: '4 cultures', delta: -0.22 },
         { label: '5+ cultures', delta: -0.38, isReference: true },
@@ -24,7 +24,7 @@ export const leversAtom = atom<Lever[]>((get) => {
       id: 'sol',
       name: '🚜 Travail du sol',
       type: 'Qualitatif',
-      current: `${CHIP_OPTIONS.soilWork[form.soilWork]} · actuel`,
+      current: `${CHIP_OPTIONS.soilWork[form.typeTravailDuSol]} · actuel`,
       options: [
         { label: 'TCS', delta: -0.28 },
         { label: 'Semis direct', delta: -0.45, isReference: true },
@@ -34,38 +34,28 @@ export const leversAtom = atom<Lever[]>((get) => {
       id: 'desh',
       name: '⚙️ Désherbage mécanique',
       type: 'Qualitatif',
-      current: `${form.hasWeeding === 1 ? `Oui (${form.weedingPassages} pass.)` : 'Non'} · actuel`,
+      current: `${form.nbrePassagesDesherbageMeca} passages · actuel`,
       options: [
         { label: 'Oui — partiel (2 pass.)', delta: -0.3 },
         { label: 'Oui — complet', delta: -0.52, isReference: true },
       ],
     },
     {
-      id: 'bio',
-      name: '🌿 Recours moyens biologiques',
-      type: 'Qualitatif',
-      current: `${CHIP_OPTIONS.yesNo[form.biologicalControl]} · actuel`,
-      options: [
-        { label: 'Oui', delta: -0.18, isReference: true },
-      ],
-    },
-    {
       id: 'macro',
       name: '🪱 Recours macroorganismes',
       type: 'Qualitatif',
-      current: `${CHIP_OPTIONS.yesNo[form.macroorganisms]} · actuel`,
+      current: `${CHIP_OPTIONS.yesNo[form.recoursMacroorganismes]} · actuel`,
       options: [
         { label: 'Oui', delta: -0.15, isReference: true },
       ],
     },
     {
-      id: 'n',
-      name: '🧪 Fertilisation',
-      type: 'Quantitatif',
-      current: `${form.fertilization} kg/ha · actuel`,
+      id: 'agri',
+      name: '🌱 Type d\'agriculture',
+      type: 'Qualitatif',
+      current: `${CHIP_OPTIONS.agricultureType[form.sdcTypeAgriculture]} · actuel`,
       options: [
-        { label: '160 kg/ha', delta: -0.1 },
-        { label: '140 kg/ha', delta: -0.18, isReference: true },
+        { label: 'Agriculture biologique', delta: -0.35, isReference: true },
       ],
     },
   ];

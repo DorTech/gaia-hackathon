@@ -1,6 +1,7 @@
-import React from 'react';
-import { useAtom, useAtomValue } from 'jotai';
+import React, { useEffect, useRef } from 'react';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { ChipGroup } from './components/atoms/ChipGroup';
+import { InputControl } from './components/atoms/InputControl';
 import { SliderControl } from './components/atoms/SliderControl';
 import { DiagnosticHeader } from './components/units/DiagnosticHeader';
 import { Field } from './components/units/Field';
@@ -9,13 +10,38 @@ import { Section } from './components/units/Section';
 import {
   itkFormAtom,
   predictedIFTAtom,
-  CHIP_OPTIONS,
+  predictingAtom,
   type ITKFormState,
 } from '../../store/diagnosticAtoms';
+import { DIAGNOSTIC_VARIABLES } from '../../config/variables';
+import { predictIFT } from '../../api/predict';
 
 export const DiagnosticPage: React.FC = () => {
   const [form, setForm] = useAtom(itkFormAtom);
   const predictedIFT = useAtomValue(predictedIFTAtom);
+  const setPredictedIFT = useSetAtom(predictedIFTAtom);
+  const setPredicting = useSetAtom(predictingAtom);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+
+    timerRef.current = setTimeout(async () => {
+      setPredicting(true);
+      try {
+        const ift = await predictIFT(form);
+        setPredictedIFT(ift);
+      } catch {
+        // keep previous value on error
+      } finally {
+        setPredicting(false);
+      }
+    }, 400);
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [form, setPredictedIFT, setPredicting]);
 
   const handleFieldChange = <K extends keyof ITKFormState>(field: K, value: ITKFormState[K]) => {
     setForm((prev) => ({
@@ -29,86 +55,38 @@ export const DiagnosticPage: React.FC = () => {
       <DiagnosticHeader />
 
       <div className="itk-layout">
-        <div className="card" style={{ padding: '16px 18px' }}>
+        <div className="card" style={{ padding: '20px 24px' }}>
           <Section title="🌾 Variables du diagnostic" className="itk-last-section">
             <div className="fgrid">
-              <Field label="NB Rotation" reference="Réf : 4,8 cultures">
-                <SliderControl
-                  minLabel="1 culture"
-                  maxLabel="8+"
-                  value={form.rotation}
-                  min={1}
-                  max={8}
-                  onChange={(value) => handleFieldChange('rotation', Math.round(value))}
-                />
-              </Field>
-
-              <Field label="Fertilisation" reference="Réf : 140 kg/ha">
-                <SliderControl
-                  minLabel="0"
-                  maxLabel="300"
-                  value={form.fertilization}
-                  min={0}
-                  max={300}
-                  onChange={(value) => handleFieldChange('fertilization', Math.round(value))}
-                />
-              </Field>
-
-              <Field label="Travail du sol" reference="Réf : TCS">
-                <ChipGroup
-                  options={CHIP_OPTIONS.soilWork}
-                  selectedIndex={form.soilWork}
-                  onSelect={(index) => handleFieldChange('soilWork', index)}
-                />
-              </Field>
-
-              <Field label="Présence de désherbage" reference="Réf : Oui">
-                <ChipGroup
-                  options={CHIP_OPTIONS.yesNo}
-                  selectedIndex={form.hasWeeding}
-                  onSelect={(index) => handleFieldChange('hasWeeding', index)}
-                />
-              </Field>
-
-              {form.hasWeeding === 1 && (
-                <Field label="Nombre de passages" reference="Réf : 2 à 3">
-                  <SliderControl
-                    minLabel="0"
-                    maxLabel="6"
-                    value={form.weedingPassages}
-                    min={0}
-                    max={6}
-                    onChange={(value) => handleFieldChange('weedingPassages', Math.round(value))}
-                  />
+              {DIAGNOSTIC_VARIABLES.map((v) => (
+                <Field key={v.id} label={v.label} reference={v.reference}>
+                  {v.slider ? (
+                    <SliderControl
+                      minLabel={v.slider.minLabel}
+                      maxLabel={v.slider.maxLabel}
+                      value={form[v.formKey] as number}
+                      min={v.slider.min}
+                      max={v.slider.max}
+                      onChange={(value) => handleFieldChange(v.formKey, Math.round(value) as ITKFormState[typeof v.formKey])}
+                    />
+                  ) : v.chips ? (
+                    <ChipGroup
+                      options={v.chips.options}
+                      selectedIndex={form[v.formKey] as number}
+                      onSelect={(index) => handleFieldChange(v.formKey, index as ITKFormState[typeof v.formKey])}
+                    />
+                  ) : v.input ? (
+                    <InputControl
+                      type={v.input.type}
+                      value={form[v.formKey]}
+                      placeholder={v.input.placeholder}
+                      min={v.input.min}
+                      max={v.input.max}
+                      onChange={(val) => handleFieldChange(v.formKey, val as ITKFormState[typeof v.formKey])}
+                    />
+                  ) : null}
                 </Field>
-              )}
-
-              <Field label="Nombre UTH" reference="Réf : 2">
-                <SliderControl
-                  minLabel="0"
-                  maxLabel="6"
-                  value={form.uth}
-                  min={0}
-                  max={6}
-                  onChange={(value) => handleFieldChange('uth', Math.round(value))}
-                />
-              </Field>
-
-              <Field label="Recours moyens biologiques" reference="Réf : Oui">
-                <ChipGroup
-                  options={CHIP_OPTIONS.yesNo}
-                  selectedIndex={form.biologicalControl}
-                  onSelect={(index) => handleFieldChange('biologicalControl', index)}
-                />
-              </Field>
-
-              <Field label="Recours macroorganismes" reference="Réf : Oui">
-                <ChipGroup
-                  options={CHIP_OPTIONS.yesNo}
-                  selectedIndex={form.macroorganisms}
-                  onSelect={(index) => handleFieldChange('macroorganisms', index)}
-                />
-              </Field>
+              ))}
             </div>
           </Section>
         </div>
