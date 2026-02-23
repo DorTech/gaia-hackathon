@@ -28,7 +28,6 @@ export interface VariableConfig {
   id: string;
   formKey: keyof ITKFormState;
   label: string;
-  reference: string;
   dbVariable: string;
   type: 'Qualitatif' | 'Quantitatif';
   unit?: string;
@@ -47,7 +46,6 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     id: 'rotation-count',
     formKey: 'nbCulturesRotation',
     label: 'NB cultures rotation',
-    reference: 'Réf : 4,8 cultures',
     dbVariable: 'nb_cultures_rotation',
     type: 'Quantitatif',
     unit: 'cultures',
@@ -58,7 +56,6 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     id: 'sequence-cultures',
     formKey: 'sequenceCultures',
     label: 'Séquence cultures',
-    reference: 'Ex : Blé > Maïs > Colza',
     dbVariable: 'sequence_cultures',
     type: 'Qualitatif',
     input: { type: 'text', placeholder: 'Blé tendre > Maïs > Colza' },
@@ -67,7 +64,6 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     id: 'macroorganisms',
     formKey: 'recoursMacroorganismes',
     label: 'Recours macroorganismes',
-    reference: 'Réf : Oui',
     dbVariable: 'recours_macroorganismes',
     type: 'Qualitatif',
     chips: { options: ['Non', 'Oui'] },
@@ -76,17 +72,16 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     id: 'weeding-passages',
     formKey: 'nbrePassagesDesherbageMeca',
     label: 'Passages désherbage méca.',
-    reference: 'Réf : 2 à 3',
     dbVariable: 'nbre_de_passages_desherbage_meca',
     type: 'Quantitatif',
     unit: 'passages',
     slider: { min: 0, max: 6, minLabel: '0', maxLabel: '6' },
+    benchmarkApi: { type: 'median', field: 'nbWeedingPasses' },
   },
   {
     id: 'soil-work',
     formKey: 'typeTravailDuSol',
     label: 'Travail du sol',
-    reference: 'Réf : TCS',
     dbVariable: 'type_de_travail_du_sol',
     type: 'Qualitatif',
     chips: { options: ['Labour', 'TCS', 'Semis direct'] },
@@ -96,7 +91,6 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     id: 'departement',
     formKey: 'departement',
     label: 'Département',
-    reference: 'Code INSEE',
     dbVariable: 'departement',
     type: 'Quantitatif',
     input: { type: 'number', placeholder: '31', min: 1, max: 976 },
@@ -105,7 +99,6 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     id: 'agriculture-type',
     formKey: 'sdcTypeAgriculture',
     label: "Type d'agriculture",
-    reference: 'Réf : Conventionnelle',
     dbVariable: 'sdc_type_agriculture',
     type: 'Qualitatif',
     chips: { options: ['Conventionnelle', 'Biologique', 'Conversion bio'] },

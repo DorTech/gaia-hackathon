@@ -1,6 +1,6 @@
-import { apiClient } from "./client";
-import type { BenchmarkFiltersState } from "../types/benchmark";
-import { buildPracticeApiMap } from "../config/variables";
+import { apiClient } from './client';
+import type { BenchmarkFiltersState } from '../types/benchmark';
+import { buildPracticeApiMap } from '../config/variables';
 
 // ── Types for API responses ──
 
@@ -100,12 +100,27 @@ export async function fetchMedianField(
   // Special route for nbCulturesRotation
   if (field === 'nbCulturesRotation') {
     const deptCode = filters.department.split(' ')[0];
-    const { data } = await apiClient.post<{ nbRotation: number }>('/query/median_nb_rotation', {
-      culture: filters.species,
-      department: deptCode,
-      agricultureType: filters.agricultureType,
-    });
-    return data.nbRotation;
+    const { data } = await apiClient.post<{ medianNbRotation: number }>(
+      '/query/median_nb_rotation',
+      {
+        culture: filters.species,
+        department: deptCode,
+        agricultureType: filters.agricultureType,
+      },
+    );
+    return data.medianNbRotation;
+  }
+  if (field === 'nbWeedingPasses') {
+    const deptCode = filters.department.split(' ')[0];
+    const { data } = await apiClient.post<{ medianNbWeedingPasses: number }>(
+      '/query/median_nb_weeding_passes',
+      {
+        culture: filters.species,
+        department: deptCode,
+        agricultureType: filters.agricultureType,
+      },
+    );
+    return data.medianNbWeedingPasses;
   }
 
   const { data } = await apiClient.post<MedianResponse>('/query/median', {
