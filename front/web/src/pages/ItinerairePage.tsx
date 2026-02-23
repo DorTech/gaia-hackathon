@@ -40,14 +40,23 @@ export default function ItinerairePage() {
     }
   };
 
-  useEffect(() => {
+  useEffect(() => {    
     if (!rotationData || !chartRef.current) return;
 
     // Clear previous render
     chartRef.current.innerHTML = "";
 
     // RotationRenderer is a global from chart-render.js loaded in index.html
-    const renderer = new RotationRenderer("rotation-chart", rotationData);
+    type RotationRendererCtor = new (divId: string, data: Record<string, unknown>) => {
+      render: () => void;
+    };
+    const Renderer = (window as unknown as { RotationRenderer?: RotationRendererCtor }).RotationRenderer;
+    if (!Renderer) {
+      setError("Le moteur de rendu du graphique n'est pas chargé.");
+      return;
+    }
+
+    const renderer = new Renderer("rotation-chart", rotationData);
     renderer.render();
 
     return () => {
