@@ -74,12 +74,11 @@ export const BenchmarkPage: React.FC = () => {
           },
         ]);
 
-        // 2. Fetch top farms
+        // 2. Fetch farms
         const farmsRes = await fetchTopFarms(filters);
         const sortedFarms = farmsRes.data
           .filter((f) => f.iftHistoChimiqueTot != null)
-          .sort((a, b) => a.iftHistoChimiqueTot - b.iftHistoChimiqueTot)
-          .slice(0, 10);
+          .sort((a, b) => a.iftHistoChimiqueTot - b.iftHistoChimiqueTot);
 
         setReferenceFarms(
           sortedFarms.map((f, i) => {
@@ -98,17 +97,17 @@ export const BenchmarkPage: React.FC = () => {
         );
 
         // 3. Fetch practice profile data
-        const currentProfile = PRACTICE_PROFILE_TEMPLATE;
+        const baseProfile = PRACTICE_PROFILE_TEMPLATE;
         const updatedProfile: PracticeProfileItem[] = await Promise.all(
-          currentProfile.map(async (item) => {
-            const apiConfig = PRACTICE_API_MAP[item.id];
-            if (!apiConfig) return item; // keep mock for items not in the API
+          baseProfile.map(async (profile) => {
+            const apiConfig = PRACTICE_API_MAP[profile.id];
+            if (!apiConfig) return profile; // keep mock for items not in the API
 
             try {
               if (apiConfig.type === 'frequency') {
                 const res = await fetchFrequency(apiConfig.field, filters, apiConfig.asBoolean);
                 const total = res.data.reduce((sum, r) => sum + r.count, 0);
-                if (total === 0) return item;
+                if (total === 0) return profile;
 
                 const frequencies = res.data
                   .filter((r) => r.value !== null)
@@ -118,31 +117,28 @@ export const BenchmarkPage: React.FC = () => {
                     top: idx === 0,
                   }));
 
-                return { ...item, frequencies };
+                return { ...profile, frequencies };
               }
 
               if (apiConfig.type === 'median') {
                 const res = await fetchMedianField(apiConfig.field, filters);
-                if (res.median === null) return item;
+                if (res === null) return profile;
 
-                const formatted =
-                  res.median % 1 === 0
-                    ? String(res.median)
-                    : res.median.toFixed(1).replace('.', ',');
+                const formatted = res % 1 === 0 ? String(res) : res.toFixed(1).replace('.', ',');
 
                 return {
-                  ...item,
+                  ...profile,
                   quantitative: {
-                    ...item.quantitative!,
+                    ...profile.quantitative!,
                     value: formatted,
                   },
                 };
               }
             } catch {
-              return item; // fallback to mock on error
+              return profile; // fallback to mock on error
             }
 
-            return item;
+            return profile;
           }),
         );
 
