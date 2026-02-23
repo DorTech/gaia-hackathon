@@ -125,8 +125,52 @@ WHERE unaccent(sac.culture_nom) ILIKE unaccent('%' || ${query.culture} || '%')
   async medianNbWeedingPasses(
     query: NewFilterDto,
   ): Promise<{ median: number | null }> {
+    const result = await this.dephyService.db.execute(sql`
+WITH rotation_cte AS (
+    SELECT
+        sdc.id,
+        COUNT(DISTINCT sac.culture_nom) AS nb_cultures_rotation,
+        STRING_AGG(DISTINCT sac.culture_nom, ' > ') AS sequence_cultures
+    FROM sdc
+    JOIN succession_assolee_synthetise_magasin_can sac
+        ON sdc.id = sac.sdc_id
+    GROUP BY sdc.id
+)
+SELECT
+    PERCENTILE_CONT(0.5) 
+        WITHIN GROUP (ORDER BY spmc.nbre_de_passages_desherbage_meca) AS median_nb_weeding
+FROM rotation_cte r
+JOIN synthetise_perf_magasin_can spmc
+    ON r.id = spmc.sdc_id
+JOIN sdc
+    ON sdc.id = r.id
+JOIN dispositif
+    ON dispositif.id = sdc.dispositif_id
+JOIN domain
+    ON domain.id = dispositif.domaine_id
+JOIN succession_assolee_synthetise_magasin_can sac
+    ON sac.sdc_id = sdc.id
+WHERE unaccent(sac.culture_nom) ILIKE unaccent('%' || ${query.culture} || '%')
+  AND domain.departement LIKE ${query.department}
+  AND sdc.type_agriculture LIKE ${query.agricultureType};
+ `);
+
+    if (result.rows.length === 0) {
+      console.warn(
+        `No data found for culture="${query.culture}", department="${query.department}", agricultureType="${query.agricultureType}"`,
+      );
+      return { median: null };
+    }
+
+    const row = result.rows[0];
+    if (!row || row?.median_nb_weeding === null) {
+      console.warn(
+        `Median number of weeding passes is null for culture="${query.culture}", department="${query.department}", agricultureType="${query.agricultureType}"`,
+      );
+      return { median: null };
+    }
     return {
-      median: null,
+      median: Number(row.median_nb_weeding),
     };
   }
 
