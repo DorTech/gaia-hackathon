@@ -5,14 +5,21 @@ import {
   IsInt,
   IsBoolean,
   Min,
-  Max,
   ValidateNested,
   IsIn,
 } from "class-validator";
 import { Type } from "class-transformer";
 import { ApiProperty, ApiPropertyOptional } from "@nestjs/swagger";
+import {
+  FilterOperator,
+  IFilter,
+  IJoinFilter,
+  IQueryRequest,
+  IMedianRequest,
+  IFrequencyRequest,
+} from "@gaia/shared-type";
 
-const FILTER_OPERATORS = [
+const FILTER_OPERATORS: FilterOperator[] = [
   "eq",
   "neq",
   "gt",
@@ -23,11 +30,9 @@ const FILTER_OPERATORS = [
   "in",
   "isNull",
   "isNotNull",
-] as const;
+];
 
-export type FilterOperator = (typeof FILTER_OPERATORS)[number];
-
-export class FilterDto {
+export class FilterDto implements IFilter {
   @ApiProperty({ example: "departement" })
   @IsString()
   field: string;
@@ -41,7 +46,7 @@ export class FilterDto {
   value?: string | number | boolean | (string | number)[];
 }
 
-export class JoinFilterDto {
+export class JoinFilterDto implements IJoinFilter {
   @ApiProperty({ example: "domaine", description: "Source table to filter from" })
   @IsString()
   table: string;
@@ -61,7 +66,7 @@ export class JoinFilterDto {
   filters: FilterDto[];
 }
 
-export class MedianDto {
+export class MedianDto implements IMedianRequest {
   @ApiProperty({ example: "sdc_realise_perf" })
   @IsString()
   table: string;
@@ -85,7 +90,7 @@ export class MedianDto {
   joins?: JoinFilterDto[];
 }
 
-export class FrequencyDto {
+export class FrequencyDto implements IFrequencyRequest {
   @ApiProperty({ example: "domaine" })
   @IsString()
   table: string;
@@ -114,7 +119,7 @@ export class FrequencyDto {
   asBoolean?: boolean;
 }
 
-export class QueryDto {
+export class QueryDto implements IQueryRequest {
   @ApiProperty({ example: "domaine" })
   @IsString()
   table: string;

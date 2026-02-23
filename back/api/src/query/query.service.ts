@@ -2,16 +2,22 @@ import { Injectable, BadRequestException } from "@nestjs/common";
 import { getTableEntry, listTables } from "./table-registry";
 import { QueryDto, MedianDto, FrequencyDto } from "./dto/query.dto";
 import { QueryRepository } from "./query.repository";
+import {
+  ITableInfo,
+  IQueryResponse,
+  IMedianResponse,
+  IFrequencyResponse,
+} from "@gaia/shared-type";
 
 @Injectable()
 export class QueryService {
   constructor(private readonly queryRepository: QueryRepository) {}
 
-  getTables() {
+  getTables(): ITableInfo[] {
     return listTables();
   }
 
-  async executeQuery(query: QueryDto) {
+  async executeQuery(query: QueryDto): Promise<IQueryResponse> {
     const entry = getTableEntry(query.table);
     if (!entry) {
       throw new BadRequestException(
@@ -49,7 +55,7 @@ export class QueryService {
     return { data, total, limit, offset };
   }
 
-  async getMedian(dto: MedianDto) {
+  async getMedian(dto: MedianDto): Promise<IMedianResponse> {
     const entry = getTableEntry(dto.table);
     if (!entry) {
       throw new BadRequestException(
@@ -77,7 +83,7 @@ export class QueryService {
     return { table: dto.table, field: dto.field, ...result };
   }
 
-  async getFrequency(dto: FrequencyDto) {
+  async getFrequency(dto: FrequencyDto): Promise<IFrequencyResponse> {
     const entry = getTableEntry(dto.table);
     if (!entry) {
       throw new BadRequestException(
