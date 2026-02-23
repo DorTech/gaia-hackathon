@@ -30,7 +30,7 @@ export default function TopBar({ open }: { open: boolean }) {
           <MenuIcon />
         </IconButton>
         <Typography variant="h6" noWrap>
-          GAIA Hackathon
+          Optimeo
         </Typography>
       </Toolbar>
     </AppBar>

@@ -1,10 +1,11 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
-import App from "../App";
-import MainLayout from "../layouts/MainLayout";
-import DashboardPage from "../pages/DashboardPage";
-import ItinerairePage from "../pages/ItinerairePage";
-import SettingsPage from "../pages/SettingsPage";
-import NotFoundPage from "../pages/NotFoundPage";
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import App from '../App';
+import MainLayout from '../layouts/MainLayout';
+import { BenchmarkPage } from '../pages/benchmark/BenchmarkPage';
+import { DiagnosticPage } from '../pages/DiagnosticPage';
+import ItinerairePage from '../pages/ItinerairePage';
+import NotFoundPage from '../pages/NotFoundPage';
+import { SimulationPage } from '../pages/SimulationPage';
 
 export const router = createBrowserRouter([
   {
@@ -13,11 +14,12 @@ export const router = createBrowserRouter([
       {
         element: <MainLayout />,
         children: [
-          { index: true, element: <Navigate to="/dashboard" replace /> },
-          { path: "dashboard", element: <DashboardPage /> },
-          { path: "itineraire", element: <ItinerairePage /> },
-          { path: "settings", element: <SettingsPage /> },
-          { path: "*", element: <NotFoundPage /> },
+          { index: true, element: <Navigate to="/benchmark" replace /> },
+          { path: 'itineraire', element: <ItinerairePage /> },
+          { path: 'benchmark', element: <BenchmarkPage /> },
+          { path: 'diagnostic', element: <DiagnosticPage /> },
+          { path: 'simulation', element: <SimulationPage /> },
+          { path: '*', element: <NotFoundPage /> },
         ],
       },
     ],

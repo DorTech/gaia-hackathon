@@ -1,3 +1,6 @@
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
 import {
   Drawer,
   List,
@@ -6,19 +9,16 @@ import {
   ListItemIcon,
   ListItemText,
   Toolbar,
-} from "@mui/material";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import AgricultureIcon from "@mui/icons-material/Agriculture";
-import SettingsIcon from "@mui/icons-material/Settings";
-import { useLocation, useNavigate } from "react-router-dom";
+} from '@mui/material';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const DRAWER_WIDTH = 240;
 const DRAWER_WIDTH_CLOSED = 64;
 
 const NAV_ITEMS = [
-  { label: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
-  { label: "Itinéraire Technique", icon: <AgricultureIcon />, path: "/itineraire" },
-  { label: "Settings", icon: <SettingsIcon />, path: "/settings" },
+  { label: 'Benchmark régional', icon: <BarChartIcon />, path: '/benchmark' },
+  { label: 'Mon diagnostic ITK', icon: <AssignmentIcon />, path: '/diagnostic' },
+  { label: 'Simulation leviers', icon: <PlayCircleFilledIcon />, path: '/simulation' },
 ];
 
 export default function Sidebar({ open }: { open: boolean }) {
@@ -31,12 +31,12 @@ export default function Sidebar({ open }: { open: boolean }) {
       sx={{
         width: open ? DRAWER_WIDTH : DRAWER_WIDTH_CLOSED,
         flexShrink: 0,
-        whiteSpace: "nowrap",
-        "& .MuiDrawer-paper": {
+        whiteSpace: 'nowrap',
+        '& .MuiDrawer-paper': {
           width: open ? DRAWER_WIDTH : DRAWER_WIDTH_CLOSED,
-          overflowX: "hidden",
+          overflowX: 'hidden',
           transition: (t) =>
-            t.transitions.create("width", {
+            t.transitions.create('width', {
               easing: t.transitions.easing.sharp,
               duration: t.transitions.duration.leavingScreen,
             }),
@@ -46,29 +46,26 @@ export default function Sidebar({ open }: { open: boolean }) {
       <Toolbar />
       <List>
         {NAV_ITEMS.map((item) => (
-          <ListItem key={item.path} disablePadding sx={{ display: "block" }}>
+          <ListItem key={item.path} disablePadding sx={{ display: 'block' }}>
             <ListItemButton
               selected={location.pathname === item.path}
               onClick={() => navigate(item.path)}
               sx={{
                 minHeight: 48,
-                justifyContent: open ? "initial" : "center",
+                justifyContent: open ? 'initial' : 'center',
                 px: 2.5,
               }}
             >
               <ListItemIcon
                 sx={{
                   minWidth: 0,
-                  mr: open ? 2 : "auto",
-                  justifyContent: "center",
+                  mr: open ? 2 : 'auto',
+                  justifyContent: 'center',
                 }}
               >
                 {item.icon}
               </ListItemIcon>
-              <ListItemText
-                primary={item.label}
-                sx={{ opacity: open ? 1 : 0 }}
-              />
+              <ListItemText primary={item.label} sx={{ opacity: open ? 1 : 0 }} />
             </ListItemButton>
           </ListItem>
         ))}
