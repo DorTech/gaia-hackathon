@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { db, dispositif, domaine, domaineSol, parcelle, parcelleType, sdc, sdcRealisePerfMagasinCan, successionAssoleeSynthetiseMagasinCan, synthetisePerfMagasinCan, interventionSynthetiseMagasinCan, synthetise, zone } from "../src";
+import { db, dispositif, domaine, domaineSol, parcelle, parcelleType, sdc, sdcRealisePerfMagasinCan, successionAssoleeSynthetiseMagasinCan, successionAssoleeRealiseMagasinCan, synthetisePerfMagasinCan, interventionSynthetiseMagasinCan, synthetise, zone } from "../src";
 import { parse } from "csv-parse/sync";
 import { parse as parseStream } from "csv-parse";
 import { readFileSync, existsSync, createReadStream } from "fs";
@@ -44,12 +44,14 @@ const importConfigs: ImportConfig[] = [
 			"sdc_realise_performance_magasin_can.csv",
 			"synthetise_performance_magasin_can.csv",
 			"succession_assolee_synthetise_magasin_can.csv",
+			"succession_assolee_realise_magasin_can.csv",
 			"intervention_synthetise_magasin_can.csv",
 		],
 		handlers: {
 			"sdc_realise_performance_magasin_can.csv": importSdcRealisePerfMagasinCan,
 			"synthetise_performance_magasin_can.csv": importSynthetisePerfMagasinCan,
 			"succession_assolee_synthetise_magasin_can.csv": importSuccessionAssoleeSynthetiseMagasinCan,
+			"succession_assolee_realise_magasin_can.csv": importSuccessionAssoleeRealiseMagasinCan,
 		},
 		streamHandlers: {
 			"intervention_synthetise_magasin_can.csv": importInterventionSynthetiseMagasinCan,
@@ -1420,6 +1422,52 @@ async function importSuccessionAssoleeSynthetiseMagasinCan(records: any[]) {
 		}));
 
 		await db.insert(successionAssoleeSynthetiseMagasinCan).values(values);
+		console.log(
+			`  Batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(records.length / batchSize)} ✓`,
+		);
+	}
+}
+
+async function importSuccessionAssoleeRealiseMagasinCan(records: any[]) {
+	console.log(`Importing ${records.length} succession_assolee_realise_magasin_can records...`);
+
+	const parseIntOrNull = (val: string) => {
+		if (!val || val === "") return null;
+		const parsed = parseInt(val, 10);
+		return isNaN(parsed) ? null : parsed;
+	};
+
+	const parseStringOrNull = (val: string) => {
+		return !val || val === "" ? null : val;
+	};
+
+	const batchSize = 1000;
+	for (let i = 0; i < records.length; i += batchSize) {
+		const batch = records.slice(i, i + batchSize);
+		const values = batch.map((record: any) => ({
+			domaineCode: parseStringOrNull(record.domaine_code),
+			domaineId: parseStringOrNull(record.domaine_id),
+			domaineNom: parseStringOrNull(record.domaine_nom),
+			domaineCampagne: parseIntOrNull(record.domaine_campagne),
+			sdcCode: parseStringOrNull(record.sdc_code),
+			sdcId: parseStringOrNull(record.sdc_id),
+			sdcNom: parseStringOrNull(record.sdc_nom),
+			parcelleId: parseStringOrNull(record.parcelle_id),
+			parcelleNom: parseStringOrNull(record.parcelle_nom),
+			zoneId: parseStringOrNull(record.zone_id),
+			zoneNom: parseStringOrNull(record.zone_nom),
+			cultureRang: parseIntOrNull(record.culture_rang),
+			cultureId: parseStringOrNull(record.culture_id),
+			cultureNom: parseStringOrNull(record.culture_nom),
+			cultureEspecesEdi: parseStringOrNull(record.culture_especes_edi),
+			ciId: parseStringOrNull(record.ci_id),
+			ciNom: parseStringOrNull(record.ci_nom),
+			precedentId: parseStringOrNull(record.precedent_id),
+			precedentNom: parseStringOrNull(record.precedent_nom),
+			precedentEspecesEdi: parseStringOrNull(record.precedent_especes_edi),
+		}));
+
+		await db.insert(successionAssoleeRealiseMagasinCan).values(values);
 		console.log(
 			`  Batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(records.length / batchSize)} ✓`,
 		);
