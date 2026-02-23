@@ -2,7 +2,7 @@
 	"name": "@bloomeo/dephy-dataset",
 	"packageManager": "yarn@4.6.0",
 	"main": "./build/index.js",
-	"types": "./build/types.d.ts",
+	"types": "./build/index.d.ts",
 	"license": "MIT",
 	"version": "1.0.0",
 	"files": [
@@ -28,6 +28,7 @@
 		"drizzle:generate": "drizzle-kit generate",
 		"drizzle:migrate": "drizzle-kit migrate",
 		"drizzle:studio": "drizzle-kit studio",
-		"import:data": "ts-node scripts/import-data.ts"
+		"import:data": "ts-node scripts/import-data.ts",
+		"build": "tsc --outDir build"
 	}
 }
