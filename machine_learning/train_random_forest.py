@@ -13,10 +13,48 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-NUMERIC_COLS = ["nb_cultures_rotation", "nbre_de_passages_desherbage_meca"]
-CATEGORICAL_COLS = ["sequence_cultures", "recours_macroorganismes", "type_de_travail_du_sol"]
-FEATURE_COLS = NUMERIC_COLS + CATEGORICAL_COLS
+NUMERIC_COLS = ["nb_cultures_rotation", "nbre_de_passages_desherbage_meca", "sequence_length"]
+CATEGORICAL_COLS = ["recours_macroorganismes", "type_de_travail_du_sol"]
+SEQUENCE_COL = "sequence_cultures"
 TARGET_COL = "ift_histo_chimique_tot"
+
+# These will be populated during training
+KNOWN_CROPS = []
+FEATURE_COLS = NUMERIC_COLS + CATEGORICAL_COLS  # Crops will be added dynamically
+
+
+def extract_crops_from_sequence(sequence: str) -> list[str]:
+    """Extract individual crops from a sequence string."""
+    if pd.isna(sequence) or not str(sequence).strip():
+        return []
+    return [crop.strip() for crop in str(sequence).split(">")]
+
+
+def get_known_crops(df: pd.DataFrame) -> list[str]:
+    """Extract all unique crops from sequence_cultures column."""
+    all_crops = set()
+    for seq in df[SEQUENCE_COL].dropna():
+        crops = extract_crops_from_sequence(seq)
+        all_crops.update(crops)
+    return sorted(list(all_crops))
+
+
+def add_crop_features(df: pd.DataFrame) -> pd.DataFrame:
+    """Add binary features for each crop presence and sequence length."""
+    df = df.copy()
+    
+    # Add sequence length
+    df["sequence_length"] = df[SEQUENCE_COL].apply(
+        lambda x: len(extract_crops_from_sequence(x)) if pd.notna(x) else 0
+    )
+    
+    # Add binary features for each known crop
+    for crop in KNOWN_CROPS:
+        df[f"crop_{crop}"] = df[SEQUENCE_COL].apply(
+            lambda x: 1 if crop in extract_crops_from_sequence(x) else 0
+        )
+    
+    return df
 
 
 def load_env() -> None:
@@ -79,9 +117,9 @@ JOIN synthetise_perf_magasin_can spmc
 
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
-    df = df.dropna(subset=[TARGET_COL] + FEATURE_COLS)
+    df = df.dropna(subset=[TARGET_COL, SEQUENCE_COL] + CATEGORICAL_COLS)
     # Convert numeric columns to numeric type
-    for col in NUMERIC_COLS:
+    for col in ["nb_cultures_rotation", "nbre_de_passages_desherbage_meca"]:
         df[col] = pd.to_numeric(df[col], errors="coerce")
     # Convert categorical columns to string
     for col in CATEGORICAL_COLS:
@@ -90,6 +128,19 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
 
 def train_model(df: pd.DataFrame) -> tuple[Pipeline, dict]:
+    global KNOWN_CROPS, FEATURE_COLS
+    
+    # Extract known crops from training data
+    KNOWN_CROPS = get_known_crops(df)
+    print(f"Found {len(KNOWN_CROPS)} unique crops: {KNOWN_CROPS}")
+    
+    # Add crop features
+    df = add_crop_features(df)
+    
+    # Update feature columns to include crops (they are numeric binary features)
+    crop_cols = [f"crop_{crop}" for crop in KNOWN_CROPS]
+    FEATURE_COLS = NUMERIC_COLS + CATEGORICAL_COLS + crop_cols
+    
     X = df[FEATURE_COLS]
     y = df[TARGET_COL]
 
@@ -97,9 +148,12 @@ def train_model(df: pd.DataFrame) -> tuple[Pipeline, dict]:
         X, y, test_size=0.2, random_state=42
     )
 
+    # All crop columns are numeric binary, so include them in numeric preprocessing
+    numeric_cols_with_crops = NUMERIC_COLS + crop_cols
+    
     preprocessor = ColumnTransformer(
         transformers=[
-            ("num", StandardScaler(), NUMERIC_COLS),
+            ("num", StandardScaler(), numeric_cols_with_crops),
             ("cat", OneHotEncoder(handle_unknown="ignore"), CATEGORICAL_COLS),
         ],
         remainder="drop",
@@ -128,6 +182,7 @@ def train_model(df: pd.DataFrame) -> tuple[Pipeline, dict]:
         "mae": float(mean_absolute_error(y_test, preds)),
         "rmse": float(mean_squared_error(y_test, preds, squared=False)),
         "r2": float(r2_score(y_test, preds)),
+        "known_crops": KNOWN_CROPS,
     }
 
     return pipeline, metrics
