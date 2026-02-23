@@ -8,6 +8,7 @@ import {
   Toolbar,
 } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
+import AgricultureIcon from "@mui/icons-material/Agriculture";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -16,6 +17,7 @@ const DRAWER_WIDTH_CLOSED = 64;
 
 const NAV_ITEMS = [
   { label: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
+  { label: "Itinéraire Technique", icon: <AgricultureIcon />, path: "/itineraire" },
   { label: "Settings", icon: <SettingsIcon />, path: "/settings" },
 ];
 

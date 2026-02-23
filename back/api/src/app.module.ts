@@ -2,6 +2,7 @@ import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { DephyModule } from "./dephy/dephy.module";
 import { QueryModule } from "./query/query.module";
+import { RotationModule } from "./rotation/rotation.module";
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { QueryModule } from "./query/query.module";
     }),
     DephyModule,
     QueryModule,
+    RotationModule,
   ],
 })
 export class AppModule {}

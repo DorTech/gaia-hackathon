@@ -14,6 +14,7 @@
     "@gaia/shared-type": "workspace:^",
     "@mui/icons-material": "^6.4.0",
     "@mui/material": "^6.4.0",
+    "@osfarm/itineraire-technique": "^1.2.3",
     "axios": "^1.7.0",
     "jotai": "^2.11.0",
     "react": "^19.0.0",
