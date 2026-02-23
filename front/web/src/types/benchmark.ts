@@ -21,7 +21,6 @@ export interface BenchmarkFilterOptions {
   species: string[];
   department: string[];
   agricultureType: string[];
-  iftThreshold: string[];
 }
 
 export interface PracticeFrequencyRow {
@@ -44,7 +43,6 @@ export interface PracticeProfileItem {
   mode: 'quali' | 'quanti';
   frequencies?: PracticeFrequencyRow[];
   note?: {
-    label: string;
     value: string;
     suffix?: string;
   };
@@ -59,5 +57,4 @@ export interface BenchmarkFiltersState {
   species: string;
   department: string;
   agricultureType: string;
-  iftThreshold: string;
 }

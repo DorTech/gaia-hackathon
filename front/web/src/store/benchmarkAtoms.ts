@@ -10,16 +10,32 @@ import { itkFormAtom, CHIP_OPTIONS } from './diagnosticAtoms';
 
 export const benchmarkLoadingAtom = atom<boolean>(false);
 
+/** Raw species list from the backend (may contain comma-separated values) */
+export const rawSpeciesListAtom = atom<string[]>([]);
+
+/** Flattened species list — splits comma-separated values and removes duplicates */
+export const flattenedSpeciesListAtom = atom<string[]>((get) => {
+  const rawSpecies = get(rawSpeciesListAtom);
+  const speciesSet = new Set<string>();
+
+  rawSpecies.forEach((item) => {
+    // Split by comma and trim each value
+    const parts = item.split(',').map((s) => s.trim());
+    parts.forEach((part) => {
+      if (part && part.length > 0) {
+        speciesSet.add(part);
+      }
+    });
+  });
+
+  // Return sorted array for consistent display
+  return Array.from(speciesSet).sort();
+});
+
 export const benchmarkFilterOptionsAtom = atom<BenchmarkFilterOptions>({
-  species: ['Blé tendre', 'Maïs grain', 'Colza', "Orge d'hiver", 'Tournesol'],
-  department: [
-    '35 — Ille-et-Vilaine',
-    '29 — Finistère',
-    "22 — Côtes-d'Armor",
-    '56 — Morbihan',
-  ],
-  agricultureType: ['Tous (Bio + Conv.)', 'Conventionnel seul', 'Biologique seul'],
-  iftThreshold: ['−20% vs médiane', '−30% vs médiane', '−40% vs médiane'],
+  species: [],
+  department: [],
+  agricultureType: ['JE VIENS PAS DU BACK', 'Tous (Bio + Conv.)', 'Conventionnel seul', 'Biologique seul'],
 });
 
 export const benchmarkReferenceFarmsAtom = atom<BenchmarkFarm[]>([
@@ -213,10 +229,9 @@ export const benchmarkPracticeProfileAtom = atom<PracticeProfileItem[]>([
 ]);
 
 export const benchmarkFiltersAtom = atom<BenchmarkFiltersState>({
-  species: 'Blé tendre',
-  department: '35 — Ille-et-Vilaine',
-  agricultureType: 'Tous (Bio + Conv.)',
-  iftThreshold: '−30% vs médiane',
+  species: '',
+  department: '',
+  agricultureType: '',
 });
 
 /**
@@ -242,14 +257,7 @@ export const enrichedPracticeProfileAtom = atom<PracticeProfileItem[]>((get) => 
         return {
           ...item,
           quantitative: item.quantitative
-            ? { ...item.quantitative, myValue: String(form.nitrogenTotal) }
-            : item.quantitative,
-        };
-      case 'fuel-consumption':
-        return {
-          ...item,
-          quantitative: item.quantitative
-            ? { ...item.quantitative, myValue: String(form.fuel) }
+            ? { ...item.quantitative, myValue: String(form.fertilization) }
             : item.quantitative,
         };
 
@@ -257,29 +265,19 @@ export const enrichedPracticeProfileAtom = atom<PracticeProfileItem[]>((get) => 
       case 'soil-work':
         return {
           ...item,
-          note: { label: 'Mon choix :', value: CHIP_OPTIONS.soilType[form.soilType] },
+          note: { value: CHIP_OPTIONS.soilWork[form.soilWork] },
         };
       case 'mechanical-weeding':
         return {
           ...item,
-          note: { label: 'Mon choix :', value: CHIP_OPTIONS.mechanicalWeeding[form.mechanicalWeeding] },
+          note: { value: form.hasWeeding === 1 ? 'Oui' : 'Non' },
         };
       case 'biocontrol':
         return {
           ...item,
-          note: { label: 'Mon choix :', value: CHIP_OPTIONS.biocontrolUse[form.biocontrolUse] },
+          note: { value: form.biologicalControl === 1 ? 'Oui' : 'Non' },
         };
-      case 'resistant-variety':
-        return {
-          ...item,
-          note: { label: 'Mon choix :', value: CHIP_OPTIONS.resistantVariety[form.resistantVariety] },
-        };
-      case 'winter-cover':
-        return {
-          ...item,
-          note: { label: 'Mon choix :', value: CHIP_OPTIONS.coverCrops[form.coverCrops] },
-        };
-
+ 
       default:
         return item;
     }

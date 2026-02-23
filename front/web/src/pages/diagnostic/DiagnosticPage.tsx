@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import { useAtom, useAtomValue } from 'jotai';
 import { ChipGroup } from './components/atoms/ChipGroup';
 import { SliderControl } from './components/atoms/SliderControl';
 import { DiagnosticHeader } from './components/units/DiagnosticHeader';
 import { Field } from './components/units/Field';
 import { PredictionSidebar } from './components/units/PredictionSidebar';
 import { Section } from './components/units/Section';
-import { CHIP_OPTIONS, INITIAL_ITK_FORM } from './constants';
-import type { ITKFormState } from './types';
-import { calculatePredictedIFT } from './utils';
+import {
+  itkFormAtom,
+  predictedIFTAtom,
+  CHIP_OPTIONS,
+  type ITKFormState,
+} from '../../store/diagnosticAtoms';
 
 export const DiagnosticPage: React.FC = () => {
-  const [form, setForm] = useState<ITKFormState>(INITIAL_ITK_FORM);
-  const [predictedIFT, setPredictedIFT] = useState(2.8);
-
-  useEffect(() => {
-    setPredictedIFT(calculatePredictedIFT(form));
-  }, [form]);
+  const [form, setForm] = useAtom(itkFormAtom);
+  const predictedIFT = useAtomValue(predictedIFTAtom);
 
   const handleFieldChange = <K extends keyof ITKFormState>(field: K, value: ITKFormState[K]) => {
     setForm((prev) => ({
@@ -24,13 +24,9 @@ export const DiagnosticPage: React.FC = () => {
     }));
   };
 
-  const resetForm = () => {
-    setForm(INITIAL_ITK_FORM);
-  };
-
   return (
     <div className="page active" id="page-itk">
-      <DiagnosticHeader onReset={resetForm} />
+      <DiagnosticHeader />
 
       <div className="itk-layout">
         <div className="card" style={{ padding: '16px 18px' }}>
@@ -117,7 +113,7 @@ export const DiagnosticPage: React.FC = () => {
           </Section>
         </div>
 
-        <PredictionSidebar predictedIFT={predictedIFT} form={form} />
+        <PredictionSidebar predictedIFT={predictedIFT} />
       </div>
     </div>
   );
