@@ -11,9 +11,11 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-FEATURE_COLS = ["sdc_filiere", "departement", "sdc_type_agriculture"]
+NUMERIC_COLS = ["nb_cultures_rotation", "nbre_de_passages_desherbage_meca"]
+CATEGORICAL_COLS = ["sequence_cultures", "recours_macroorganismes", "type_de_travail_du_sol"]
+FEATURE_COLS = NUMERIC_COLS + CATEGORICAL_COLS
 TARGET_COL = "ift_histo_chimique_tot"
 
 
@@ -36,13 +38,40 @@ def get_connection():
 
 def fetch_training_data() -> pd.DataFrame:
     query = """
-        SELECT
-            ift_histo_chimique_tot,
-            sdc_filiere,
-            departement,
-            sdc_type_agriculture
-        FROM sdc_realise_perf_magasin_can
-        WHERE ift_histo_chimique_tot IS NOT NULL
+WITH rotation_cte AS (
+    SELECT
+        sdc.id,
+        COUNT(DISTINCT succession_assolee_synthetise_magasin_can.culture_nom) AS nb_cultures_rotation,
+        STRING_AGG(DISTINCT succession_assolee_synthetise_magasin_can.culture_nom, ' > ') AS sequence_cultures
+    FROM sdc
+    JOIN succession_assolee_synthetise_magasin_can
+        ON sdc.id = succession_assolee_synthetise_magasin_can.sdc_id
+    GROUP BY sdc.id
+    HAVING COUNT(DISTINCT succession_assolee_synthetise_magasin_can.culture_nom) > 2
+       AND COUNT(DISTINCT succession_assolee_synthetise_magasin_can.culture_nom) < 6
+)
+SELECT
+    r.id,
+    r.nb_cultures_rotation,
+    r.sequence_cultures,
+    spmc.ift_histo_chimique_tot,
+    spmc.ift_histo_biocontrole,
+    spmc.tps_utilisation_materiel,
+    spmc.tps_travail_manuel,
+    spmc.recours_macroorganismes,
+    spmc.recours_produits_biotiques_sansamm,
+    spmc.utili_desherbage_meca,
+    spmc.type_de_travail_du_sol,
+    spmc.ferti_n_tot,
+    spmc.conso_eau,
+    spmc.conso_carburant,
+    spmc.mb_reelle_avec_autoconso,
+    spmc.nbre_de_passages_desherbage_meca,
+    spmc.recours_aux_moyens_biologiques,
+    spmc.nombre_uth_necessaires
+FROM rotation_cte r
+JOIN synthetise_perf_magasin_can spmc
+    ON r.id = spmc.sdc_id;
     """
     with get_connection() as conn:
         df = pd.read_sql(query, conn)
@@ -51,7 +80,11 @@ def fetch_training_data() -> pd.DataFrame:
 
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna(subset=[TARGET_COL] + FEATURE_COLS)
-    for col in FEATURE_COLS:
+    # Convert numeric columns to numeric type
+    for col in NUMERIC_COLS:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+    # Convert categorical columns to string
+    for col in CATEGORICAL_COLS:
         df[col] = df[col].astype(str).str.strip()
     return df
 
@@ -66,11 +99,8 @@ def train_model(df: pd.DataFrame) -> tuple[Pipeline, dict]:
 
     preprocessor = ColumnTransformer(
         transformers=[
-            (
-                "cat",
-                OneHotEncoder(handle_unknown="ignore"),
-                FEATURE_COLS,
-            )
+            ("num", StandardScaler(), NUMERIC_COLS),
+            ("cat", OneHotEncoder(handle_unknown="ignore"), CATEGORICAL_COLS),
         ],
         remainder="drop",
     )
