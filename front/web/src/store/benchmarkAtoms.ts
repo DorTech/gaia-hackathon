@@ -265,19 +265,19 @@ export const enrichedPracticeProfileAtom = atom<PracticeProfileItem[]>((get) => 
       case 'soil-work':
         return {
           ...item,
-          note: { label: 'Mon choix :', value: CHIP_OPTIONS.soilWork[form.soilWork] },
+          note: { value: CHIP_OPTIONS.soilWork[form.soilWork] },
         };
       case 'mechanical-weeding':
         return {
           ...item,
-          note: { label: 'Mon choix :', value: form.hasWeeding === 1 ? 'Oui' : 'Non' },
+          note: { value: form.hasWeeding === 1 ? 'Oui' : 'Non' },
         };
       case 'biocontrol':
         return {
           ...item,
-          note: { label: 'Mon choix :', value: form.biologicalControl === 1 ? 'Oui' : 'Non' },
+          note: { value: form.biologicalControl === 1 ? 'Oui' : 'Non' },
         };
-
+ 
       default:
         return item;
     }

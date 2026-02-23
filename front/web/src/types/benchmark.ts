@@ -43,7 +43,6 @@ export interface PracticeProfileItem {
   mode: 'quali' | 'quanti';
   frequencies?: PracticeFrequencyRow[];
   note?: {
-    label: string;
     value: string;
     suffix?: string;
   };
