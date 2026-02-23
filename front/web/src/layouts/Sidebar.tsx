@@ -9,12 +9,18 @@ import {
 } from "@mui/material";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import SettingsIcon from "@mui/icons-material/Settings";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import PlayCircleFilledIcon from "@mui/icons-material/PlayCircleFilled";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const DRAWER_WIDTH = 240;
 const DRAWER_WIDTH_CLOSED = 64;
 
 const NAV_ITEMS = [
+  { label: "Benchmark régional", icon: <BarChartIcon />, path: "/benchmark" },
+  { label: "Mon diagnostic ITK", icon: <AssignmentIcon />, path: "/diagnostic" },
+  { label: "Simulation leviers", icon: <PlayCircleFilledIcon />, path: "/simulation" },
   { label: "Dashboard", icon: <DashboardIcon />, path: "/dashboard" },
   { label: "Settings", icon: <SettingsIcon />, path: "/settings" },
 ];
