@@ -15,8 +15,8 @@ export const BadgeType: React.FC<BadgeTypeProps> = ({ type }) => {
         textTransform: 'uppercase',
         letterSpacing: '0.04em',
         marginLeft: '5px',
-        backgroundColor: isQuantitatif ? '#EBF3FC' : '#F2ECFA',
-        color: isQuantitatif ? '#3A82C8' : '#9966CC'
+        backgroundColor: isQuantitatif ? '#c2dcfa' : '#dac1fa',
+        color: isQuantitatif ? '#2972bb' : '#7945ae',
       }}
     />
   );

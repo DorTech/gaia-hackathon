@@ -51,8 +51,7 @@ export interface PracticeProfileItem {
   quantitative?: {
     value: string;
     unit: string;
-    comparison: string;
-    bars: PracticeQuantBar[];
+    myValue?: string;
   };
 }
 
@@ -82,34 +81,15 @@ export const BENCHMARK_REFERENCE_FARMS: BenchmarkFarm[] = [
 export const BENCHMARK_MEDIAN_KPIS: MedianKpi[] = [
   {
     id: 'ift',
-    label: '📉 Médiane IFT total — Dép. 35',
+    label: '📉 Médiane IFT total',
     value: '2,30',
     unit: 'IFT',
-    variant: 'green',
-    sub: '312 exploitations · Blé tendre · Campagne 2023',
+    variant: 'violet',
+    sub: '312 exploitations · Blé tendre',
     delta: '↑ +21,7% vs votre exploitation (2,80)',
     deltaClass: 'warn',
   },
-  {
-    id: 'work',
-    label: '⏱ Médiane temps de travail — Dép. 35',
-    value: '18,4',
-    unit: 'h/ha',
-    variant: 'teal',
-    sub: 'Travail total (manuel + mécanisé)',
-    delta: '↓ −7,5% vs votre exploitation (19,9 h/ha)',
-    deltaClass: 'good',
-  },
-  {
-    id: 'margin',
-    label: '€ Médiane marge brute — Dép. 35',
-    value: '1 240',
-    unit: '€/ha',
-    variant: 'violet',
-    sub: 'Marge brute réelle hors autoconsommation',
-    delta: '↓ −4,0% vs votre exploitation (1 292 €/ha)',
-    deltaClass: 'good',
-  },
+
 ];
 
 export const BENCHMARK_PRACTICE_PROFILE: PracticeProfileItem[] = [
@@ -135,11 +115,7 @@ export const BENCHMARK_PRACTICE_PROFILE: PracticeProfileItem[] = [
       { label: 'Oui — systématique', pct: 82, top: true },
       { label: 'Non', pct: 18 },
     ],
-    note: {
-      label: 'Médiane passages :',
-      value: '3,2',
-      suffix: 'vs 0,4 (ensemble)',
-    },
+   
   },
   {
     id: 'rotation-count',
@@ -150,11 +126,7 @@ export const BENCHMARK_PRACTICE_PROFILE: PracticeProfileItem[] = [
     quantitative: {
       value: '4,8',
       unit: 'cultures',
-      comparison: 'vs 3,1 — ensemble département',
-      bars: [
-        { label: 'Ensemble', width: 62, color: 'var(--text3)' },
-        { label: 'Référence', width: 96, color: 'var(--green)' },
-      ],
+      myValue: '3',
     },
   },
   {
@@ -178,11 +150,7 @@ export const BENCHMARK_PRACTICE_PROFILE: PracticeProfileItem[] = [
     quantitative: {
       value: '142',
       unit: 'kgN/ha',
-      comparison: 'vs 185 kgN/ha — ensemble',
-      bars: [
-        { label: 'Ensemble', width: 100, color: 'var(--text3)' },
-        { label: 'Référence', width: 77, color: 'var(--green)' },
-      ],
+      myValue: '185',
     },
   },
   {
@@ -218,11 +186,7 @@ export const BENCHMARK_PRACTICE_PROFILE: PracticeProfileItem[] = [
     quantitative: {
       value: '68',
       unit: 'L/ha',
-      comparison: 'vs 94 L/ha — ensemble département',
-      bars: [
-        { label: 'Ensemble', width: 100, color: 'var(--text3)' },
-        { label: 'Référence', width: 72, color: 'var(--green)' },
-      ],
+      myValue: '92',
     },
   },
 ];

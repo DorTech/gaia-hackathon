@@ -10,7 +10,6 @@ import {
 import { BenchmarkFilters, type BenchmarkFiltersState } from './BenchmarkFilters';
 import { BenchmarkHeader } from './BenchmarkHeader';
 import { PracticeProfileCard } from './PracticeProfileCard';
-import { ThresholdSummary } from './ThresholdSummary';
 
 export const BenchmarkPage: React.FC = () => {
   const navigate = useNavigate();
@@ -29,7 +28,7 @@ export const BenchmarkPage: React.FC = () => {
     return 1;
   };
 
-  const medianIft = 2.30;
+  const medianIft = 2.3;
   const thresholdValue = useMemo(() => {
     const multiplier = getThresholdMultiplier(appliedFilters.iftThreshold);
     return Math.round(medianIft * multiplier * 100) / 100;
@@ -58,25 +57,15 @@ export const BenchmarkPage: React.FC = () => {
         options={BENCHMARK_FILTER_OPTIONS}
       />
 
-      {/* SEUIL RETENU */}
-      <ThresholdSummary
-        thresholdLabel={formatIft(thresholdValue)}
-        multiplier={getThresholdMultiplier(appliedFilters.iftThreshold).toFixed(2)}
-        referenceCount={filteredFarms.length}
-        totalCount={totalReferenceFarms}
-      />
-
       {/* KPIs MÉDIANE */}
       <MedianKpiRow kpis={BENCHMARK_MEDIAN_KPIS} />
 
-        {/* PROFIL PRATIQUES */}
-        <PracticeProfileCard
-          title={`🔍 Profil des pratiques — ${filteredFarms.length} fermes référence (IFT ≤ ${formatIft(thresholdValue)})`}
-          tagLabel={`IFT ${appliedFilters.iftThreshold}`}
-          items={BENCHMARK_PRACTICE_PROFILE}
-        />
-
-
+      {/* PROFIL PRATIQUES */}
+      <PracticeProfileCard
+        title={"Liste des pratiques les plus performantes sur l'IFT"}
+        tagLabel={`IFT ${appliedFilters.iftThreshold}`}
+        items={BENCHMARK_PRACTICE_PROFILE}
+      />
     </div>
   );
 };
