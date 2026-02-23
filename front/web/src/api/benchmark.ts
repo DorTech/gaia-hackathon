@@ -208,7 +208,8 @@ export async function fetchDistinctAgricultureTypes(): Promise<string[]> {
   );
   return data.data
     .filter((r) => r.value != null && r.value !== "")
-    .map((r) => String(r.value));
+    .map((r) => String(r.value))
+    .concat("Tous (Bio + Conv.)"); // Add combined option
 }
 
 // ── Practice profile helpers ──
