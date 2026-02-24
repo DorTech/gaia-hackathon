@@ -88,20 +88,30 @@ Rules:
 
 If a period longer than the crop duration is needed, insert a secondary crop or cover crop step instead of extending the main crop.
 
-Additionally, you MUST extract diagnostic variables from the user's description and include them in the JSON output under a "diagnostic_variables" key. For each variable, return the value if it can be inferred from the prompt, or null if not mentioned.
+Additionally, you MUST include a "diagnostic_variables" key in the JSON output. This extracts ONLY information that the user EXPLICITLY stated in their prompt.
 
 "diagnostic_variables": {
-  "departement": number | null,          // French department number (e.g. 31 for Haute-Garonne, 29 for Finistère). Infer from region names (e.g. "Bretagne" → 29 or 35, "Beauce" → 28, "Picardie" → 80).
-  "sdc_type_agriculture": string | null,  // One of: "Conventionnel", "Agriculture biologique", "Agriculture de conservation", "Agriculture raisonnée", or other types mentioned.
-  "nb_cultures_rotation": number | null,  // Count of distinct main crops (NOT cover crops) in the rotation.
-  "sequence_cultures": string | null,     // Crop sequence as "Crop1 > Crop2 > Crop3" format using French names.
-  "recours_macroorganismes": string | null, // "Oui" or "Non" - whether macroorganisms (trichogrammes, auxiliaires) are used.
-  "nbre_de_passages_desherbage_meca": number | null, // Number of mechanical weeding passes if mentioned.
-  "type_de_travail_du_sol": string | null, // One of: "Aucun", "Labour", "TCS" (techniques culturales simplifiées), "Semis direct".
-  "ferti_n_tot": number | null            // Total nitrogen fertilization in kg/ha if mentioned.
+  "departement": number | null,
+  "sdc_type_agriculture": string | null,
+  "nb_cultures_rotation": number | null,
+  "sequence_cultures": string | null,
+  "recours_macroorganismes": string | null,
+  "nbre_de_passages_desherbage_meca": number | null,
+  "type_de_travail_du_sol": string | null,
+  "ferti_n_tot": number | null
 }
 
-IMPORTANT: Always compute nb_cultures_rotation and sequence_cultures from the rotation you generate, even if the user did not explicitly mention them. The other fields should only be filled if the user's description provides enough information to infer them.
+STRICT RULES for diagnostic_variables — you MUST follow these exactly:
+- "departement": Only fill if the user EXPLICITLY names a department, city, or region. Map to the department number (e.g. "Loire" → 42, "Bretagne" → 35, "Beauce" → 28). If no location is mentioned, return null.
+- "sdc_type_agriculture": Only fill if the user EXPLICITLY mentions agriculture type (e.g. "conventionnel", "bio", "agriculture de conservation"). Return the keyword the user used (e.g. "conventionnel", "biologique", "conservation", "raisonnée"). If not mentioned, return null.
+- "nb_cultures_rotation": Count ONLY the main crops the user EXPLICITLY listed. Do NOT count cover crops or CIVEs you invented. If the user says "blé et maïs", that is 2.
+- "sequence_cultures": Build the sequence ONLY from crops the user EXPLICITLY named, in the order they mentioned them. Format: "Crop1 > Crop2". Use French names.
+- "recours_macroorganismes": Only fill ("Oui" or "Non") if the user EXPLICITLY mentions macroorganisms, trichogrammes, or biological control. Otherwise null.
+- "nbre_de_passages_desherbage_meca": Only fill if the user EXPLICITLY mentions a number of mechanical weeding passes. Otherwise null.
+- "type_de_travail_du_sol": Only fill if the user EXPLICITLY mentions soil work type (labour, TCS, semis direct, sans travail du sol). Value must be one of: "Aucun", "Labour", "TCS", "Semis direct". Otherwise null.
+- "ferti_n_tot": Only fill if the user EXPLICITLY mentions a nitrogen fertilization amount in kg/ha. Otherwise null.
+
+CRITICAL: Do NOT infer, guess, or assume any diagnostic variable that the user did not EXPLICITLY write. When in doubt, return null. A variable should be null unless the user's exact words clearly provide that information.
 
 - Return ONLY the JSON object, no other text`;
 
