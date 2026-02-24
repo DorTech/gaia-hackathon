@@ -50,8 +50,8 @@ const QualitativeItem: React.FC<QualitativeItemProps> = ({ item }) => {
                 className="fr-lbl"
                 sx={{
                   fontSize: '1rem',
-                  minWidth: '120px',
-                  flex: '0 0 120px',
+                  minWidth: '180px',
+                  flex: '0 0 180px',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
