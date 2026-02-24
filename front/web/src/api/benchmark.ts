@@ -52,18 +52,15 @@ function buildFilters(filters: BenchmarkFiltersState): Filter[] {
   const deptCode = filters.department.split(' ')[0];
   out.push({ field: 'departement', operator: 'eq', value: deptCode });
 
-  // Agriculture type — "Tous (Bio + Conv.)" means no filter
-  if (filters.agricultureType !== 'Tous (Bio + Conv.)') {
-    const apiValue =
-      filters.agricultureType === 'Biologique seul'
-        ? 'Agriculture Biologique'
-        : 'Agriculture Conventionnelle';
-    out.push({
-      field: 'sdcTypeAgriculture',
-      operator: 'eq',
-      value: apiValue,
-    });
-  }
+  const apiValue =
+    filters.agricultureType === 'Biologique seul'
+      ? 'Agriculture Biologique'
+      : 'Agriculture Conventionnelle';
+  out.push({
+    field: 'sdcTypeAgriculture',
+    operator: 'eq',
+    value: apiValue,
+  });
 
   return out;
 }
