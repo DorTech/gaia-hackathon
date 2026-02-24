@@ -371,9 +371,18 @@ export class QueryService {
 
   async getFrequencyVar(dto: NewFilterDto): Promise<INewFrequencyResponse> {
     let rows: { value: string | boolean | null; count: number }[] = [];
-
+    const dbFilters: NewFilterDB = this.buildDbFilters(dto);
     if (dto.field === "sequenceCultures") {
-      rows = await this.queryRepository.frequencySequenceCultures(dto);
+      rows = await this.queryRepository.frequencySequenceCultures(dbFilters);
+      rows = rows.map((r) => ({
+        ...r,
+        value:
+          typeof r.value === "string"
+            ? this.normalizeFrequencySequences(r.value)
+            : r.value,
+      }));
+      // Aggregate rows with the same normalized value
+      rows = this.aggregateFrequencyRows(rows);
     } else if (dto.field === "macroorganismes") {
       rows = await this.queryRepository.frequencyMacroorganismes(dto);
     } else if (dto.field === "soilWork") {
@@ -438,5 +447,36 @@ export class QueryService {
       department: dto.department,
       agricultureType: dto.agricultureType,
     };
+  }
+
+  // Aggregates frequency rows with the same value, summing their counts
+  private aggregateFrequencyRows(
+    rows: { value: string | boolean | null; count: number }[],
+  ): { value: string | boolean | null; count: number }[] {
+    const aggregated = new Map<string | boolean | null, number>();
+
+    for (const row of rows) {
+      const key = row.value;
+      aggregated.set(key, (aggregated.get(key) ?? 0) + row.count);
+    }
+
+    return Array.from(aggregated, ([value, count]) => ({ value, count }));
+  }
+
+  // Take input like "'Blé > Carotte > Céleri-rave > Maïs > Orge > Tournesol'" and must look in the culture aliases value
+  // to find the corresponding canonical culture name, then return a normalized string like "Blé > Carotte > Céleri-rave > Maïs > Orge > Tournesol" to match with the database values in frequencySequenceCultures
+  normalizeFrequencySequences(culture: string): string {
+    const parts = culture.split(">").map((p) => p.trim());
+    const normalizedParts = parts.map((part) => {
+      for (const [canonical, aliases] of Object.entries(CULTURE_ALIASES)) {
+        if (
+          aliases.some((alias) => alias.toLowerCase() === part.toLowerCase())
+        ) {
+          return canonical;
+        }
+      }
+      return part; // If no match, return original
+    });
+    return normalizedParts.join(" > ");
   }
 }

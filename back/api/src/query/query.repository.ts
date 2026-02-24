@@ -261,18 +261,18 @@ WHERE sac.culture_nom IN (${query.culture.map((c) => `'${c}'`).join(", ")})
   }
 
   async frequencySequenceCultures(
-    query: NewFilterDto,
+    query: NewFilterDB,
   ): Promise<{ value: string | boolean | null; count: number }[]> {
-    const result = await this.dephyService.db.execute(sql`
+    const result = await this.dephyService.db.execute(`
 WITH filtered_sdc AS (
     SELECT DISTINCT sdc.id
     FROM sdc
     JOIN dispositif ON dispositif.id = sdc.dispositif_id
     JOIN domain ON domain.id = dispositif.domaine_id
     JOIN succession_assolee_synthetise_magasin_can sac ON sac.sdc_id = sdc.id
-    WHERE sac.culture_nom ILIKE '%' || ${query.culture} || '%'
-      AND domain.departement LIKE ${query.department}
-      AND sdc.type_agriculture LIKE ${query.agricultureType}
+    WHERE sac.culture_nom IN (${query.culture.map((c) => `'${c}'`).join(", ")})
+      AND domain.departement LIKE '${query.department}'
+      AND sdc.type_agriculture LIKE '${query.agricultureType}'
 ),
 sequence_cte AS (
     SELECT
