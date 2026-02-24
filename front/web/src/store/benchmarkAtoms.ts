@@ -90,6 +90,13 @@ export const enrichedPracticeProfileAtom = atom<PracticeProfileItem[]>((get) => 
             ? { ...item.quantitative, myValue: String(form.departement) }
             : item.quantitative,
         };
+      case 'fertilization':
+        return {
+          ...item,
+          quantitative: item.quantitative
+            ? { ...item.quantitative, myValue: String(form.fertiNTot) }
+            : item.quantitative,
+        };
 
       // Qualitative — attach user's current choice as a note
       case 'soil-work':
