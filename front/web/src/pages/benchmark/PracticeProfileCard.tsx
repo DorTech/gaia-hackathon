@@ -112,7 +112,7 @@ const QuantitativeItem: React.FC<QuantitativeItemProps> = ({ item }) => {
     <>
       <Typography className="qv" component="div" fontSize={'1.6rem'}>
         {item.quantitative.value}{' '}
-        <span style={{ fontSize: '1.5rem', fontWeight: 400, color: 'var(--text3)' }}>
+        <span style={{ fontSize: '1.3rem', fontWeight: 400, color: 'var(--text3)' }}>
           {item.quantitative.unit}
         </span>
       </Typography>
