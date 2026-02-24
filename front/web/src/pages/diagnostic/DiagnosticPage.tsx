@@ -3,8 +3,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { ChipGroup } from './components/atoms/ChipGroup';
 import { InputControl } from './components/atoms/InputControl';
 import { SliderControl } from './components/atoms/SliderControl';
-import { DiagnosticHeader } from './components/units/DiagnosticHeader';
-import { FieldLabel } from './components/atoms/FieldLabel';
+
 import { Field } from './components/units/Field';
 import { PredictionSidebar } from './components/units/PredictionSidebar';
 import { Section } from './components/units/Section';
@@ -31,7 +30,9 @@ export const DiagnosticPage: React.FC = () => {
 
   useEffect(() => {
     if (agricultureTypes.length === 0) {
-      fetchDistinctAgricultureTypes().then(setAgricultureTypes).catch(() => {});
+      fetchDistinctAgricultureTypes()
+        .then(setAgricultureTypes)
+        .catch(() => {});
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -65,14 +66,12 @@ export const DiagnosticPage: React.FC = () => {
   return (
     <div className="page active" id="page-itk">
       <div>
-        <ItineraireComponent/>
+        <ItineraireComponent />
       </div>
-      
-      <DiagnosticHeader />
 
       <div className="itk-layout">
         <div className="card" style={{ padding: '20px 24px' }}>
-          <Section title="🌾 Variables du diagnostic" className="itk-last-section">
+          <Section title="🌾 Variables" className="itk-last-section">
             <div className="fgrid">
               {DIAGNOSTIC_VARIABLES.map((v) => (
                 <Field key={v.id} label={v.label}>
@@ -120,7 +119,9 @@ export const DiagnosticPage: React.FC = () => {
                         displayEmpty
                         renderValue={(selected) => {
                           if (!selected) {
-                            return <span style={{ color: 'var(--text3)' }}>{v.select!.placeholder}</span>;
+                            return (
+                              <span style={{ color: 'var(--text3)' }}>{v.select!.placeholder}</span>
+                            );
                           }
                           const name = v.select!.options[selected];
                           return name ? `${selected} — ${name}` : selected;

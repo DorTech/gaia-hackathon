@@ -74,14 +74,14 @@ export const ItineraireComponent: React.FC = () => {
 
       <Paper sx={{ p: 3, mb: 3 }}>
         <Typography variant="h6" gutterBottom>
-          Décrivez votre rotation culturale
+          Description de votre itinéraire technique
         </Typography>
         <Stack spacing={2}>
           <TextField
             multiline
             minRows={4}
             maxRows={10}
-            label="Décrivez la rotation que vous souhaitez générer..."
+            label="Décrivez votre itinéraire techique..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             fullWidth
@@ -94,7 +94,7 @@ export const ItineraireComponent: React.FC = () => {
               disabled={loading || !prompt.trim()}
               startIcon={loading ? <CircularProgress size={20} /> : undefined}
             >
-              {loading ? 'Génération en cours...' : 'Générer la rotation'}
+              {loading ? 'Génération en cours...' : "Générer l'itinéraire"}
             </Button>
           </Box>
         </Stack>
@@ -109,7 +109,7 @@ export const ItineraireComponent: React.FC = () => {
       {rotationData && (
         <Paper sx={{ p: 3 }}>
           <Typography variant="h6" gutterBottom>
-            Rotation générée
+            Itinéraire généré
           </Typography>
           <Box id="rotation-chart" ref={chartRef} sx={{ width: '100%', minHeight: 500 }} />
         </Paper>
