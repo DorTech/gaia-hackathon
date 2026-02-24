@@ -9,11 +9,13 @@ import { Field } from './components/units/Field';
 import { PredictionSidebar } from './components/units/PredictionSidebar';
 import { Section } from './components/units/Section';
 import {
+  agricultureTypesAtom,
   itkFormAtom,
   predictedIFTAtom,
   predictingAtom,
   type ITKFormState,
 } from '../../store/diagnosticAtoms';
+import { fetchDistinctAgricultureTypes } from '../../api/benchmark';
 import { FormControl, MenuItem, Select, type SelectChangeEvent } from '@mui/material';
 import { DIAGNOSTIC_VARIABLES } from '../../config/variables';
 import { predictIFT } from '../../api/predict';
@@ -24,7 +26,14 @@ export const DiagnosticPage: React.FC = () => {
   const predictedIFT = useAtomValue(predictedIFTAtom);
   const setPredictedIFT = useSetAtom(predictedIFTAtom);
   const setPredicting = useSetAtom(predictingAtom);
+  const [agricultureTypes, setAgricultureTypes] = useAtom(agricultureTypesAtom);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    if (agricultureTypes.length === 0) {
+      fetchDistinctAgricultureTypes().then(setAgricultureTypes).catch(() => {});
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -32,7 +41,7 @@ export const DiagnosticPage: React.FC = () => {
     timerRef.current = setTimeout(async () => {
       setPredicting(true);
       try {
-        const ift = await predictIFT(form);
+        const ift = await predictIFT(form, agricultureTypes);
         setPredictedIFT(ift);
       } catch {
         // keep previous value on error
@@ -80,6 +89,14 @@ export const DiagnosticPage: React.FC = () => {
                           v.formKey,
                           Math.round(value) as ITKFormState[typeof v.formKey],
                         )
+                      }
+                    />
+                  ) : v.dynamicChips ? (
+                    <ChipGroup
+                      options={agricultureTypes}
+                      selectedIndex={form[v.formKey] as number}
+                      onSelect={(index) =>
+                        handleFieldChange(v.formKey, index as ITKFormState[typeof v.formKey])
                       }
                     />
                   ) : v.chips ? (

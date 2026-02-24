@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import type { Lever, LeverDeltas } from '../pages/simulationComponents/types';
-import { itkFormAtom, predictedIFTAtom, CHIP_OPTIONS } from './diagnosticAtoms';
+import { agricultureTypesAtom, itkFormAtom, predictedIFTAtom, CHIP_OPTIONS } from './diagnosticAtoms';
 
 
 /**
@@ -9,6 +9,7 @@ import { itkFormAtom, predictedIFTAtom, CHIP_OPTIONS } from './diagnosticAtoms';
  */
 export const leversAtom = atom<Lever[]>((get) => {
   const form = get(itkFormAtom);
+  const agriTypes = get(agricultureTypesAtom);
 
   return [
     {
@@ -74,7 +75,7 @@ export const leversAtom = atom<Lever[]>((get) => {
       id: 'agri',
       name: '🌱 Type d\'agriculture',
       type: 'Qualitatif',
-      current: `${CHIP_OPTIONS.agricultureType[form.sdcTypeAgriculture]} · actuel`,
+      current: `${agriTypes[form.sdcTypeAgriculture] ?? '—'} · actuel`,
       options: [
         { label: 'Agriculture biologique', delta: -0.35, isReference: true },
       ],

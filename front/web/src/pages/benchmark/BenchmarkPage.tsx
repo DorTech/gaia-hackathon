@@ -22,7 +22,7 @@ import {
   rawSpeciesListAtom,
   PRACTICE_PROFILE_TEMPLATE,
 } from '../../store/benchmarkAtoms';
-import { itkFormAtom, predictedIFTAtom } from '../../store/diagnosticAtoms';
+import { agricultureTypesAtom, itkFormAtom, predictedIFTAtom } from '../../store/diagnosticAtoms';
 import { DEPT_NAMES } from '../../config/departments';
 import { iftMedianValueAtom } from '../../store/referenceAtoms';
 import type { BenchmarkFiltersState, PracticeProfileItem } from '../../types/benchmark';
@@ -47,6 +47,7 @@ export const BenchmarkPage: React.FC = () => {
   const setMedianIft = useSetAtom(iftMedianValueAtom);
   const setRawSpecies = useSetAtom(rawSpeciesListAtom);
   const diagnosticForm = useAtomValue(itkFormAtom);
+  const agricultureTypes = useAtomValue(agricultureTypesAtom);
 
   const loadBenchmarkData = useCallback(
     async (filters: BenchmarkFiltersState) => {
@@ -181,12 +182,11 @@ export const BenchmarkPage: React.FC = () => {
           fetchDistinctAgricultureTypes(),
         ]);
 
-        // Store raw species for flattening
         setRawSpecies(species);
 
         setFilterOptions((prev) => ({
           ...prev,
-          species, // Keep raw for now, we'll use flattened in the combobox
+          species,
           department: departments,
           agricultureType: agricultureTypes,
         }));
@@ -223,6 +223,31 @@ export const BenchmarkPage: React.FC = () => {
     }
     loadFilterOptions();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // One-way sync: diagnostic form → benchmark filters for department & agriculture type
+  useEffect(() => {
+    const deptCode = String(diagnosticForm.departement);
+    const deptName = DEPT_NAMES[deptCode];
+    const deptFormatted = deptName ? `${deptCode} — ${deptName}` : deptCode;
+    const matchedDept = filterOptions.department.find((d) => d === deptFormatted) ?? deptFormatted;
+
+    const diagAgriType = agricultureTypes[diagnosticForm.sdcTypeAgriculture] ?? '';
+    const matchedAgriType =
+      filterOptions.agricultureType.find((t) =>
+        t.toLowerCase().includes(diagAgriType.toLowerCase()),
+      ) ?? '';
+
+    setAppliedFilters((prev) => ({
+      ...prev,
+      department: matchedDept,
+      agricultureType: matchedAgriType,
+    }));
+  }, [
+    diagnosticForm.departement,
+    diagnosticForm.sdcTypeAgriculture,
+    agricultureTypes,
+    filterOptions,
+  ]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleApplyFilters = useCallback(
     (filters: BenchmarkFiltersState) => {

@@ -8,7 +8,7 @@ interface PredictResponse {
   ift_histo_chimique_tot: number;
 }
 
-export async function predictIFT(form: ITKFormState): Promise<number> {
+export async function predictIFT(form: ITKFormState, agricultureTypes: string[]): Promise<number> {
   const payload = {
     nb_cultures_rotation: form.nbCulturesRotation,
     sequence_cultures: form.sequenceCultures,
@@ -16,7 +16,7 @@ export async function predictIFT(form: ITKFormState): Promise<number> {
     nbre_de_passages_desherbage_meca: form.nbrePassagesDesherbageMeca,
     type_de_travail_du_sol: CHIP_API_VALUES.typeTravailDuSol[form.typeTravailDuSol] ?? 'Labour',
     departement: form.departement,
-    sdc_type_agriculture: CHIP_API_VALUES.sdcTypeAgriculture[form.sdcTypeAgriculture] ?? 'Agriculture conventionnelle',
+    sdc_type_agriculture: agricultureTypes[form.sdcTypeAgriculture] ?? 'Agriculture conventionnelle',
   };
 
   const { data } = await mlClient.post<PredictResponse>('/predict', payload);
