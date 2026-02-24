@@ -122,7 +122,7 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     label: 'Fertilisation azotée totale',
     dbVariable: 'ferti_n_tot',
     type: 'Quantitatif',
-    unit: 'kg N/ha',
+    unit: 'kg/ha',
     slider: { min: 0, max: 300, minLabel: '0', maxLabel: '300' },
     benchmarkApi: { type: 'median', field: 'fertilisation' },
   },
