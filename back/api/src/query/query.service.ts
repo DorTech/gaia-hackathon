@@ -384,11 +384,12 @@ export class QueryService {
       // Aggregate rows with the same normalized value
       rows = this.aggregateFrequencyRows(rows);
     } else if (dto.field === "macroorganismes") {
-      rows = await this.queryRepository.frequencyMacroorganismes(dto);
+      rows = await this.queryRepository.frequencyMacroorganismes(dbFilters);
     } else if (dto.field === "soilWork") {
-      rows = await this.queryRepository.frequencySoilWork(dto);
+      rows = await this.queryRepository.frequencySoilWork(dbFilters);
+      console.log("soilWork rows:", rows);
     } else if (dto.field === "agricultureType") {
-      rows = await this.queryRepository.frequencyAgricultureType(dto);
+      rows = await this.queryRepository.frequencyAgricultureType(dbFilters);
     }
 
     const total = rows.reduce((sum, r) => sum + r.count, 0);

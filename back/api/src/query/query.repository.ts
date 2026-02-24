@@ -325,9 +325,9 @@ ORDER BY count DESC;
   }
 
   async frequencyMacroorganismes(
-    query: NewFilterDto,
+    query: NewFilterDB,
   ): Promise<{ value: string | boolean | null; count: number }[]> {
-    const result = await this.dephyService.db.execute(sql`
+    const result = await this.dephyService.db.execute(`
 SELECT
     CASE WHEN spmc.recours_macroorganismes > 0 THEN true ELSE false END AS value,
     COUNT(*)::int AS count
@@ -336,9 +336,9 @@ JOIN sdc ON sdc.id = spmc.sdc_id
 JOIN dispositif ON dispositif.id = sdc.dispositif_id
 JOIN domain ON domain.id = dispositif.domaine_id
 JOIN succession_assolee_synthetise_magasin_can sac ON sac.sdc_id = sdc.id
-WHERE sac.culture_nom ILIKE '%' || ${query.culture} || '%'
-  AND domain.departement LIKE ${query.department}
-  AND sdc.type_agriculture LIKE ${query.agricultureType}
+WHERE sac.culture_nom IN (${query.culture.map((c) => `'${c}'`).join(", ")})
+  AND domain.departement LIKE '${query.department}'
+  AND sdc.type_agriculture LIKE '${query.agricultureType}'
 GROUP BY (CASE WHEN spmc.recours_macroorganismes > 0 THEN true ELSE false END)
 ORDER BY count DESC;
     `);
@@ -349,9 +349,9 @@ ORDER BY count DESC;
   }
 
   async frequencySoilWork(
-    query: NewFilterDto,
+    query: NewFilterDB,
   ): Promise<{ value: string | boolean | null; count: number }[]> {
-    const result = await this.dephyService.db.execute(sql`
+    const result = await this.dephyService.db.execute(`
 SELECT
     spmc.type_de_travail_du_sol AS value,
     COUNT(*)::int AS count
@@ -360,9 +360,9 @@ JOIN sdc ON sdc.id = spmc.sdc_id
 JOIN dispositif ON dispositif.id = sdc.dispositif_id
 JOIN domain ON domain.id = dispositif.domaine_id
 JOIN succession_assolee_synthetise_magasin_can sac ON sac.sdc_id = sdc.id
-WHERE sac.culture_nom ILIKE '%' || ${query.culture} || '%'
-  AND domain.departement LIKE ${query.department}
-  AND sdc.type_agriculture LIKE ${query.agricultureType}
+WHERE sac.culture_nom IN (${query.culture.map((c) => `'${c}'`).join(", ")})
+  AND domain.departement LIKE '${query.department}'
+  AND sdc.type_agriculture LIKE '${query.agricultureType}'
 GROUP BY spmc.type_de_travail_du_sol
 ORDER BY count DESC;
     `);
@@ -373,9 +373,9 @@ ORDER BY count DESC;
   }
 
   async frequencyAgricultureType(
-    query: NewFilterDto,
+    query: NewFilterDB,
   ): Promise<{ value: string | boolean | null; count: number }[]> {
-    const result = await this.dephyService.db.execute(sql`
+    const result = await this.dephyService.db.execute(`
 SELECT
     sdc.type_agriculture AS value,
     COUNT(*)::int AS count
@@ -383,9 +383,9 @@ FROM sdc
 JOIN dispositif ON dispositif.id = sdc.dispositif_id
 JOIN domain ON domain.id = dispositif.domaine_id
 JOIN succession_assolee_synthetise_magasin_can sac ON sac.sdc_id = sdc.id
-WHERE sac.culture_nom ILIKE '%' || ${query.culture} || '%'
-  AND domain.departement LIKE ${query.department}
-  AND sdc.type_agriculture LIKE ${query.agricultureType}
+WHERE sac.culture_nom IN (${query.culture.map((c) => `'${c}'`).join(", ")})
+  AND domain.departement LIKE '${query.department}'
+  AND sdc.type_agriculture LIKE '${query.agricultureType}'
 GROUP BY sdc.type_agriculture
 ORDER BY count DESC;
     `);
