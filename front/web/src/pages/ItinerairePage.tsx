@@ -8,16 +8,26 @@ import {
   CircularProgress,
   Alert,
 } from '@mui/material';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { generateRotation } from '../api/rotation';
 import { SectionPanel } from './diagnostic/components/units/SectionPanel';
-import { itinerairePromptAtom, itineraireRotationDataAtom } from '../store/diagnosticAtoms';
+import {
+  agricultureTypesAtom,
+  itkFormAtom,
+  itinerairePromptAtom,
+  itineraireRotationDataAtom,
+  mapDiagnosticVariablesToForm,
+  prefilledKeysAtom,
+} from '../store/diagnosticAtoms';
 
 export const ItineraireComponent: React.FC = () => {
   const [prompt, setPrompt] = useAtom(itinerairePromptAtom);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rotationData, setRotationData] = useAtom(itineraireRotationDataAtom);
+  const setForm = useSetAtom(itkFormAtom);
+  const setPrefilledKeys = useSetAtom(prefilledKeysAtom);
+  const agricultureTypes = useAtomValue(agricultureTypesAtom);
 
   const chartRef = useRef<HTMLDivElement>(null);
 
@@ -30,6 +40,18 @@ export const ItineraireComponent: React.FC = () => {
     try {
       const data = await generateRotation({ prompt: prompt.trim() });
       setRotationData(data);
+
+      // Prefill diagnostic variables from LLM extraction
+      if (data.diagnostic_variables) {
+        const { partial, filledKeys } = mapDiagnosticVariablesToForm(
+          data.diagnostic_variables,
+          agricultureTypes,
+        );
+        if (filledKeys.size > 0) {
+          setForm((prev) => ({ ...prev, ...partial }));
+          setPrefilledKeys(filledKeys);
+        }
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to generate rotation';
       setError(message);

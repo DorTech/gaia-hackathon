@@ -14,7 +14,7 @@ export class RotationService {
   }
 
   async generate(dto: GenerateRotationDto): Promise<Record<string, any>> {
-    const systemPrompt = `You are an agricultural expert. Generate a JSON object describing a crop rotation plan.
+    const systemPrompt = `You are an agricultural expert. Generate a JSON object describing a crop rotation plan. Take a close care to the crop growth duration and period to ensure the rotation is realistic and coherent.
 
 The JSON MUST follow this exact schema:
 {
@@ -74,6 +74,35 @@ Rules:
 - Colors: use earth tones (#d2b48c) for cereals, greens (#2d9f6e, #4caf50) for legumes/forage, gold (#ffd700) for oilseeds, light blue (#a7c6ed) for cover crops, grey (#d6d6d6) for secondary crops
 - Generate valid UUID v4 for all id fields
 - Climate data should be realistic for the specified region (12 values, one per month Jan-Dec)
+- Crop duration constraints (MUST be respected):
+- Maïs grain: 5-7 months (April-October)
+- Maïs ensilage: 4-6 months
+- Blé tendre d’hiver: 9-11 months
+- Orge de printemps: 4-5 months
+- Colza: 10-11 months
+- Couverts végétaux / CIVE: 2-5 months
+- For every step:
+- duration (months) MUST match the difference between startDate and endDate (±1 month tolerance)
+- If duration exceeds the realistic maximum for the crop, the response is INVALID
+- Do NOT extend a crop beyond its biological growth cycle to avoid gaps. Use cover crops or fallow periods instead.
+
+If a period longer than the crop duration is needed, insert a secondary crop or cover crop step instead of extending the main crop.
+
+Additionally, you MUST extract diagnostic variables from the user's description and include them in the JSON output under a "diagnostic_variables" key. For each variable, return the value if it can be inferred from the prompt, or null if not mentioned.
+
+"diagnostic_variables": {
+  "departement": number | null,          // French department number (e.g. 31 for Haute-Garonne, 29 for Finistère). Infer from region names (e.g. "Bretagne" → 29 or 35, "Beauce" → 28, "Picardie" → 80).
+  "sdc_type_agriculture": string | null,  // One of: "Conventionnel", "Agriculture biologique", "Agriculture de conservation", "Agriculture raisonnée", or other types mentioned.
+  "nb_cultures_rotation": number | null,  // Count of distinct main crops (NOT cover crops) in the rotation.
+  "sequence_cultures": string | null,     // Crop sequence as "Crop1 > Crop2 > Crop3" format using French names.
+  "recours_macroorganismes": string | null, // "Oui" or "Non" - whether macroorganisms (trichogrammes, auxiliaires) are used.
+  "nbre_de_passages_desherbage_meca": number | null, // Number of mechanical weeding passes if mentioned.
+  "type_de_travail_du_sol": string | null, // One of: "Aucun", "Labour", "TCS" (techniques culturales simplifiées), "Semis direct".
+  "ferti_n_tot": number | null            // Total nitrogen fertilization in kg/ha if mentioned.
+}
+
+IMPORTANT: Always compute nb_cultures_rotation and sequence_cultures from the rotation you generate, even if the user did not explicitly mention them. The other fields should only be filled if the user's description provides enough information to infer them.
+
 - Return ONLY the JSON object, no other text`;
 
     try {
@@ -98,9 +127,7 @@ Rules:
       return JSON.parse(content);
     } catch (error) {
       if (error instanceof SyntaxError) {
-        throw new InternalServerErrorException(
-          "OpenAI returned invalid JSON",
-        );
+        throw new InternalServerErrorException("OpenAI returned invalid JSON");
       }
       throw error;
     }

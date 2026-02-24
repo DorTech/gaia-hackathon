@@ -125,7 +125,7 @@ export const SummaryBar: React.FC<SummaryBarProps> = ({
               marginBottom: '3px',
             }}
           >
-            Médiane Dép. 35
+            Médiane
           </Typography>
           <Typography
             sx={{
