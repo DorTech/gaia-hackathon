@@ -157,10 +157,12 @@ export const DiagnosticPage: React.FC = () => {
                             </Typography>
                           );
                         }
-                        const name = v.select!.options[selected];
+                        const padded = selected.padStart(2, '0');
+                        const name = v.select!.options[padded] ?? v.select!.options[selected];
+                        const display = name ? padded : selected;
                         return (
                           <Typography variant="body2">
-                            {name ? `${selected} — ${name}` : selected}
+                            {name ? `${display} — ${name}` : selected}
                           </Typography>
                         );
                       }}
