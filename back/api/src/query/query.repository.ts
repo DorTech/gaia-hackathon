@@ -78,7 +78,7 @@ export class QueryRepository {
   async medianNbRotation(
     query: NewFilterDB,
   ): Promise<{ median: number | null }> {
-    const result = await this.dephyService.db.execute(sql`
+    const result = await this.dephyService.db.execute(`
 WITH rotation_cte AS (
     SELECT
         sdc.id,
@@ -103,9 +103,9 @@ JOIN domain
     ON domain.id = dispositif.domaine_id
 JOIN succession_assolee_synthetise_magasin_can sac
     ON sac.sdc_id = sdc.id
-WHERE unaccent(sac.culture_nom) ILIKE unaccent('%' || ${query.culture} || '%')
-  AND domain.departement LIKE ${query.department}
-  AND sdc.type_agriculture LIKE ${query.agricultureType};
+WHERE sac.culture_nom IN (${query.culture.map((c) => `'${c}'`).join(", ")})
+  AND domain.departement LIKE '${query.department}'
+  AND sdc.type_agriculture LIKE '${query.agricultureType}';
  `);
 
     if (result.rows.length === 0) {
@@ -130,7 +130,7 @@ WHERE unaccent(sac.culture_nom) ILIKE unaccent('%' || ${query.culture} || '%')
   async medianNbWeedingPasses(
     query: NewFilterDB,
   ): Promise<{ median: number | null }> {
-    const result = await this.dephyService.db.execute(sql`
+    const result = await this.dephyService.db.execute(`
 WITH rotation_cte AS (
     SELECT
         sdc.id,
@@ -155,9 +155,9 @@ JOIN domain
     ON domain.id = dispositif.domaine_id
 JOIN succession_assolee_synthetise_magasin_can sac
     ON sac.sdc_id = sdc.id
-WHERE sac.culture_nom IN (${query.culture.join(", ")})
-  AND domain.departement LIKE ${query.department}
-  AND sdc.type_agriculture LIKE ${query.agricultureType};
+WHERE sac.culture_nom IN (${query.culture.map((c) => `'${c}'`).join(", ")})
+  AND domain.departement LIKE '${query.department}'
+  AND sdc.type_agriculture LIKE '${query.agricultureType}';
  `);
 
     if (result.rows.length === 0) {
@@ -180,9 +180,9 @@ WHERE sac.culture_nom IN (${query.culture.join(", ")})
   }
 
   async medianFertilisationNTot(
-    query: NewFilterDto,
+    query: NewFilterDB,
   ): Promise<{ median: number | null }> {
-    const result = await this.dephyService.db.execute(sql`
+    const result = await this.dephyService.db.execute(`
 SELECT
     PERCENTILE_CONT(0.5) 
         WITHIN GROUP (ORDER BY spmc.ferti_n_tot) AS median_fertilisation_n_tot
@@ -195,11 +195,11 @@ JOIN domain
     ON domain.id = dispositif.domaine_id
 JOIN succession_assolee_synthetise_magasin_can sac
     ON sac.sdc_id = sdc.id
-WHERE unaccent(sac.culture_nom) ILIKE unaccent('%' || ${query.culture} || '%')
-  AND domain.departement LIKE ${query.department}
-  AND sdc.type_agriculture LIKE ${query.agricultureType};
+WHERE sac.culture_nom IN (${query.culture.map((c) => `'${c}'`).join(", ")})
+  AND domain.departement LIKE '${query.department}'
+  AND sdc.type_agriculture LIKE '${query.agricultureType}';
  `);
-
+    console.log("Median fertilisation query result:", result);
     if (result.rows.length === 0) {
       console.warn(
         `No data found for culture="${query.culture}", department="${query.department}", agricultureType="${query.agricultureType}"`,
@@ -208,15 +208,15 @@ WHERE unaccent(sac.culture_nom) ILIKE unaccent('%' || ${query.culture} || '%')
     }
 
     const row = result.rows[0];
-    if (!row || row?.median_nb_weeding === null) {
+    if (!row || row?.median_fertilisation_n_tot === null) {
       console.warn(
-        `Median number of weeding passes is null for culture="${query.culture}", department="${query.department}", agricultureType="${query.agricultureType}"`,
+        `Median number of fertilisation N tot is null for culture="${query.culture}", department="${query.department}", agricultureType="${query.agricultureType}"`,
       );
       return { median: null };
     }
 
     return {
-      median: Number(row.median_nb_weeding),
+      median: Number(row.median_fertilisation_n_tot),
     };
   }
 
@@ -255,6 +255,112 @@ WHERE unaccent(sac.culture_nom) ILIKE unaccent('%' || ${query.culture} || '%')
       .orderBy(sql`count(*) desc`);
 
     return rows.map((r: any) => ({
+      value: r.value ?? null,
+      count: Number(r.count),
+    }));
+  }
+
+  async frequencySequenceCultures(
+    query: NewFilterDto,
+  ): Promise<{ value: string | boolean | null; count: number }[]> {
+    const result = await this.dephyService.db.execute(sql`
+WITH filtered_sdc AS (
+    SELECT DISTINCT sdc.id
+    FROM sdc
+    JOIN dispositif ON dispositif.id = sdc.dispositif_id
+    JOIN domain ON domain.id = dispositif.domaine_id
+    JOIN succession_assolee_synthetise_magasin_can sac ON sac.sdc_id = sdc.id
+    WHERE sac.culture_nom ILIKE '%' || ${query.culture} || '%'
+      AND domain.departement LIKE ${query.department}
+      AND sdc.type_agriculture LIKE ${query.agricultureType}
+),
+sequence_cte AS (
+    SELECT
+        sac.sdc_id,
+        STRING_AGG(DISTINCT sac.culture_nom, ' > ') AS sequence_cultures
+    FROM succession_assolee_synthetise_magasin_can sac
+    WHERE sac.sdc_id IN (SELECT id FROM filtered_sdc)
+    GROUP BY sac.sdc_id
+)
+SELECT
+    sequence_cultures AS value,
+    COUNT(*)::int AS count
+FROM sequence_cte
+GROUP BY sequence_cultures
+ORDER BY count DESC;
+    `);
+    return result.rows.map((r: any) => ({
+      value: r.value ?? null,
+      count: Number(r.count),
+    }));
+  }
+
+  async frequencyMacroorganismes(
+    query: NewFilterDto,
+  ): Promise<{ value: string | boolean | null; count: number }[]> {
+    const result = await this.dephyService.db.execute(sql`
+SELECT
+    CASE WHEN spmc.recours_macroorganismes > 0 THEN true ELSE false END AS value,
+    COUNT(*)::int AS count
+FROM synthetise_perf_magasin_can spmc
+JOIN sdc ON sdc.id = spmc.sdc_id
+JOIN dispositif ON dispositif.id = sdc.dispositif_id
+JOIN domain ON domain.id = dispositif.domaine_id
+JOIN succession_assolee_synthetise_magasin_can sac ON sac.sdc_id = sdc.id
+WHERE sac.culture_nom ILIKE '%' || ${query.culture} || '%'
+  AND domain.departement LIKE ${query.department}
+  AND sdc.type_agriculture LIKE ${query.agricultureType}
+GROUP BY (CASE WHEN spmc.recours_macroorganismes > 0 THEN true ELSE false END)
+ORDER BY count DESC;
+    `);
+    return result.rows.map((r: any) => ({
+      value: r.value ?? null,
+      count: Number(r.count),
+    }));
+  }
+
+  async frequencySoilWork(
+    query: NewFilterDto,
+  ): Promise<{ value: string | boolean | null; count: number }[]> {
+    const result = await this.dephyService.db.execute(sql`
+SELECT
+    spmc.type_de_travail_du_sol AS value,
+    COUNT(*)::int AS count
+FROM synthetise_perf_magasin_can spmc
+JOIN sdc ON sdc.id = spmc.sdc_id
+JOIN dispositif ON dispositif.id = sdc.dispositif_id
+JOIN domain ON domain.id = dispositif.domaine_id
+JOIN succession_assolee_synthetise_magasin_can sac ON sac.sdc_id = sdc.id
+WHERE sac.culture_nom ILIKE '%' || ${query.culture} || '%'
+  AND domain.departement LIKE ${query.department}
+  AND sdc.type_agriculture LIKE ${query.agricultureType}
+GROUP BY spmc.type_de_travail_du_sol
+ORDER BY count DESC;
+    `);
+    return result.rows.map((r: any) => ({
+      value: r.value ?? null,
+      count: Number(r.count),
+    }));
+  }
+
+  async frequencyAgricultureType(
+    query: NewFilterDto,
+  ): Promise<{ value: string | boolean | null; count: number }[]> {
+    const result = await this.dephyService.db.execute(sql`
+SELECT
+    sdc.type_agriculture AS value,
+    COUNT(*)::int AS count
+FROM sdc
+JOIN dispositif ON dispositif.id = sdc.dispositif_id
+JOIN domain ON domain.id = dispositif.domaine_id
+JOIN succession_assolee_synthetise_magasin_can sac ON sac.sdc_id = sdc.id
+WHERE sac.culture_nom ILIKE '%' || ${query.culture} || '%'
+  AND domain.departement LIKE ${query.department}
+  AND sdc.type_agriculture LIKE ${query.agricultureType}
+GROUP BY sdc.type_agriculture
+ORDER BY count DESC;
+    `);
+    return result.rows.map((r: any) => ({
       value: r.value ?? null,
       count: Number(r.count),
     }));

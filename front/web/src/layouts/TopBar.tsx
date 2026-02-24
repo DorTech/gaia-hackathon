@@ -1,11 +1,11 @@
-import { alpha } from "@mui/material/styles";
-import { AppBar, Box, ToggleButton, ToggleButtonGroup, Toolbar, Typography } from "@mui/material";
-import { useLocation, useNavigate } from "react-router-dom";
+import { alpha } from '@mui/material/styles';
+import { AppBar, Box, ToggleButton, ToggleButtonGroup, Toolbar, Typography } from '@mui/material';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const NAV_ITEMS = [
-  { label: "Mon diagnostic ITK", path: "/diagnostic" },
-  { label: "Benchmark", path: "/benchmark" },
-  { label: "Simulation leviers", path: "/simulation" },
+  { label: 'Ma ferme', path: '/diagnostic' },
+  { label: 'Comparateur', path: '/benchmark' },
+  { label: 'Simulation leviers', path: '/simulation' },
 ];
 
 export default function TopBar() {
@@ -20,18 +20,18 @@ export default function TopBar() {
         background: (t) =>
           `linear-gradient(110deg, ${alpha(t.palette.primary.light, 0.94)} 0%, ${alpha(t.palette.primary.main, 0.88)} 100%)`,
         color: (t) => t.palette.secondary.dark,
-        backdropFilter: "blur(10px)",
+        backdropFilter: 'blur(10px)',
         boxShadow: (t) => t.shadows[2],
         borderBottom: (t) => `1px solid ${alpha(t.palette.common.white, 0.35)}`,
       }}
     >
-      <Toolbar sx={{ justifyContent: "space-between", gap: 2, minHeight: 64 }}>
+      <Toolbar sx={{ justifyContent: 'space-between', gap: 2, minHeight: 64 }}>
         <Box display="flex" alignItems="center" gap={0.6}>
           <Box
             sx={{
               width: 10,
               height: 10,
-              borderRadius: "50%",
+              borderRadius: '50%',
               background: (t) => t.palette.secondary.dark,
               boxShadow: (t) => `0 0 0 4px ${alpha(t.palette.common.white, 0.35)}`,
             }}
@@ -41,7 +41,7 @@ export default function TopBar() {
             noWrap
             sx={{
               fontWeight: 800,
-              letterSpacing: "-0.03em",
+              letterSpacing: '-0.03em',
               color: (t) => t.palette.common.white,
               textShadow: (t) => `0 1px 2px ${alpha(t.palette.secondary.dark, 0.28)}`,
             }}
@@ -53,7 +53,7 @@ export default function TopBar() {
             noWrap
             sx={{
               fontWeight: 800,
-              letterSpacing: "-0.03em",
+              letterSpacing: '-0.03em',
               color: (t) => alpha(t.palette.secondary.dark, 0.95),
             }}
           >
@@ -75,31 +75,31 @@ export default function TopBar() {
               p: 0.45,
               border: (t) => `1px solid ${alpha(t.palette.common.white, 0.45)}`,
               boxShadow: (t) => `inset 0 1px 0 ${alpha(t.palette.common.white, 0.5)}`,
-              "& .MuiToggleButtonGroup-grouped": {
+              '& .MuiToggleButtonGroup-grouped': {
                 border: 0,
                 borderRadius: 999,
                 px: 2,
                 py: 0.7,
-                textTransform: "none",
+                textTransform: 'none',
                 color: (t) => alpha(t.palette.secondary.dark, 0.86),
                 fontWeight: 700,
-                fontSize: "0.84rem",
+                fontSize: '0.84rem',
                 lineHeight: 1.2,
-                "&:not(:first-of-type)": {
+                '&:not(:first-of-type)': {
                   ml: 0.5,
                 },
-                "&.Mui-selected": {
+                '&.Mui-selected': {
                   background: (t) =>
                     `linear-gradient(125deg, ${t.palette.common.white} 0%, ${alpha(t.palette.primary.light, 0.92)} 100%)`,
                   color: (t) => t.palette.secondary.dark,
                   fontWeight: 800,
                   boxShadow: (t) => `0 2px 10px ${alpha(t.palette.secondary.dark, 0.2)}`,
                 },
-                "&.Mui-selected:hover": {
+                '&.Mui-selected:hover': {
                   background: (t) =>
                     `linear-gradient(125deg, ${alpha(t.palette.common.white, 0.98)} 0%, ${alpha(t.palette.primary.light, 0.95)} 100%)`,
                 },
-                "&:hover": {
+                '&:hover': {
                   backgroundColor: (t) => alpha(t.palette.common.white, 0.42),
                 },
               },
