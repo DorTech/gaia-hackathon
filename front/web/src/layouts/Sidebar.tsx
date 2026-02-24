@@ -17,9 +17,8 @@ const DRAWER_WIDTH = 240;
 const DRAWER_WIDTH_CLOSED = 64;
 
 const NAV_ITEMS = [
-  { label: 'Itinéraire Technique', icon: <AgricultureIcon />, path: '/itineraire' },
-  { label: 'Benchmark', icon: <BarChartIcon />, path: '/benchmark' },
   { label: 'Mon diagnostic ITK', icon: <AssignmentIcon />, path: '/diagnostic' },
+  { label: 'Benchmark', icon: <BarChartIcon />, path: '/benchmark' },
   { label: 'Simulation leviers', icon: <PlayCircleFilledIcon />, path: '/simulation' },
 ];
 

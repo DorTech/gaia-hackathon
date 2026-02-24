@@ -1,8 +1,22 @@
 import { Injectable } from "@nestjs/common";
-import { sql, eq, ne, gt, gte, lt, lte, like, inArray, isNull, isNotNull, and, SQL } from "drizzle-orm";
+import {
+  sql,
+  eq,
+  ne,
+  gt,
+  gte,
+  lt,
+  lte,
+  like,
+  inArray,
+  isNull,
+  isNotNull,
+  and,
+  SQL,
+} from "drizzle-orm";
 import { PgTable } from "drizzle-orm/pg-core";
 import { DephyService } from "../dephy/dephy.service";
-import { FilterDto, JoinFilterDto } from "./dto/query.dto";
+import { NewFilterDto, JoinFilterDto, FilterDto } from "./dto/query.dto";
 import { getTableEntry } from "./table-registry";
 
 @Injectable()
@@ -41,7 +55,9 @@ export class QueryRepository {
   ): Promise<{ median: number | null; count: number }> {
     const result = await this.dephyService.db
       .select({
-        median: sql<number | null>`percentile_cont(0.5) WITHIN GROUP (ORDER BY ${column})`,
+        median: sql<
+          number | null
+        >`percentile_cont(0.5) WITHIN GROUP (ORDER BY ${column})`,
         count: sql<number>`count(${column})`,
       })
       .from(table)
@@ -51,6 +67,110 @@ export class QueryRepository {
     return {
       median: row.median !== null ? Number(row.median) : null,
       count: Number(row.count),
+    };
+  }
+
+  async medianNbRotation(
+    query: NewFilterDto,
+  ): Promise<{ median: number | null }> {
+    const result = await this.dephyService.db.execute(sql`
+WITH rotation_cte AS (
+    SELECT
+        sdc.id,
+        COUNT(DISTINCT sac.culture_nom) AS nb_cultures_rotation,
+        STRING_AGG(DISTINCT sac.culture_nom, ' > ') AS sequence_cultures
+    FROM sdc
+    JOIN succession_assolee_synthetise_magasin_can sac
+        ON sdc.id = sac.sdc_id
+    GROUP BY sdc.id
+)
+SELECT
+    PERCENTILE_CONT(0.5) 
+        WITHIN GROUP (ORDER BY r.nb_cultures_rotation) AS median_nb_rotation
+FROM rotation_cte r
+JOIN synthetise_perf_magasin_can spmc
+    ON r.id = spmc.sdc_id
+JOIN sdc
+    ON sdc.id = r.id
+JOIN dispositif
+    ON dispositif.id = sdc.dispositif_id
+JOIN domain
+    ON domain.id = dispositif.domaine_id
+JOIN succession_assolee_synthetise_magasin_can sac
+    ON sac.sdc_id = sdc.id
+WHERE unaccent(sac.culture_nom) ILIKE unaccent('%' || ${query.culture} || '%')
+  AND domain.departement LIKE ${query.department}
+  AND sdc.type_agriculture LIKE ${query.agricultureType};
+ `);
+
+    if (result.rows.length === 0) {
+      console.warn(
+        `No data found for culture="${query.culture}", department="${query.department}", agricultureType="${query.agricultureType}"`,
+      );
+      return { median: null };
+    }
+
+    const row = result.rows[0];
+    if (!row || row?.median_nb_rotation === null) {
+      console.warn(
+        `Median number of rotations is null for culture="${query.culture}", department="${query.department}", agricultureType="${query.agricultureType}"`,
+      );
+      return { median: null };
+    }
+    return {
+      median: Number(row.median_nb_rotation),
+    };
+  }
+
+  async medianNbWeedingPasses(
+    query: NewFilterDto,
+  ): Promise<{ median: number | null }> {
+    const result = await this.dephyService.db.execute(sql`
+WITH rotation_cte AS (
+    SELECT
+        sdc.id,
+        COUNT(DISTINCT sac.culture_nom) AS nb_cultures_rotation,
+        STRING_AGG(DISTINCT sac.culture_nom, ' > ') AS sequence_cultures
+    FROM sdc
+    JOIN succession_assolee_synthetise_magasin_can sac
+        ON sdc.id = sac.sdc_id
+    GROUP BY sdc.id
+)
+SELECT
+    PERCENTILE_CONT(0.5) 
+        WITHIN GROUP (ORDER BY spmc.nbre_de_passages_desherbage_meca) AS median_nb_weeding
+FROM rotation_cte r
+JOIN synthetise_perf_magasin_can spmc
+    ON r.id = spmc.sdc_id
+JOIN sdc
+    ON sdc.id = r.id
+JOIN dispositif
+    ON dispositif.id = sdc.dispositif_id
+JOIN domain
+    ON domain.id = dispositif.domaine_id
+JOIN succession_assolee_synthetise_magasin_can sac
+    ON sac.sdc_id = sdc.id
+WHERE unaccent(sac.culture_nom) ILIKE unaccent('%' || ${query.culture} || '%')
+  AND domain.departement LIKE ${query.department}
+  AND sdc.type_agriculture LIKE ${query.agricultureType};
+ `);
+
+    if (result.rows.length === 0) {
+      console.warn(
+        `No data found for culture="${query.culture}", department="${query.department}", agricultureType="${query.agricultureType}"`,
+      );
+      return { median: null };
+    }
+
+    const row = result.rows[0];
+    if (!row || row?.median_nb_weeding === null) {
+      console.warn(
+        `Median number of weeding passes is null for culture="${query.culture}", department="${query.department}", agricultureType="${query.agricultureType}"`,
+      );
+      return { median: null };
+    }
+    return {
+      median: Number(row.median_nb_weeding),
     };
   }
 
@@ -138,9 +258,14 @@ export class QueryRepository {
       );
     }
 
-    const sourceWhere = join.filters.length > 0
-      ? and(...join.filters.map((f) => this.buildCondition(f, sourceEntry.columns, join.table)))
-      : undefined;
+    const sourceWhere =
+      join.filters.length > 0
+        ? and(
+            ...join.filters.map((f) =>
+              this.buildCondition(f, sourceEntry.columns, join.table),
+            ),
+          )
+        : undefined;
 
     const subquery = this.dephyService.db
       .select({ val: sourceCol })
@@ -150,7 +275,11 @@ export class QueryRepository {
     return inArray(targetCol, subquery);
   }
 
-  private buildCondition(filter: FilterDto, columns: Record<string, any>, tableName: string) {
+  private buildCondition(
+    filter: FilterDto,
+    columns: Record<string, any>,
+    tableName: string,
+  ) {
     const col = columns[filter.field];
     if (!col) {
       throw new Error(

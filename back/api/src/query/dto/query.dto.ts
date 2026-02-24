@@ -47,19 +47,31 @@ export class FilterDto implements IFilter {
 }
 
 export class JoinFilterDto implements IJoinFilter {
-  @ApiProperty({ example: "domaine", description: "Source table to filter from" })
+  @ApiProperty({
+    example: "domaine",
+    description: "Source table to filter from",
+  })
   @IsString()
   table: string;
 
-  @ApiProperty({ example: "id", description: "Column to select from source table" })
+  @ApiProperty({
+    example: "id",
+    description: "Column to select from source table",
+  })
   @IsString()
   field: string;
 
-  @ApiProperty({ example: "domaineId", description: "Column on the target table to match against" })
+  @ApiProperty({
+    example: "domaineId",
+    description: "Column on the target table to match against",
+  })
   @IsString()
   targetField: string;
 
-  @ApiProperty({ type: [FilterDto], description: "Filters applied to the source table" })
+  @ApiProperty({
+    type: [FilterDto],
+    description: "Filters applied to the source table",
+  })
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => FilterDto)
@@ -82,12 +94,32 @@ export class MedianDto implements IMedianRequest {
   @Type(() => FilterDto)
   filters?: FilterDto[];
 
-  @ApiPropertyOptional({ type: [JoinFilterDto], description: "Cross-table subquery filters" })
+  @ApiPropertyOptional({
+    type: [JoinFilterDto],
+    description: "Cross-table subquery filters",
+  })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => JoinFilterDto)
   joins?: JoinFilterDto[];
+}
+
+export class NewFilterDto {
+  @ApiProperty({ example: "blé", description: "Crop type" })
+  @IsString()
+  culture: string;
+
+  @ApiProperty({ example: "75", description: "Department number" })
+  @IsString()
+  department: string;
+
+  @ApiProperty({
+    example: "conventionnelle",
+    description: "Type of agriculture",
+  })
+  @IsString()
+  agricultureType: string;
 }
 
 export class FrequencyDto implements IFrequencyRequest {
@@ -106,14 +138,20 @@ export class FrequencyDto implements IFrequencyRequest {
   @Type(() => FilterDto)
   filters?: FilterDto[];
 
-  @ApiPropertyOptional({ type: [JoinFilterDto], description: "Cross-table subquery filters" })
+  @ApiPropertyOptional({
+    type: [JoinFilterDto],
+    description: "Cross-table subquery filters",
+  })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => JoinFilterDto)
   joins?: JoinFilterDto[];
 
-  @ApiPropertyOptional({ example: false, description: "Treat numeric field as boolean (0 = false, > 0 = true)" })
+  @ApiPropertyOptional({
+    example: false,
+    description: "Treat numeric field as boolean (0 = false, > 0 = true)",
+  })
   @IsOptional()
   @IsBoolean()
   asBoolean?: boolean;
@@ -124,7 +162,10 @@ export class QueryDto implements IQueryRequest {
   @IsString()
   table: string;
 
-  @ApiPropertyOptional({ type: [String], example: ["id", "code", "departement"] })
+  @ApiPropertyOptional({
+    type: [String],
+    example: ["id", "code", "departement"],
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
@@ -137,7 +178,10 @@ export class QueryDto implements IQueryRequest {
   @Type(() => FilterDto)
   filters?: FilterDto[];
 
-  @ApiPropertyOptional({ example: 20, description: "Omit or set to 0 to fetch all rows" })
+  @ApiPropertyOptional({
+    example: 20,
+    description: "Omit or set to 0 to fetch all rows",
+  })
   @IsOptional()
   @IsInt()
   @Min(0)
@@ -149,7 +193,10 @@ export class QueryDto implements IQueryRequest {
   @Min(0)
   offset?: number = 0;
 
-  @ApiPropertyOptional({ type: [JoinFilterDto], description: "Cross-table subquery filters" })
+  @ApiPropertyOptional({
+    type: [JoinFilterDto],
+    description: "Cross-table subquery filters",
+  })
   @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })

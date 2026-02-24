@@ -226,20 +226,26 @@ div.mainITKContainer.withTranscript .bottom-transcript {
 .fsec { margin-bottom: 14px; }
 .fsec-title {
   font-size: .68rem; font-weight: 800; text-transform: uppercase; letter-spacing: .1em;
-  color: var(--text2); border-bottom: 2px solid var(--green-l); padding-bottom: 6px;
-  margin-bottom: 10px; display: flex; align-items: center; gap: 6px;
+  color: var(--text2); border-bottom: 2px solid var(--green-l); padding-bottom: 8px;
+  margin-bottom: 16px; display: flex; align-items: center; gap: 6px;
 }
-.fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.fgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 20px; }
 .fgrid.t3 { grid-template-columns: 1fr 1fr 1fr; }
-.fld { display: flex; flex-direction: column; gap: 3px; }
+.fld {
+  display: flex; flex-direction: column; gap: 10px;
+  background: var(--green-ll); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px 16px;
+  transition: border-color .15s, box-shadow .15s;
+}
+.fld:hover { border-color: var(--green); box-shadow: 0 2px 8px rgba(77,168,107,.08); }
 .fld.full { grid-column: span 2; }
 .flbl {
-  font-size: .67rem; font-weight: 600; color: var(--text2);
-  display: flex; align-items: center; gap: 5px; flex-wrap: wrap;
+  font-size: .72rem; font-weight: 700; color: var(--text);
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
 }
 .fref {
-  font-size: .57rem; background: var(--green-l); color: var(--green-d);
-  padding: 1px 5px; border-radius: 3px; font-weight: 700;
+  font-size: .58rem; background: var(--green-l); color: var(--green-d);
+  padding: 2px 7px; border-radius: 4px; font-weight: 700;
 }
 .fsel, .finp {
   border: 1px solid var(--border2); border-radius: 7px; padding: 7px 9px;
@@ -269,15 +275,15 @@ div.mainITKContainer.withTranscript .bottom-transcript {
     gap: 4px;
   }
 }
-.chips { display: flex; gap: 5px; flex-wrap: wrap; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .chip {
-  padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border2);
+  padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border2);
   font-size: .71rem; font-weight: 600; cursor: pointer;
   background: var(--white); color: var(--text2); transition: all .13s;
 }
 .chip:hover { border-color: var(--green); color: var(--green-d); }
 .chip.on { background: var(--green); border-color: var(--green-d); color: white; }
-.slider-w { display: flex; flex-direction: column; gap: 2px; }
+.slider-w { display: flex; flex-direction: column; gap: 4px; }
 .slider-top { display: flex; justify-content: space-between; align-items: baseline; }
 .slider-top .cap { font-size: .6rem; color: var(--text3); }
 .slider-val { font-size: .78rem; font-weight: 800; color: var(--green-d); }

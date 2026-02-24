@@ -18,6 +18,7 @@ export const Field: React.FC<FieldProps> = ({ label, disabled = false, children 
     const nextDisabled = disabled || childProps.disabled;
 
     return React.cloneElement(child as React.ReactElement<{ disabled?: boolean }>, {
+      ...childProps,
       disabled: nextDisabled,
     });
   });

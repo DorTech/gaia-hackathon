@@ -1,6 +1,11 @@
 import { Injectable, BadRequestException } from "@nestjs/common";
 import { getTableEntry, listTables } from "./table-registry";
-import { QueryDto, MedianDto, FrequencyDto } from "./dto/query.dto";
+import {
+  QueryDto,
+  MedianDto,
+  FrequencyDto,
+  NewFilterDto,
+} from "./dto/query.dto";
 import { QueryRepository } from "./query.repository";
 import {
   ITableInfo,
@@ -21,7 +26,9 @@ export class QueryService {
     const entry = getTableEntry(query.table);
     if (!entry) {
       throw new BadRequestException(
-        `Unknown table "${query.table}". Available: ${listTables().map((t) => t.name).join(", ")}`,
+        `Unknown table "${query.table}". Available: ${listTables()
+          .map((t) => t.name)
+          .join(", ")}`,
       );
     }
 
@@ -45,7 +52,12 @@ export class QueryService {
 
     const limit = query.limit || undefined;
     const offset = query.offset ?? 0;
-    const where = this.queryRepository.buildWhere(query.filters ?? [], columns, query.table, query.joins);
+    const where = this.queryRepository.buildWhere(
+      query.filters ?? [],
+      columns,
+      query.table,
+      query.joins,
+    );
 
     const [data, total] = await Promise.all([
       this.queryRepository.findRows(table, selectColumns, where, limit, offset),
@@ -59,7 +71,9 @@ export class QueryService {
     const entry = getTableEntry(dto.table);
     if (!entry) {
       throw new BadRequestException(
-        `Unknown table "${dto.table}". Available: ${listTables().map((t) => t.name).join(", ")}`,
+        `Unknown table "${dto.table}". Available: ${listTables()
+          .map((t) => t.name)
+          .join(", ")}`,
       );
     }
 
@@ -77,7 +91,12 @@ export class QueryService {
       );
     }
 
-    const where = this.queryRepository.buildWhere(dto.filters ?? [], columns, dto.table, dto.joins);
+    const where = this.queryRepository.buildWhere(
+      dto.filters ?? [],
+      columns,
+      dto.table,
+      dto.joins,
+    );
     const result = await this.queryRepository.median(table, col, where);
 
     return { table: dto.table, field: dto.field, ...result };
@@ -87,7 +106,9 @@ export class QueryService {
     const entry = getTableEntry(dto.table);
     if (!entry) {
       throw new BadRequestException(
-        `Unknown table "${dto.table}". Available: ${listTables().map((t) => t.name).join(", ")}`,
+        `Unknown table "${dto.table}". Available: ${listTables()
+          .map((t) => t.name)
+          .join(", ")}`,
       );
     }
 
@@ -105,8 +126,18 @@ export class QueryService {
       );
     }
 
-    const where = this.queryRepository.buildWhere(dto.filters ?? [], columns, dto.table, dto.joins);
-    const rows = await this.queryRepository.frequency(table, col, where, dto.asBoolean);
+    const where = this.queryRepository.buildWhere(
+      dto.filters ?? [],
+      columns,
+      dto.table,
+      dto.joins,
+    );
+    const rows = await this.queryRepository.frequency(
+      table,
+      col,
+      where,
+      dto.asBoolean,
+    );
 
     const total = rows.reduce((sum, r) => sum + r.count, 0);
     const data = rows.map((r) => ({
@@ -115,5 +146,20 @@ export class QueryService {
     }));
 
     return { table: dto.table, field: dto.field, total, data };
+  }
+
+  async getMedianNbRotation(
+    dto: NewFilterDto,
+  ): Promise<{ medianNbRotation: number | null }> {
+    const nbRotation = await this.queryRepository.medianNbRotation(dto);
+    return { medianNbRotation: nbRotation.median };
+  }
+
+  async getMedianNbWeedingPasses(
+    dto: NewFilterDto,
+  ): Promise<{ medianNbWeedingPasses: number | null }> {
+    const nbWeedingPasses =
+      await this.queryRepository.medianNbWeedingPasses(dto);
+    return { medianNbWeedingPasses: nbWeedingPasses.median };
   }
 }

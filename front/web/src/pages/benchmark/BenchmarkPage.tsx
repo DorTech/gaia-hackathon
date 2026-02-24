@@ -52,34 +52,50 @@ export const BenchmarkPage: React.FC = () => {
       try {
         // 1. Fetch median IFT
         const medianRes = await fetchMedianIFT(filters);
-        const medianValue = medianRes.median ?? 2.3;
         const count = medianRes.count;
 
-        setMedianIft(medianValue);
+        if (medianRes.median != null && count > 0) {
+          const medianValue = medianRes.median;
+          setMedianIft(medianValue);
 
-        const formattedMedian = medianValue.toFixed(2).replace('.', ',');
-        const deltaPct = (((medianValue - userIFT) / userIFT) * 100).toFixed(1);
-        const deltaSign = parseFloat(deltaPct) > 0 ? '↑ +' : '↓ ';
+          const formattedMedian = medianValue.toFixed(2).replace('.', ',');
+          const deltaPct = (((medianValue - userIFT) / userIFT) * 100).toFixed(1);
+          const deltaSign = parseFloat(deltaPct) > 0 ? '↑ +' : '↓ ';
 
-        setMedianKpis([
-          {
-            id: 'ift',
-            label: '📉 Médiane IFT total',
-            value: formattedMedian,
-            unit: 'IFT',
-            variant: 'violet',
-            sub: `${count} exploitations · ${filters.species}`,
-            delta: `${deltaSign}${Math.abs(parseFloat(deltaPct)).toFixed(1)}% vs votre exploitation (${userIFT.toFixed(2).replace('.', ',')})`,
-            deltaClass: parseFloat(deltaPct) > 0 ? 'warn' : 'good',
-          },
-        ]);
+          setMedianKpis([
+            {
+              id: 'ift',
+              label: '📉 Médiane IFT total',
+              value: formattedMedian,
+              unit: 'IFT',
+              variant: 'violet',
+              sub: `${count} exploitations · ${filters.species}`,
+              delta: `${deltaSign}${Math.abs(parseFloat(deltaPct)).toFixed(1)}% vs votre exploitation (${userIFT.toFixed(2).replace('.', ',')})`,
+              deltaClass: parseFloat(deltaPct) > 0 ? 'warn' : 'good',
+            },
+          ]);
+        } else {
+          setMedianKpis([
+            {
+              id: 'ift',
+              label: '📉 Médiane IFT total',
+              value: '—',
+              unit: '',
+              variant: 'violet',
+              sub: `Aucune exploitation trouvée · ${filters.species}`,
+              delta: '',
+              deltaClass: 'good',
+            },
+          ]);
+        }
 
-        // 2. Fetch top farms
+        const medianValue = medianRes.median ?? 0;
+
+        // 2. Fetch farms
         const farmsRes = await fetchTopFarms(filters);
         const sortedFarms = farmsRes.data
           .filter((f) => f.iftHistoChimiqueTot != null)
-          .sort((a, b) => a.iftHistoChimiqueTot - b.iftHistoChimiqueTot)
-          .slice(0, 10);
+          .sort((a, b) => a.iftHistoChimiqueTot - b.iftHistoChimiqueTot);
 
         setReferenceFarms(
           sortedFarms.map((f, i) => {
@@ -98,17 +114,17 @@ export const BenchmarkPage: React.FC = () => {
         );
 
         // 3. Fetch practice profile data
-        const currentProfile = PRACTICE_PROFILE_TEMPLATE;
+        const baseProfile = PRACTICE_PROFILE_TEMPLATE;
         const updatedProfile: PracticeProfileItem[] = await Promise.all(
-          currentProfile.map(async (item) => {
-            const apiConfig = PRACTICE_API_MAP[item.id];
-            if (!apiConfig) return item; // keep mock for items not in the API
+          baseProfile.map(async (profile) => {
+            const apiConfig = PRACTICE_API_MAP[profile.id];
+            if (!apiConfig) return profile; // keep mock for items not in the API
 
             try {
               if (apiConfig.type === 'frequency') {
                 const res = await fetchFrequency(apiConfig.field, filters, apiConfig.asBoolean);
                 const total = res.data.reduce((sum, r) => sum + r.count, 0);
-                if (total === 0) return item;
+                if (total === 0) return profile;
 
                 const frequencies = res.data
                   .filter((r) => r.value !== null)
@@ -118,31 +134,28 @@ export const BenchmarkPage: React.FC = () => {
                     top: idx === 0,
                   }));
 
-                return { ...item, frequencies };
+                return { ...profile, frequencies };
               }
 
               if (apiConfig.type === 'median') {
                 const res = await fetchMedianField(apiConfig.field, filters);
-                if (res.median === null) return item;
+                if (res === null) return profile;
 
-                const formatted =
-                  res.median % 1 === 0
-                    ? String(res.median)
-                    : res.median.toFixed(1).replace('.', ',');
+                const formatted = res % 1 === 0 ? String(res) : res.toFixed(1).replace('.', ',');
 
                 return {
-                  ...item,
+                  ...profile,
                   quantitative: {
-                    ...item.quantitative!,
+                    ...profile.quantitative!,
                     value: formatted,
                   },
                 };
               }
             } catch {
-              return item; // fallback to mock on error
+              return profile; // fallback to mock on error
             }
 
-            return item;
+            return profile;
           }),
         );
 
@@ -238,7 +251,7 @@ export const BenchmarkPage: React.FC = () => {
         </div>
       )}
 
-      {hasAllFilters && (
+      {hasAllFilters && !loading && (
         <>
           {/* KPIs MÉDIANE */}
           <MedianKpiRow kpis={medianKpis} />
