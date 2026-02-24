@@ -15,7 +15,7 @@ import {
   type ITKFormState,
 } from '../../store/diagnosticAtoms';
 import { fetchDistinctAgricultureTypes } from '../../api/benchmark';
-import { FormControl, MenuItem, Select, type SelectChangeEvent } from '@mui/material';
+import { FormControl, MenuItem, Select, Typography, type SelectChangeEvent } from '@mui/material';
 import { DIAGNOSTIC_VARIABLES } from '../../config/variables';
 import { predictIFT } from '../../api/predict';
 import { ItineraireComponent } from '../ItinerairePage';
@@ -120,18 +120,24 @@ export const DiagnosticPage: React.FC = () => {
                         renderValue={(selected) => {
                           if (!selected) {
                             return (
-                              <span style={{ color: 'var(--text3)' }}>{v.select!.placeholder}</span>
+                              <Typography variant="body2" sx={{ color: 'var(--text3)' }}>
+                                {v.select!.placeholder}
+                              </Typography>
                             );
                           }
                           const name = v.select!.options[selected];
-                          return name ? `${selected} — ${name}` : selected;
+                          return (
+                            <Typography variant="body2">
+                              {name ? `${selected} — ${name}` : selected}
+                            </Typography>
+                          );
                         }}
                       >
                         {Object.entries(v.select.options)
                           .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
                           .map(([code, name]) => (
                             <MenuItem key={code} value={code}>
-                              {code} — {name}
+                              <Typography variant="body2">{code} — {name}</Typography>
                             </MenuItem>
                           ))}
                       </Select>
