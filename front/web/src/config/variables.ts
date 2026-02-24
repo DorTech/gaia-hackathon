@@ -39,8 +39,9 @@ export interface VariableConfig {
   unit?: string;
   slider?: SliderConfig;
   chips?: ChipConfig;
-  /** When true, chip options come from agricultureTypesAtom instead of static config */
-  dynamicChips?: boolean;
+  /** When set, chip options come from a dynamic atom instead of static config.
+   *  Value identifies the data source: 'agricultureTypes' | 'soilWorkTypes' */
+  dynamicChips?: string;
   input?: InputConfig;
   select?: SelectConfig;
   benchmarkApi?: {
@@ -66,7 +67,7 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     dbVariable: 'sdc_type_agriculture',
     type: 'Qualitatif',
     benchmarkApi: { type: 'frequency', field: 'agricultureType' },
-    dynamicChips: true,
+    dynamicChips: 'agricultureTypes',
   },
   {
     id: 'rotation-count',
@@ -112,7 +113,7 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     label: 'Type de travail du sol',
     dbVariable: 'type_de_travail_du_sol',
     type: 'Qualitatif',
-    chips: { options: ['Aucun', 'Labour', 'TCS', 'Semis direct'] },
+    dynamicChips: 'soilWorkTypes',
     benchmarkApi: { type: 'frequency', field: 'soilWork' },
   },
 

@@ -9,13 +9,14 @@ import { PredictionSidebar } from './components/units/PredictionSidebar';
 import { SectionPanel } from './components/units/SectionPanel';
 import {
   agricultureTypesAtom,
+  soilWorkTypesAtom,
   itkFormAtom,
   predictedIFTAtom,
   predictingAtom,
   prefilledKeysAtom,
   type ITKFormState,
 } from '../../store/diagnosticAtoms';
-import { fetchDistinctAgricultureTypes } from '../../api/benchmark';
+import { fetchDistinctAgricultureTypes, fetchDistinctSoilWorkTypes } from '../../api/benchmark';
 import { FormControl, MenuItem, Select, Typography, type SelectChangeEvent } from '@mui/material';
 import { DIAGNOSTIC_VARIABLES } from '../../config/variables';
 import { predictIFT } from '../../api/predict';
@@ -27,6 +28,7 @@ export const DiagnosticPage: React.FC = () => {
   const setPredictedIFT = useSetAtom(predictedIFTAtom);
   const setPredicting = useSetAtom(predictingAtom);
   const [agricultureTypes, setAgricultureTypes] = useAtom(agricultureTypesAtom);
+  const [soilWorkTypes, setSoilWorkTypes] = useAtom(soilWorkTypesAtom);
   const prefilledKeys = useAtomValue(prefilledKeysAtom);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -34,6 +36,11 @@ export const DiagnosticPage: React.FC = () => {
     if (agricultureTypes.length === 0) {
       fetchDistinctAgricultureTypes()
         .then(setAgricultureTypes)
+        .catch(() => {});
+    }
+    if (soilWorkTypes.length === 0) {
+      fetchDistinctSoilWorkTypes()
+        .then(setSoilWorkTypes)
         .catch(() => {});
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -44,7 +51,7 @@ export const DiagnosticPage: React.FC = () => {
     timerRef.current = setTimeout(async () => {
       setPredicting(true);
       try {
-        const ift = await predictIFT(form, agricultureTypes);
+        const ift = await predictIFT(form, agricultureTypes, soilWorkTypes);
         setPredictedIFT(ift);
       } catch {
         // keep previous value on error
@@ -56,7 +63,7 @@ export const DiagnosticPage: React.FC = () => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [agricultureTypes, form, setPredictedIFT, setPredicting]);
+  }, [agricultureTypes, soilWorkTypes, form, setPredictedIFT, setPredicting]);
 
   const handleFieldChange = <K extends keyof ITKFormState>(field: K, value: ITKFormState[K]) => {
     setForm((prev) => ({
@@ -65,9 +72,12 @@ export const DiagnosticPage: React.FC = () => {
     }));
   };
 
-  const soilWorkOptions =
-    DIAGNOSTIC_VARIABLES.find((v) => v.formKey === 'typeTravailDuSol')?.chips?.options ?? [];
-  const selectedSoilWork = soilWorkOptions[form.typeTravailDuSol] ?? 'Travail du sol non défini';
+  const dynamicChipsMap: Record<string, string[]> = {
+    agricultureTypes,
+    soilWorkTypes,
+  };
+
+  const selectedSoilWork = soilWorkTypes[form.typeTravailDuSol] ?? 'Travail du sol non défini';
   const selectedAgricultureType =
     agricultureTypes[form.sdcTypeAgriculture] ?? 'Type d’agriculture non défini';
   const variablesSummary = `${form.nbCulturesRotation} cultures • ${selectedSoilWork} • Dépt. ${form.departement} • ${selectedAgricultureType}`;
@@ -105,7 +115,7 @@ export const DiagnosticPage: React.FC = () => {
                   />
                 ) : v.dynamicChips ? (
                   <ChipGroup
-                    options={agricultureTypes}
+                    options={dynamicChipsMap[v.dynamicChips] ?? []}
                     selectedIndex={form[v.formKey] as number}
                     onSelect={(index) =>
                       handleFieldChange(v.formKey, index as ITKFormState[typeof v.formKey])

@@ -160,5 +160,24 @@ export async function fetchDistinctAgricultureTypes(): Promise<string[]> {
   return data.data.filter((r) => r.value != null && r.value !== '').map((r) => String(r.value));
 }
 
+/** Convert DB-style labels like "LABOUR_OCCASIONNEL" to "Labour occasionnel" */
+function formatLabel(raw: string): string {
+  return raw
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/^\w/, (c) => c.toUpperCase());
+}
+
+/** Fetch distinct soil work types from the database */
+export async function fetchDistinctSoilWorkTypes(): Promise<string[]> {
+  const { data } = await apiClient.post<FrequencyResponse>('/query/frequency', {
+    table: 'synthetise_perf_magasin_can',
+    field: 'typeDeTravailDuSol',
+  });
+  return data.data
+    .filter((r) => r.value != null && r.value !== '')
+    .map((r) => formatLabel(String(r.value)));
+}
+
 /** Maps practice IDs to their API config — derived from centralized variable definitions */
 export const PRACTICE_API_MAP = buildPracticeApiMap();

@@ -8,13 +8,14 @@ interface PredictResponse {
   ift_histo_chimique_tot: number;
 }
 
-export async function predictIFT(form: ITKFormState, agricultureTypes: string[]): Promise<number> {
+export async function predictIFT(form: ITKFormState, agricultureTypes: string[], soilWorkTypes: string[] = []): Promise<number> {
+  const soilWorkValue = soilWorkTypes[form.typeTravailDuSol] ?? '';
   const payload = {
     nb_cultures_rotation: form.nbCulturesRotation,
     sequence_cultures: form.sequenceCultures,
     recours_macroorganismes: CHIP_API_VALUES.recoursMacroorganismes[form.recoursMacroorganismes] ?? 'Non',
     nbre_de_passages_desherbage_meca: form.nbrePassagesDesherbageMeca,
-    type_de_travail_du_sol: CHIP_API_VALUES.typeTravailDuSol[form.typeTravailDuSol] === 'Aucun' ? '' : (CHIP_API_VALUES.typeTravailDuSol[form.typeTravailDuSol] ?? 'Labour'),
+    type_de_travail_du_sol: soilWorkValue.toLowerCase() === 'aucun' ? '' : soilWorkValue,
     departement: form.departement,
     sdc_type_agriculture: agricultureTypes[form.sdcTypeAgriculture] ?? 'Agriculture conventionnelle',
     ferti_n_tot: form.fertiNTot,

@@ -1,10 +1,10 @@
 import { Box, Grid } from '@mui/material';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import React, { useEffect, useRef } from 'react';
-import { fetchDistinctAgricultureTypes } from '../api/benchmark';
+import { fetchDistinctAgricultureTypes, fetchDistinctSoilWorkTypes } from '../api/benchmark';
 import { predictIFT } from '../api/predict';
 import type { ITKFormState } from '../store/diagnosticAtoms';
-import { agricultureTypesAtom, predictedIFTAtom } from '../store/diagnosticAtoms';
+import { agricultureTypesAtom, soilWorkTypesAtom, predictedIFTAtom } from '../store/diagnosticAtoms';
 import {
   leverOverridesAtom,
   leversAtom,
@@ -23,12 +23,18 @@ export const SimulationPage: React.FC = () => {
   const simulating = useAtomValue(simulatingAtom);
   const simulatedForm = useAtomValue(simulatedFormAtom);
   const [agricultureTypes, setAgricultureTypes] = useAtom(agricultureTypesAtom);
+  const [soilWorkTypes, setSoilWorkTypes] = useAtom(soilWorkTypesAtom);
 
-  // Fetch agriculture types if not already loaded (e.g. direct navigation)
+  // Fetch agriculture types and soil work types if not already loaded (e.g. direct navigation)
   useEffect(() => {
     if (agricultureTypes.length === 0) {
       fetchDistinctAgricultureTypes()
         .then(setAgricultureTypes)
+        .catch(() => {});
+    }
+    if (soilWorkTypes.length === 0) {
+      fetchDistinctSoilWorkTypes()
+        .then(setSoilWorkTypes)
         .catch(() => {});
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -47,7 +53,7 @@ export const SimulationPage: React.FC = () => {
     const timer = setTimeout(async () => {
       setSimulating(true);
       try {
-        const result = await predictIFT(simulatedForm, agricultureTypes);
+        const result = await predictIFT(simulatedForm, agricultureTypes, soilWorkTypes);
         setSimulatedIFT(Math.round(result * 100) / 100);
       } catch (err) {
         console.error('Simulation predict failed:', err);
@@ -56,7 +62,7 @@ export const SimulationPage: React.FC = () => {
       }
     }, 300);
     return () => clearTimeout(timer);
-  }, [simulatedForm, agricultureTypes, setSimulatedIFT, setSimulating]);
+  }, [simulatedForm, agricultureTypes, soilWorkTypes, setSimulatedIFT, setSimulating]);
 
   const handlePickOption = (leverId: string, formOverrides: Partial<ITKFormState> | null) => {
     setOverrides((prev) => {

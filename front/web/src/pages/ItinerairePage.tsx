@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { generateRotation } from '../api/rotation';
 import {
   agricultureTypesAtom,
+  soilWorkTypesAtom,
   itinerairePromptAtom,
   itineraireRotationDataAtom,
   itkFormAtom,
@@ -20,6 +21,7 @@ export const ItineraireComponent: React.FC = () => {
   const setForm = useSetAtom(itkFormAtom);
   const setPrefilledKeys = useSetAtom(prefilledKeysAtom);
   const agricultureTypes = useAtomValue(agricultureTypesAtom);
+  const soilWorkTypes = useAtomValue(soilWorkTypesAtom);
 
   const chartRef = useRef<HTMLDivElement>(null);
 
@@ -38,6 +40,7 @@ export const ItineraireComponent: React.FC = () => {
         const { partial, filledKeys } = mapDiagnosticVariablesToForm(
           data.diagnostic_variables,
           agricultureTypes,
+          soilWorkTypes,
         );
         if (filledKeys.size > 0) {
           setForm((prev) => ({ ...prev, ...partial }));

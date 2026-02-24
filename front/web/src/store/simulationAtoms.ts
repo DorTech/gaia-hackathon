@@ -1,6 +1,6 @@
 import { atom } from 'jotai';
 import type { Lever, LeverOverrides } from '../pages/simulationComponents/types';
-import { agricultureTypesAtom, itkFormAtom, CHIP_OPTIONS } from './diagnosticAtoms';
+import { agricultureTypesAtom, soilWorkTypesAtom, itkFormAtom, CHIP_API_VALUES } from './diagnosticAtoms';
 import type { ITKFormState } from './diagnosticAtoms';
 import { benchmarkPracticeProfileAtom } from './benchmarkAtoms';
 
@@ -11,6 +11,7 @@ import { benchmarkPracticeProfileAtom } from './benchmarkAtoms';
 export const leversAtom = atom<Lever[]>((get) => {
   const form = get(itkFormAtom);
   const agriTypes = get(agricultureTypesAtom);
+  const soilWorkTypes = get(soilWorkTypesAtom);
   const profile = get(benchmarkPracticeProfileAtom);
 
   // Build agriculture type options from dynamic atom, excluding the current selection
@@ -60,14 +61,14 @@ export const leversAtom = atom<Lever[]>((get) => {
       id: 'sol',
       name: 'Type de travail du sol',
       type: 'Qualitatif',
-      current: `${CHIP_OPTIONS.soilWork[form.typeTravailDuSol]} · actuel`,
+      current: `${soilWorkTypes[form.typeTravailDuSol] ?? '—'} · actuel`,
       options: (() => {
         const freqs = (profile.find(p => p.id === 'soil-work')?.frequencies ?? [])
-          .filter(f => (CHIP_OPTIONS.soilWork as readonly string[]).indexOf(f.label) !== form.typeTravailDuSol);
+          .filter(f => soilWorkTypes.indexOf(f.label) !== form.typeTravailDuSol);
         const refLabel = freqs.filter(f => f.label !== 'Autres').sort((a, b) => b.pct - a.pct)[0]?.label;
         return freqs.map(f => ({
           label: f.label,
-          formOverrides: { typeTravailDuSol: (CHIP_OPTIONS.soilWork as readonly string[]).indexOf(f.label) },
+          formOverrides: { typeTravailDuSol: soilWorkTypes.indexOf(f.label) },
           isReference: f.label === refLabel,
         }));
       })(),
@@ -92,11 +93,11 @@ export const leversAtom = atom<Lever[]>((get) => {
       id: 'macro',
       name: 'Recours aux macro-organismes',
       type: 'Qualitatif',
-      current: `${CHIP_OPTIONS.yesNo[form.recoursMacroorganismes]} · actuel`,
+      current: `${CHIP_API_VALUES.recoursMacroorganismes[form.recoursMacroorganismes]} · actuel`,
       options: (() => {
         const freqs = profile.find(p => p.id === 'macroorganisms')?.frequencies ?? [];
         const refLabel = freqs.filter(f => f.label !== 'Autres').sort((a, b) => b.pct - a.pct)[0]?.label;
-        return CHIP_OPTIONS.yesNo
+        return ([...CHIP_API_VALUES.recoursMacroorganismes] as string[])
           .map((label, idx) => ({ label, idx }))
           .filter(({ idx }) => idx !== form.recoursMacroorganismes)
           .map(({ label, idx }) => ({

@@ -37,6 +37,7 @@ export const prefilledKeysAtom = atom<Set<keyof ITKFormState>>(new Set<keyof ITK
 export function mapDiagnosticVariablesToForm(
   vars: DiagnosticVariables,
   agricultureTypes: string[],
+  soilWorkTypes: string[] = [],
 ): { partial: Partial<ITKFormState>; filledKeys: Set<keyof ITKFormState> } {
   const partial: Partial<ITKFormState> = {};
   const filledKeys = new Set<keyof ITKFormState>();
@@ -81,16 +82,13 @@ export function mapDiagnosticVariablesToForm(
     filledKeys.add('nbrePassagesDesherbageMeca');
   }
 
-  if (vars.type_de_travail_du_sol != null) {
-    const soilMap: Record<string, number> = {
-      Aucun: 0,
-      Labour: 1,
-      TCS: 2,
-      'Semis direct': 3,
-    };
-    const val = soilMap[vars.type_de_travail_du_sol];
-    if (val !== undefined) {
-      partial.typeTravailDuSol = val;
+  if (vars.type_de_travail_du_sol != null && soilWorkTypes.length > 0) {
+    const keyword = vars.type_de_travail_du_sol.toLowerCase();
+    const idx = soilWorkTypes.findIndex(
+      (t) => t.toLowerCase() === keyword || t.toLowerCase().includes(keyword) || keyword.includes(t.toLowerCase()),
+    );
+    if (idx >= 0) {
+      partial.typeTravailDuSol = idx;
       filledKeys.add('typeTravailDuSol');
     }
   }
@@ -109,19 +107,15 @@ export const predictedIFTAtom = atom<number>(2.5);
 /** Loading state for the prediction API */
 export const predictingAtom = atom<boolean>(false);
 
-export const CHIP_OPTIONS = {
-  soilWork: ['Aucun', 'Labour', 'TCS', 'Semis direct'] as const,
-  yesNo: ['Non', 'Oui'] as const,
-} as const;
-
-/** API string values for chip indices */
 export const CHIP_API_VALUES = {
-  typeTravailDuSol: ['Aucun', 'Labour', 'TCS', 'Semis direct'] as const,
   recoursMacroorganismes: ['Non', 'Oui'] as const,
 } as const;
 
 /** Agriculture types fetched from backend — writable atom populated on app load */
 export const agricultureTypesAtom = atom<string[]>([]);
+
+/** Soil work types fetched from backend — writable atom populated on app load */
+export const soilWorkTypesAtom = atom<string[]>([]);
 
 /** Prompt used to generate itinerary, kept across route changes */
 export const itinerairePromptAtom = atom<string>('');

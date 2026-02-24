@@ -7,7 +7,7 @@ import type {
   BenchmarkFiltersState,
 } from '../types/benchmark';
 import { buildPracticeProfileTemplate } from '../config/variables';
-import { agricultureTypesAtom, itkFormAtom, CHIP_OPTIONS } from './diagnosticAtoms';
+import { agricultureTypesAtom, soilWorkTypesAtom, itkFormAtom, CHIP_API_VALUES } from './diagnosticAtoms';
 
 export const benchmarkLoadingAtom = atom<boolean>(false);
 
@@ -65,6 +65,7 @@ export const enrichedPracticeProfileAtom = atom<PracticeProfileItem[]>((get) => 
   const profile = get(benchmarkPracticeProfileAtom);
   const form = get(itkFormAtom);
   const agriTypes = get(agricultureTypesAtom);
+  const soilWorkTypes = get(soilWorkTypesAtom);
 
   return profile.map((item) => {
     switch (item.id) {
@@ -102,12 +103,12 @@ export const enrichedPracticeProfileAtom = atom<PracticeProfileItem[]>((get) => 
       case 'soil-work':
         return {
           ...item,
-          note: { value: CHIP_OPTIONS.soilWork[form.typeTravailDuSol] },
+          note: { value: soilWorkTypes[form.typeTravailDuSol] ?? '—' },
         };
       case 'macroorganisms':
         return {
           ...item,
-          note: { value: CHIP_OPTIONS.yesNo[form.recoursMacroorganismes] },
+          note: { value: CHIP_API_VALUES.recoursMacroorganismes[form.recoursMacroorganismes] },
         };
       case 'agriculture-type':
         return {
