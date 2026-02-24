@@ -1,4 +1,4 @@
-# GAIA - Optimisation des pratiques agricoles
+# OPTIMEO driven by Doriane
 
 ![Screenshot](screenshot.png)
 
