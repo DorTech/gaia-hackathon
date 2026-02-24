@@ -126,6 +126,13 @@ export class NewFilterDto {
   agricultureType: string;
 }
 
+export type NewFilterDB = Pick<
+  NewFilterDto,
+  "field" | "department" | "agricultureType"
+> & {
+  culture: string[];
+};
+
 export class FrequencyDto implements IFrequencyRequest {
   @ApiProperty({ example: "domaine" })
   @IsString()
