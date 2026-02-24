@@ -29,23 +29,39 @@ export default function TopBar() {
         <Box display="flex" alignItems="center" gap={1.2}>
           <img src="/logo.png" alt="Logo" style={{ height: 50 }} />
 
-          <Typography
-            variant="h5"
-            noWrap
-            sx={{
-              fontFamily: '"Fredoka", sans-serif',
-              fontWeight: 700,
-              letterSpacing: '0.01em',
-              textShadow: (t) => `0 1px 3px ${alpha(t.palette.secondary.dark, 0.2)}`,
-            }}
-          >
-            <Box component="span" sx={{ color: (t) => t.palette.common.white }}>
-              Opti
-            </Box>
-            <Box component="span" sx={{ color: (t) => alpha(t.palette.secondary.dark, 0.9) }}>
-              meo
-            </Box>
-          </Typography>
+          <Box>
+            <Typography
+              variant="h5"
+              noWrap
+              sx={{
+                fontFamily: '"Fredoka", sans-serif',
+                fontWeight: 700,
+                letterSpacing: '0.01em',
+                lineHeight: 1.1,
+                textShadow: (t) => `0 1px 3px ${alpha(t.palette.secondary.dark, 0.2)}`,
+              }}
+            >
+              <Box component="span" sx={{ color: (t) => t.palette.common.white }}>
+                Opti
+              </Box>
+              <Box component="span" sx={{ color: (t) => alpha(t.palette.secondary.dark, 0.9) }}>
+                meo
+              </Box>
+            </Typography>
+            <Typography
+              noWrap
+              sx={{
+                fontSize: '0.6rem',
+                fontWeight: 600,
+                fontStyle: 'italic',
+                color: (t) => alpha(t.palette.secondary.dark, 0.7),
+                letterSpacing: '0.03em',
+                mt: -0.2,
+              }}
+            >
+              Driven by Doriane
+            </Typography>
+          </Box>
         </Box>
 
         <Box>
@@ -76,15 +92,9 @@ export default function TopBar() {
                   ml: 0.5,
                 },
                 '&.Mui-selected': {
-                  background: (t) =>
-                    `linear-gradient(125deg, ${t.palette.common.white} 0%, ${alpha(t.palette.primary.light, 0.92)} 100%)`,
-                  color: (t) => t.palette.secondary.dark,
+                  backgroundColor: "#dcedb6",
                   fontWeight: 800,
                   boxShadow: (t) => `0 2px 10px ${alpha(t.palette.secondary.dark, 0.2)}`,
-                },
-                '&.Mui-selected:hover': {
-                  background: (t) =>
-                    `linear-gradient(125deg, ${alpha(t.palette.common.white, 0.98)} 0%, ${alpha(t.palette.primary.light, 0.95)} 100%)`,
                 },
                 '&:hover': {
                   backgroundColor: (t) => alpha(t.palette.common.white, 0.42),
