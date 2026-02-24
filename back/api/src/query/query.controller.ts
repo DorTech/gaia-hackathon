@@ -67,4 +67,11 @@ export class QueryController {
   ): Promise<INewFrequencyResponse> {
     return this.queryService.getFrequencyVar(body);
   }
+
+  @Post("median_ift")
+  async getMedianIft(
+    @Body() body: NewFilterDto,
+  ): Promise<{ median: number | null; count: number }> {
+    return this.queryService.getMedianIft(body);
+  }
 }

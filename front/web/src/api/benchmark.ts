@@ -16,13 +16,6 @@ interface FrequencyRow {
   percentage: number;
 }
 
-interface MedianResponse {
-  table: string;
-  field: string;
-  median: number | null;
-  count: number;
-}
-
 interface FrequencyResponse {
   total: number;
   data: FrequencyRow[];
@@ -67,11 +60,15 @@ function buildFilters(filters: BenchmarkFiltersState): Filter[] {
 
 // ── API calls ──
 
-export async function fetchMedianIFT(filters: BenchmarkFiltersState): Promise<MedianResponse> {
-  const { data } = await apiClient.post<MedianResponse>('/query/median', {
-    table: TABLE,
+export async function fetchMedianIFT(
+  filters: BenchmarkFiltersState,
+): Promise<{ median: number; count: number }> {
+  const deptCode = filters.department.split(' ')[0];
+  const { data } = await apiClient.post<{ median: number; count: number }>('/query/median_ift', {
     field: 'iftHistoChimiqueTot',
-    filters: buildFilters(filters),
+    culture: filters.species,
+    department: deptCode,
+    agricultureType: filters.agricultureType,
   });
   return data;
 }

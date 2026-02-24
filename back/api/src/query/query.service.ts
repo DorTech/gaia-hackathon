@@ -168,4 +168,12 @@ export class QueryService {
     // TODO ADD ALL FREQUENCY VARS
     return { total: 0, data: [] };
   }
+
+  async getMedianIft(
+    dto: NewFilterDto,
+  ): Promise<{ median: number | null; count: number }> {
+    // TODO add median for IFT
+    // COUNT IS NB OF FARM IN THE MEDIAN
+    return { median: null, count: 0 };
+  }
 }
