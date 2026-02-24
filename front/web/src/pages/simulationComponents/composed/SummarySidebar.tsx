@@ -141,7 +141,7 @@ export const SummarySidebar: React.FC<SummaryBarProps> = ({
               letterSpacing: '0.05em',
             }}
           >
-            Médiane Dép. 35
+            Médiane
           </Typography>
           <Typography
             sx={{

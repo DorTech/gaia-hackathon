@@ -23,8 +23,7 @@ export default function BottomBar() {
         top: 'auto',
         bottom: 0,
         zIndex: (t) => t.zIndex.drawer + 1,
-        background: (t) =>
-          `linear-gradient(110deg, ${alpha(t.palette.primary.light, 0.94)} 0%, ${alpha(t.palette.primary.main, 0.88)} 100%)`,
+        background: alpha('rgba(194, 224, 123, 0.38)', 0.38),
         color: (t) => t.palette.secondary.dark,
         backdropFilter: 'blur(10px)',
         boxShadow: (t) => t.shadows[2],
