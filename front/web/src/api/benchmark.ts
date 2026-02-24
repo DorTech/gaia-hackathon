@@ -52,9 +52,7 @@ function buildFilters(filters: BenchmarkFiltersState): Filter[] {
   const deptCode = filters.department.split(' ')[0];
   out.push({ field: 'departement', operator: 'eq', value: deptCode });
 
-  // Agriculture type — "Tous (Bio + Conv.)" means no filter
-  if (filters.agricultureType !== 'Tous (Bio + Conv.)') {
-    const apiValue =
+  const apiValue =
       filters.agricultureType === 'Biologique seul'
         ? 'Agriculture Biologique'
         : 'Agriculture Conventionnelle';
@@ -63,7 +61,6 @@ function buildFilters(filters: BenchmarkFiltersState): Filter[] {
       operator: 'eq',
       value: apiValue,
     });
-  }
 
   return out;
 }
@@ -191,7 +188,6 @@ export async function fetchDistinctAgricultureTypes(): Promise<string[]> {
   return data.data
     .filter((r) => r.value != null && r.value !== '')
     .map((r) => String(r.value))
-    .concat('Tous (Bio + Conv.)'); // Add combined option
 }
 
 /** Maps practice IDs to their API config — derived from centralized variable definitions */
