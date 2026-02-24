@@ -67,13 +67,22 @@ export const ItineraireComponent: React.FC = () => {
   }, [rotationData]);
 
   return (
-    <>
-      <Typography variant="h4" gutterBottom>
-        Itinéraire Technique
+    <Box sx={{ px: { xs: 1, md: 2 }, py: { xs: 2, md: 3 } }}>
+      <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
+        Ma ferme
       </Typography>
 
-      <Paper sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h6" gutterBottom>
+      <Paper
+        sx={{
+          p: { xs: 2.5, md: 3 },
+          mb: 3,
+          borderRadius: 2.5,
+          border: '1px solid rgba(0, 0, 0, 0.06)',
+          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.06)',
+          background: 'linear-gradient(180deg, #ffffff 0%, #fafafa 100%)',
+        }}
+      >
+        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
           Description de votre itinéraire technique
         </Typography>
         <Stack spacing={2}>
@@ -86,6 +95,12 @@ export const ItineraireComponent: React.FC = () => {
             onChange={(e) => setPrompt(e.target.value)}
             fullWidth
             disabled={loading}
+            sx={{
+              '& .MuiInputBase-root': {
+                borderRadius: 2,
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              },
+            }}
           />
           <Box>
             <Button
@@ -93,6 +108,13 @@ export const ItineraireComponent: React.FC = () => {
               onClick={handleGenerate}
               disabled={loading || !prompt.trim()}
               startIcon={loading ? <CircularProgress size={20} /> : undefined}
+              sx={{
+                textTransform: 'none',
+                px: 3,
+                py: 1,
+                borderRadius: 2,
+                boxShadow: '0 6px 16px rgba(0, 0, 0, 0.12)',
+              }}
             >
               {loading ? 'Génération en cours...' : "Générer l'itinéraire"}
             </Button>
@@ -101,19 +123,36 @@ export const ItineraireComponent: React.FC = () => {
       </Paper>
 
       {error && (
-        <Alert severity="error" sx={{ mb: 3 }}>
+        <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
           {error}
         </Alert>
       )}
 
       {rotationData && (
-        <Paper sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>
+        <Paper
+          sx={{
+            p: { xs: 2.5, md: 3 },
+            borderRadius: 2.5,
+            border: '1px solid rgba(0, 0, 0, 0.06)',
+            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.06)',
+          }}
+        >
+          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
             Itinéraire généré
           </Typography>
-          <Box id="rotation-chart" ref={chartRef} sx={{ width: '100%', minHeight: 500 }} />
+          <Box
+            id="rotation-chart"
+            ref={chartRef}
+            sx={{
+              width: '100%',
+              minHeight: 500,
+              borderRadius: 2,
+              border: '1px dashed rgba(0, 0, 0, 0.12)',
+              backgroundColor: 'rgba(0, 0, 0, 0.02)',
+            }}
+          />
         </Paper>
       )}
-    </>
+    </Box>
   );
 };
