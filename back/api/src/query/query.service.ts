@@ -399,7 +399,7 @@ export class QueryService {
     }
 
     if (otherCount > 0) {
-      significant.push({ value: "Autre", count: otherCount });
+      significant.push({ value: "Autres", count: otherCount });
     }
 
     const data = significant.map((r) => ({
