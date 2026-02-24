@@ -135,7 +135,6 @@ const ComparisonBox: React.FC<ComparisonBoxProps> = ({ refVal, item }) => {
   if (myVal === null) return null;
 
   const diff = calculateDiff(refVal, myVal);
-  const isPositive = diff !== null && diff < 0; // négatif est bon
 
   return (
     <Box
@@ -144,14 +143,12 @@ const ComparisonBox: React.FC<ComparisonBoxProps> = ({ refVal, item }) => {
         marginTop: '8px',
         padding: '8px 12px',
         borderRadius: '6px',
-        backgroundColor: isPositive ? 'rgba(40, 167, 69, 0.1)' : 'rgba(255, 152, 0, 0.1)',
-        border: isPositive
-          ? '1px solid rgba(40, 167, 69, 0.3)'
-          : '1px solid rgba(255, 152, 0, 0.3)',
+        backgroundColor: 'rgba(43, 178, 208, 0.13)',
+        border: '1px solid rgba(0, 179, 255, 0.3)',
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-        <span style={{ color: 'var(--text3)' }}>vs moi:</span>
+        <span style={{ color: 'var(--text3)' }}>Ma valeur:</span>
         <span style={{ fontWeight: 700, color: 'var(--text2)' }}>
           {item.quantitative.myValue} {item.quantitative.unit}
         </span>
@@ -159,7 +156,7 @@ const ComparisonBox: React.FC<ComparisonBoxProps> = ({ refVal, item }) => {
           <span
             style={{
               fontWeight: 700,
-              color: isPositive ? 'var(--green-d)' : 'var(--orange)',
+              color: 'var(--text2)',
               fontSize: '0.9rem',
             }}
           >
@@ -205,15 +202,6 @@ export const PracticeProfileCard: React.FC<PracticeProfileCardProps> = ({ title,
                 <Typography className="lt-name" fontSize={15} component="div">
                   {item.name}
                 </Typography>
-                <Typography className="lt-var" fontSize={10} component="div">
-                  {item.variable}
-                </Typography>
-              </Box>
-              <Box
-                component="span"
-                className={`badge-type ${item.type === 'Quantitatif' ? 'bt-q' : 'bt-ql'}`}
-              >
-                {item.type}
               </Box>
             </Box>
 
