@@ -47,8 +47,9 @@ export function mapDiagnosticVariablesToForm(
   }
 
   if (vars.sdc_type_agriculture != null && agricultureTypes.length > 0) {
+    const keyword = vars.sdc_type_agriculture.toLowerCase();
     const idx = agricultureTypes.findIndex(
-      (t) => t.toLowerCase() === vars.sdc_type_agriculture!.toLowerCase(),
+      (t) => t.toLowerCase().includes(keyword) || keyword.includes(t.toLowerCase()),
     );
     if (idx >= 0) {
       partial.sdcTypeAgriculture = idx;
