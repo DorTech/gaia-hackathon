@@ -8,14 +8,16 @@ import {
   CircularProgress,
   Alert,
 } from '@mui/material';
+import { useAtom } from 'jotai';
 import { generateRotation } from '../api/rotation';
 import { SectionPanel } from './diagnostic/components/units/SectionPanel';
+import { itinerairePromptAtom, itineraireRotationDataAtom } from '../store/diagnosticAtoms';
 
 export const ItineraireComponent: React.FC = () => {
-  const [prompt, setPrompt] = useState('');
+  const [prompt, setPrompt] = useAtom(itinerairePromptAtom);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [rotationData, setRotationData] = useState<Record<string, unknown> | null>(null);
+  const [rotationData, setRotationData] = useAtom(itineraireRotationDataAtom);
 
   const chartRef = useRef<HTMLDivElement>(null);
 
@@ -72,7 +74,7 @@ export const ItineraireComponent: React.FC = () => {
       </Typography>
 
       <SectionPanel
-        title="🌾 Description de votre itinéraire technique"
+        title="📝 Description de votre itinéraire technique"
         className="itk-last-section"
         cardSx={{ background: 'linear-gradient(180deg, #ffffff 0%, #fafafa 100%)' }}
       >
@@ -119,7 +121,7 @@ export const ItineraireComponent: React.FC = () => {
       )}
 
       {rotationData && (
-        <SectionPanel title="🌾 Itinéraire généré" defaultExpanded>
+        <SectionPanel title="🗺️ Itinéraire généré" defaultExpanded>
           <Box
             id="rotation-chart"
             ref={chartRef}
