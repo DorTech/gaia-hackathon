@@ -11,6 +11,8 @@ export interface ITKFormState {
   fertiNTot: number;
 }
 
+export type RotationDataState = Record<string, unknown> | null;
+
 export const ITK_FORM_DEFAULTS: ITKFormState = {
   nbCulturesRotation: 3,
   sequenceCultures: 'Blé tendre > Maïs > Colza',
@@ -43,3 +45,9 @@ export const CHIP_API_VALUES = {
 
 /** Agriculture types fetched from backend — writable atom populated on app load */
 export const agricultureTypesAtom = atom<string[]>([]);
+
+/** Prompt used to generate itinerary, kept across route changes */
+export const itinerairePromptAtom = atom<string>('');
+
+/** Last generated itinerary payload, kept across route changes */
+export const itineraireRotationDataAtom = atom<RotationDataState>(null);
