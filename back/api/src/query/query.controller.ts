@@ -74,4 +74,10 @@ export class QueryController {
   ): Promise<{ median: number | null; count: number }> {
     return this.queryService.getMedianIft(body);
   }
+
+  @Post("culture_list")
+  async getCultureList(): Promise<string[]> {
+    const record = this.queryService.getCultureName();
+    return Object.keys(record);
+  }
 }

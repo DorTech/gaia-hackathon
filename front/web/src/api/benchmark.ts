@@ -136,11 +136,8 @@ function formatDept(code: string): string {
 
 /** Fetch distinct species from the database */
 export async function fetchDistinctSpecies(): Promise<string[]> {
-  const { data } = await apiClient.post<FrequencyResponse>('/query/frequency', {
-    table: TABLE,
-    field: 'especes',
-  });
-  return data.data.filter((r) => r.value != null && r.value !== '').map((r) => String(r.value));
+  const { data } = await apiClient.post<string[]>('/query/culture_list');
+  return data.filter((value) => value != null && value !== '').map((value) => String(value));
 }
 
 /** Fetch distinct departments from the database, formatted as "CODE — Nom" */
