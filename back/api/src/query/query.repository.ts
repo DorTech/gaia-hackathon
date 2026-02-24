@@ -220,6 +220,35 @@ WHERE sac.culture_nom IN (${query.culture.map((c) => `'${c}'`).join(", ")})
     };
   }
 
+  async medianIft(
+    query: NewFilterDB,
+  ): Promise<{ median: number | null; count: number }> {
+    const result = await this.dephyService.db.execute(`
+SELECT
+    PERCENTILE_CONT(0.5)
+        WITHIN GROUP (ORDER BY spmc.ift_histo_chimique_tot) AS median_ift,
+    COUNT(DISTINCT spmc.domaine_id)::int AS farm_count
+FROM synthetise_perf_magasin_can spmc
+JOIN sdc ON sdc.id = spmc.sdc_id
+JOIN dispositif ON dispositif.id = sdc.dispositif_id
+JOIN domain ON domain.id = dispositif.domaine_id
+JOIN succession_assolee_synthetise_magasin_can sac ON sac.sdc_id = sdc.id
+WHERE sac.culture_nom IN (${query.culture.map((c) => `'${c}'`).join(", ")})
+  AND domain.departement LIKE '${query.department}'
+  AND sdc.type_agriculture LIKE '${query.agricultureType}'
+  AND spmc.ift_histo_chimique_tot IS NOT NULL;
+    `);
+
+    if (result.rows.length === 0 || result.rows[0]?.median_ift === null) {
+      return { median: null, count: 0 };
+    }
+
+    return {
+      median: Number(result.rows[0].median_ift),
+      count: Number(result.rows[0].farm_count),
+    };
+  }
+
   async frequency(
     table: PgTable,
     column: any,
@@ -296,9 +325,9 @@ ORDER BY count DESC;
   }
 
   async frequencyMacroorganismes(
-    query: NewFilterDto,
+    query: NewFilterDB,
   ): Promise<{ value: string | boolean | null; count: number }[]> {
-    const result = await this.dephyService.db.execute(sql`
+    const result = await this.dephyService.db.execute(`
 SELECT
     CASE WHEN spmc.recours_macroorganismes > 0 THEN true ELSE false END AS value,
     COUNT(*)::int AS count
@@ -307,9 +336,9 @@ JOIN sdc ON sdc.id = spmc.sdc_id
 JOIN dispositif ON dispositif.id = sdc.dispositif_id
 JOIN domain ON domain.id = dispositif.domaine_id
 JOIN succession_assolee_synthetise_magasin_can sac ON sac.sdc_id = sdc.id
-WHERE sac.culture_nom ILIKE '%' || ${query.culture} || '%'
-  AND domain.departement LIKE ${query.department}
-  AND sdc.type_agriculture LIKE ${query.agricultureType}
+WHERE sac.culture_nom IN (${query.culture.map((c) => `'${c}'`).join(", ")})
+  AND domain.departement LIKE '${query.department}'
+  AND sdc.type_agriculture LIKE '${query.agricultureType}'
 GROUP BY (CASE WHEN spmc.recours_macroorganismes > 0 THEN true ELSE false END)
 ORDER BY count DESC;
     `);
@@ -320,9 +349,9 @@ ORDER BY count DESC;
   }
 
   async frequencySoilWork(
-    query: NewFilterDto,
+    query: NewFilterDB,
   ): Promise<{ value: string | boolean | null; count: number }[]> {
-    const result = await this.dephyService.db.execute(sql`
+    const result = await this.dephyService.db.execute(`
 SELECT
     spmc.type_de_travail_du_sol AS value,
     COUNT(*)::int AS count
@@ -331,9 +360,9 @@ JOIN sdc ON sdc.id = spmc.sdc_id
 JOIN dispositif ON dispositif.id = sdc.dispositif_id
 JOIN domain ON domain.id = dispositif.domaine_id
 JOIN succession_assolee_synthetise_magasin_can sac ON sac.sdc_id = sdc.id
-WHERE sac.culture_nom ILIKE '%' || ${query.culture} || '%'
-  AND domain.departement LIKE ${query.department}
-  AND sdc.type_agriculture LIKE ${query.agricultureType}
+WHERE sac.culture_nom IN (${query.culture.map((c) => `'${c}'`).join(", ")})
+  AND domain.departement LIKE '${query.department}'
+  AND sdc.type_agriculture LIKE '${query.agricultureType}'
 GROUP BY spmc.type_de_travail_du_sol
 ORDER BY count DESC;
     `);
@@ -344,9 +373,9 @@ ORDER BY count DESC;
   }
 
   async frequencyAgricultureType(
-    query: NewFilterDto,
+    query: NewFilterDB,
   ): Promise<{ value: string | boolean | null; count: number }[]> {
-    const result = await this.dephyService.db.execute(sql`
+    const result = await this.dephyService.db.execute(`
 SELECT
     sdc.type_agriculture AS value,
     COUNT(*)::int AS count
@@ -354,9 +383,9 @@ FROM sdc
 JOIN dispositif ON dispositif.id = sdc.dispositif_id
 JOIN domain ON domain.id = dispositif.domaine_id
 JOIN succession_assolee_synthetise_magasin_can sac ON sac.sdc_id = sdc.id
-WHERE sac.culture_nom ILIKE '%' || ${query.culture} || '%'
-  AND domain.departement LIKE ${query.department}
-  AND sdc.type_agriculture LIKE ${query.agricultureType}
+WHERE sac.culture_nom IN (${query.culture.map((c) => `'${c}'`).join(", ")})
+  AND domain.departement LIKE '${query.department}'
+  AND sdc.type_agriculture LIKE '${query.agricultureType}'
 GROUP BY sdc.type_agriculture
 ORDER BY count DESC;
     `);

@@ -384,11 +384,12 @@ export class QueryService {
       // Aggregate rows with the same normalized value
       rows = this.aggregateFrequencyRows(rows);
     } else if (dto.field === "macroorganismes") {
-      rows = await this.queryRepository.frequencyMacroorganismes(dto);
+      rows = await this.queryRepository.frequencyMacroorganismes(dbFilters);
     } else if (dto.field === "soilWork") {
-      rows = await this.queryRepository.frequencySoilWork(dto);
+      rows = await this.queryRepository.frequencySoilWork(dbFilters);
+      console.log("soilWork rows:", rows);
     } else if (dto.field === "agricultureType") {
-      rows = await this.queryRepository.frequencyAgricultureType(dto);
+      rows = await this.queryRepository.frequencyAgricultureType(dbFilters);
     }
 
     const total = rows.reduce((sum, r) => sum + r.count, 0);
@@ -422,9 +423,8 @@ export class QueryService {
   async getMedianIft(
     dto: NewFilterDto,
   ): Promise<{ median: number | null; count: number }> {
-    // TODO add median for IFT
-    // COUNT IS NB OF FARM IN THE MEDIAN
-    return { median: null, count: 0 };
+    const dbFilters: NewFilterDB = this.buildDbFilters(dto);
+    return this.queryRepository.medianIft(dbFilters);
   }
 
   // Provides a mapping of culture names to their known aliases in the dataset, to help standardize user input and improve matching with database entries - hackathon workaround
