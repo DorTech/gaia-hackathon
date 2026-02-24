@@ -1,22 +1,18 @@
-import React, { useEffect, useRef } from "react";
-import { Box, Grid } from "@mui/material";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { Box, Grid } from '@mui/material';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import React, { useEffect, useRef } from 'react';
+import { fetchDistinctAgricultureTypes } from '../api/benchmark';
+import { predictIFT } from '../api/predict';
+import type { ITKFormState } from '../store/diagnosticAtoms';
+import { agricultureTypesAtom, predictedIFTAtom } from '../store/diagnosticAtoms';
 import {
-  PageHeader,
-  SummaryBar,
-  LeversList,
-} from "./simulationComponents";
-import { predictedIFTAtom, agricultureTypesAtom } from "../store/diagnosticAtoms";
-import { fetchDistinctAgricultureTypes } from "../api/benchmark";
-import type { ITKFormState } from "../store/diagnosticAtoms";
-import {
-  leversAtom,
   leverOverridesAtom,
+  leversAtom,
   simulatedFormAtom,
   simulatedIFTAtom,
   simulatingAtom,
-} from "../store/simulationAtoms";
-import { predictIFT } from "../api/predict";
+} from '../store/simulationAtoms';
+import { LeversList, PageHeader, SummarySidebar } from './simulationComponents';
 
 export const SimulationPage: React.FC = () => {
   const baseIFT = useAtomValue(predictedIFTAtom);
@@ -31,7 +27,9 @@ export const SimulationPage: React.FC = () => {
   // Fetch agriculture types if not already loaded (e.g. direct navigation)
   useEffect(() => {
     if (agricultureTypes.length === 0) {
-      fetchDistinctAgricultureTypes().then(setAgricultureTypes).catch(() => {});
+      fetchDistinctAgricultureTypes()
+        .then(setAgricultureTypes)
+        .catch(() => {});
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -63,6 +61,7 @@ export const SimulationPage: React.FC = () => {
   const handlePickOption = (leverId: string, formOverrides: Partial<ITKFormState> | null) => {
     setOverrides((prev) => {
       if (!formOverrides) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { [leverId]: _, ...rest } = prev;
         return rest;
       }
@@ -73,44 +72,36 @@ export const SimulationPage: React.FC = () => {
   const activeLeverCount = Object.keys(overrides).length;
   const displayIFT = simulatedIFT || baseIFT;
   const gained = baseIFT - displayIFT;
-  const gainPct = gained > 0 ? ((gained / baseIFT) * 100).toFixed(1) : "0";
+  const gainPct = gained > 0 ? ((gained / baseIFT) * 100).toFixed(1) : '0';
 
   return (
     <Box
       sx={{
-        backgroundColor: "var(--bg)",
-        padding: "18px 20px",
-        minHeight: "100vh",
+        backgroundColor: 'var(--bg)',
+        padding: '18px 20px',
+        minHeight: '100vh',
       }}
     >
       <PageHeader
         title="Simulation des leviers agronomiques"
-        description="Sélectionnez les pratiques des fermes référence que vous seriez prêt à mobiliser · Recalcul RF en temps réel"
+        description="Sélectionnez les pratiques des fermes que vous seriez prêt à mobiliser · Recalcul de l'IFT en temps réel"
       />
 
-      <SummaryBar
-        baseIFT={baseIFT}
-        simulatedIFT={displayIFT}
-        gained={gained}
-        gainPct={gainPct}
-        activeLeverCount={activeLeverCount}
-        simulating={simulating}
-      />
+      <Grid container spacing={2}>
+        {/* Left column - Levers List */}
+        <Grid item xs={12} md={9}>
+          <LeversList levers={levers} overrides={overrides} onPickOption={handlePickOption} />
+        </Grid>
 
-      <Grid
-        container
-        spacing={2}
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "1fr",
-          gap: "14px",
-        }}
-      >
-        <Grid item xs={12}>
-          <LeversList
-            levers={levers}
-            overrides={overrides}
-            onPickOption={handlePickOption}
+        {/* Right column - Summary Card */}
+        <Grid item xs={12} md={3}>
+          <SummarySidebar
+            baseIFT={baseIFT}
+            simulatedIFT={displayIFT}
+            gained={gained}
+            gainPct={gainPct}
+            activeLeverCount={activeLeverCount}
+            simulating={simulating}
           />
         </Grid>
       </Grid>
