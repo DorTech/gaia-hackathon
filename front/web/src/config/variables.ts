@@ -94,7 +94,7 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     dbVariable: 'type_de_travail_du_sol',
     type: 'Qualitatif',
     chips: { options: ['Labour', 'TCS', 'Semis direct'] },
-    benchmarkApi: { type: 'frequency', field: 'typeDeTravailDuSol' },
+    benchmarkApi: { type: 'frequency', field: 'soilWork' },
   },
   {
     id: 'departement',
@@ -112,7 +112,7 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     type: 'Quantitatif',
     unit: 'kg N/ha',
     slider: { min: 0, max: 300, minLabel: '0', maxLabel: '300' },
-    benchmarkApi: { type: 'median', field: 'fertiNTot' },
+    benchmarkApi: { type: 'median', field: 'fertilisation' },
   },
   {
     id: 'agriculture-type',
@@ -121,6 +121,7 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     dbVariable: 'sdc_type_agriculture',
     type: 'Qualitatif',
     chips: { options: ['Conventionnelle', 'Biologique', 'Conversion bio'] },
+    benchmarkApi: { type: 'frequency', field: 'agricultureType' },
   },
 ];
 

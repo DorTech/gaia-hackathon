@@ -124,7 +124,7 @@ export const BenchmarkPage: React.FC = () => {
 
             try {
               if (apiConfig.type === 'frequency') {
-                const res = await fetchFrequency(apiConfig.field, filters, apiConfig.asBoolean);
+                const res = await fetchFrequency(apiConfig.field, filters);
                 const total = res.data.reduce((sum, r) => sum + r.count, 0);
                 if (total === 0) return profile;
 
@@ -197,10 +197,11 @@ export const BenchmarkPage: React.FC = () => {
         const deptFormatted = deptName ? `${deptCode} — ${deptName}` : deptCode;
         const matchedDept = departments.find((d) => d === deptFormatted) ?? '';
 
-        const diagAgriType = ['Conventionnelle', 'Biologique', 'Conversion bio'][diagnosticForm.sdcTypeAgriculture] ?? '';
-        const matchedAgriType = agricultureTypes.find((t) =>
-          t.toLowerCase().includes(diagAgriType.toLowerCase()),
-        ) ?? '';
+        const diagAgriType =
+          ['Conventionnelle', 'Biologique', 'Conversion bio'][diagnosticForm.sdcTypeAgriculture] ??
+          '';
+        const matchedAgriType =
+          agricultureTypes.find((t) => t.toLowerCase().includes(diagAgriType.toLowerCase())) ?? '';
 
         setAppliedFilters(
           (prev: { species: string; department: string; agricultureType: string }) => ({

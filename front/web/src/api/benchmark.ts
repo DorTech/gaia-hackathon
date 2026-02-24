@@ -13,6 +13,7 @@ interface Filter {
 interface FrequencyRow {
   value: string | boolean | null;
   count: number;
+  percentage: number;
 }
 
 interface MedianResponse {
@@ -23,8 +24,7 @@ interface MedianResponse {
 }
 
 interface FrequencyResponse {
-  table: string;
-  field: string;
+  total: number;
   data: FrequencyRow[];
 }
 
@@ -79,13 +79,14 @@ export async function fetchMedianIFT(filters: BenchmarkFiltersState): Promise<Me
 export async function fetchFrequency(
   field: string,
   filters: BenchmarkFiltersState,
-  asBoolean?: boolean,
 ): Promise<FrequencyResponse> {
-  const { data } = await apiClient.post<FrequencyResponse>('/query/frequency', {
-    table: TABLE,
-    field,
-    filters: buildFilters(filters),
-    ...(asBoolean ? { asBoolean: true } : {}),
+  // Special route for nbCulturesRotation
+  const deptCode = filters.department.split(' ')[0];
+  const { data } = await apiClient.post<FrequencyResponse>('/query/frequency_var', {
+    field: field,
+    culture: filters.species,
+    department: deptCode,
+    agricultureType: filters.agricultureType,
   });
   return data;
 }

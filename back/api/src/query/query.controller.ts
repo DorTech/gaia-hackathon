@@ -12,6 +12,7 @@ import {
   IQueryResponse,
   IMedianResponse,
   IFrequencyResponse,
+  INewFrequencyResponse,
 } from "@gaia/shared-type";
 
 @ApiTags("query")
@@ -55,5 +56,15 @@ export class QueryController {
     @Body() body: NewFilterDto,
   ): Promise<{ median: number | null }> {
     return this.queryService.getMedianVar(body);
+  }
+
+  @Post("frequency_var")
+  @ApiOperation({
+    summary: "Get value frequency distribution for a qualitative column",
+  })
+  async getFrequencyVar(
+    @Body() body: NewFilterDto,
+  ): Promise<INewFrequencyResponse> {
+    return this.queryService.getFrequencyVar(body);
   }
 }

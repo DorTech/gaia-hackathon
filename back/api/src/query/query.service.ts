@@ -12,6 +12,7 @@ import {
   IQueryResponse,
   IMedianResponse,
   IFrequencyResponse,
+  INewFrequencyResponse,
 } from "@gaia/shared-type";
 
 @Injectable()
@@ -158,7 +159,13 @@ export class QueryService {
         await this.queryRepository.medianNbWeedingPasses(dto);
       return { median: nbWeedingPasses.median };
     }
+    // TODO ADD FERTI
 
     return { median: null };
+  }
+
+  async getFrequencyVar(dto: NewFilterDto): Promise<INewFrequencyResponse> {
+    // TODO ADD ALL FREQUENCY VARS
+    return { total: 0, data: [] };
   }
 }
