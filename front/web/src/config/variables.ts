@@ -39,6 +39,8 @@ export interface VariableConfig {
   unit?: string;
   slider?: SliderConfig;
   chips?: ChipConfig;
+  /** When true, chip options come from agricultureTypesAtom instead of static config */
+  dynamicChips?: boolean;
   input?: InputConfig;
   select?: SelectConfig;
   benchmarkApi?: {
@@ -120,7 +122,7 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     label: "Type d'agriculture",
     dbVariable: 'sdc_type_agriculture',
     type: 'Qualitatif',
-    chips: { options: ['Conventionnelle', 'Biologique', 'Conversion bio'] },
+    dynamicChips: true,
   },
 ];
 

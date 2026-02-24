@@ -22,7 +22,7 @@ import {
   rawSpeciesListAtom,
   PRACTICE_PROFILE_TEMPLATE,
 } from '../../store/benchmarkAtoms';
-import { itkFormAtom, predictedIFTAtom } from '../../store/diagnosticAtoms';
+import { agricultureTypesAtom, itkFormAtom, predictedIFTAtom } from '../../store/diagnosticAtoms';
 import { DEPT_NAMES } from '../../config/departments';
 import { iftMedianValueAtom } from '../../store/referenceAtoms';
 import type { BenchmarkFiltersState, PracticeProfileItem } from '../../types/benchmark';
@@ -47,6 +47,7 @@ export const BenchmarkPage: React.FC = () => {
   const setMedianIft = useSetAtom(iftMedianValueAtom);
   const setRawSpecies = useSetAtom(rawSpeciesListAtom);
   const diagnosticForm = useAtomValue(itkFormAtom);
+  const agricultureTypes = useAtomValue(agricultureTypesAtom);
 
   const loadBenchmarkData = useCallback(
     async (filters: BenchmarkFiltersState) => {
@@ -197,7 +198,7 @@ export const BenchmarkPage: React.FC = () => {
         const deptFormatted = deptName ? `${deptCode} — ${deptName}` : deptCode;
         const matchedDept = departments.find((d) => d === deptFormatted) ?? '';
 
-        const diagAgriType = ['Conventionnelle', 'Biologique', 'Conversion bio'][diagnosticForm.sdcTypeAgriculture] ?? '';
+        const diagAgriType = agricultureTypes[diagnosticForm.sdcTypeAgriculture] ?? '';
         const matchedAgriType = agricultureTypes.find((t) =>
           t.toLowerCase().includes(diagAgriType.toLowerCase()),
         ) ?? '';
