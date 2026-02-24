@@ -76,15 +76,9 @@ export default function TopBar() {
                   ml: 0.5,
                 },
                 '&.Mui-selected': {
-                  background: (t) =>
-                    `linear-gradient(125deg, ${t.palette.common.white} 0%, ${alpha(t.palette.primary.light, 0.92)} 100%)`,
-                  color: (t) => t.palette.secondary.dark,
+                  backgroundColor: "#dcedb6",
                   fontWeight: 800,
                   boxShadow: (t) => `0 2px 10px ${alpha(t.palette.secondary.dark, 0.2)}`,
-                },
-                '&.Mui-selected:hover': {
-                  background: (t) =>
-                    `linear-gradient(125deg, ${alpha(t.palette.common.white, 0.98)} 0%, ${alpha(t.palette.primary.light, 0.95)} 100%)`,
                 },
                 '&:hover': {
                   backgroundColor: (t) => alpha(t.palette.common.white, 0.42),
