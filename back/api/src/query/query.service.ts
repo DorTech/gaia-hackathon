@@ -159,7 +159,11 @@ export class QueryService {
         await this.queryRepository.medianNbWeedingPasses(dto);
       return { median: nbWeedingPasses.median };
     }
-    // TODO ADD FERTI
+    if (dto.field === "fertilisation") {
+      const fertilisation =
+        await this.queryRepository.medianFertilisationNTot(dto);
+      return { median: fertilisation.median };
+    }
 
     return { median: null };
   }
