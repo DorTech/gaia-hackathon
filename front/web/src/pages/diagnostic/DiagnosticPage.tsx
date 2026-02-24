@@ -17,6 +17,7 @@ import {
 import { Box } from '@mui/material';
 import { DIAGNOSTIC_VARIABLES } from '../../config/variables';
 import { predictIFT } from '../../api/predict';
+import { ItineraireComponent } from '../ItinerairePage';
 
 export const DiagnosticPage: React.FC = () => {
   const [form, setForm] = useAtom(itkFormAtom);
@@ -54,6 +55,10 @@ export const DiagnosticPage: React.FC = () => {
 
   return (
     <div className="page active" id="page-itk">
+      <div>
+        <ItineraireComponent/>
+      </div>
+      
       <DiagnosticHeader />
 
       <div className="itk-layout">
