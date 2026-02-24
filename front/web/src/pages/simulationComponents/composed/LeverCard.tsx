@@ -4,13 +4,14 @@ import { LeverCardProps } from '../types';
 import { BadgeType } from '../atomic';
 import { LeverOptions } from './LeverOptions';
 
-export const LeverCard: React.FC<LeverCardProps> = ({ lever, delta, onPickOption }) => {
+export const LeverCard: React.FC<LeverCardProps> = ({ lever, activeOverrides, onPickOption }) => {
+  const isActive = !!activeOverrides;
   return (
     <Card
       sx={{
-        backgroundColor: delta && delta !== 0 ? 'var(--green-ll)' : 'white',
+        backgroundColor: isActive ? 'var(--green-ll)' : 'white',
         border: '1px solid var(--border)',
-        borderColor: delta && delta !== 0 ? 'var(--green)' : 'var(--border)',
+        borderColor: isActive ? 'var(--green)' : 'var(--border)',
         borderRadius: '9px',
         padding: '12px 14px',
         marginBottom: '8px',
@@ -45,7 +46,7 @@ export const LeverCard: React.FC<LeverCardProps> = ({ lever, delta, onPickOption
           </Typography>
           <BadgeType type={lever.type} />
         </Box>
-        <LeverOptions lever={lever} delta={delta} onPickOption={onPickOption} />
+        <LeverOptions lever={lever} activeOverrides={activeOverrides} onPickOption={onPickOption} />
       </Box>
     </Card>
   );

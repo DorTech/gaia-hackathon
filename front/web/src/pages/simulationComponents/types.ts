@@ -1,5 +1,22 @@
-export interface LeverDeltas {
-  [key: string]: number;
+import type { ITKFormState } from '../../store/diagnosticAtoms';
+
+export type LeverOverrides = Record<string, Partial<ITKFormState>>;
+
+export interface LeverSliderConfig {
+  min: number;
+  max: number;
+  currentValue: number;
+  unit: string;
+  referenceValue: number;
+  referenceLabel: string;
+  /** Which form field this slider controls */
+  formKey: keyof ITKFormState;
+}
+
+export interface LeverOption {
+  label: string;
+  formOverrides: Partial<ITKFormState>;
+  isReference?: boolean;
 }
 
 export interface Lever {
@@ -7,7 +24,8 @@ export interface Lever {
   name: string;
   type: 'Quantitatif' | 'Qualitatif';
   current: string;
-  options: Array<{ label: string; delta: number; isReference?: boolean }>;
+  options: LeverOption[];
+  slider?: LeverSliderConfig;
 }
 
 export interface PageHeaderProps {
@@ -43,8 +61,8 @@ export interface LeverImpactProps {
 
 export interface LeverCardProps {
   lever: Lever;
-  delta?: number;
-  onPickOption: (leverId: string, delta: number) => void;
+  activeOverrides?: Partial<ITKFormState>;
+  onPickOption: (leverId: string, overrides: Partial<ITKFormState> | null) => void;
 }
 
 export interface SummaryBarProps {
@@ -53,6 +71,7 @@ export interface SummaryBarProps {
   gained: number;
   gainPct: string;
   activeLeverCount: number;
+  simulating?: boolean;
 }
 
 export interface InfoBoxProps {
@@ -61,6 +80,6 @@ export interface InfoBoxProps {
 
 export interface LeversListProps {
   levers: Lever[];
-  deltas: LeverDeltas;
-  onPickOption: (leverId: string, delta: number) => void;
+  overrides: LeverOverrides;
+  onPickOption: (leverId: string, overrides: Partial<ITKFormState> | null) => void;
 }
