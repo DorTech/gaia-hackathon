@@ -50,7 +50,7 @@ export const SummaryBar: React.FC<SummaryBarProps> = ({
             color: 'var(--orange)',
           }}
         >
-          {baseIFT}
+          {baseIFT.toFixed(2)}
         </Typography>
       </Box>
       <Typography sx={{ fontSize: '1.2rem', color: 'var(--text3)' }}>→</Typography>

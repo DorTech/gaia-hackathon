@@ -74,6 +74,7 @@ export const DiagnosticPage: React.FC = () => {
                       value={form[v.formKey] as number}
                       min={v.slider.min}
                       max={v.slider.max}
+                      unit={v.unit}
                       onChange={(value) =>
                         handleFieldChange(
                           v.formKey,

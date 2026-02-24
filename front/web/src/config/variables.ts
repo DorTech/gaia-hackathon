@@ -103,6 +103,16 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     select: { options: DEPT_NAMES, placeholder: 'Choisir un département' },
   },
   {
+    id: 'fertilization',
+    formKey: 'fertiNTot',
+    label: 'Fertilisation N totale',
+    dbVariable: 'ferti_n_tot',
+    type: 'Quantitatif',
+    unit: 'kg N/ha',
+    slider: { min: 0, max: 300, minLabel: '0', maxLabel: '300' },
+    benchmarkApi: { type: 'median', field: 'fertiNTot' },
+  },
+  {
     id: 'agriculture-type',
     formKey: 'sdcTypeAgriculture',
     label: "Type d'agriculture",

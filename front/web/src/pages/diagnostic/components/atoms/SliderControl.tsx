@@ -7,6 +7,7 @@ interface SliderControlProps {
   value: number;
   min: number;
   max: number;
+  unit?: string;
   disabled?: boolean;
   onChange: (value: number) => void;
 }
@@ -17,6 +18,7 @@ export const SliderControl: React.FC<SliderControlProps> = ({
   value,
   min,
   max,
+  unit,
   disabled = false,
   onChange,
 }) => {
@@ -27,7 +29,7 @@ export const SliderControl: React.FC<SliderControlProps> = ({
           {minLabel}
         </Typography>
         <Typography   sx={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--green-d)' }}>
-          {value}
+          {value}{unit ? ` ${unit}` : ''}
         </Typography>
         <Typography  sx={{ fontSize: '0.67rem', color: 'var(--text3)' }}>
           {maxLabel}

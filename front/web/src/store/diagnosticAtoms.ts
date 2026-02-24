@@ -8,6 +8,7 @@ export interface ITKFormState {
   typeTravailDuSol: number;
   departement: number;
   sdcTypeAgriculture: number;
+  fertiNTot: number;
 }
 
 export const ITK_FORM_DEFAULTS: ITKFormState = {
@@ -18,6 +19,7 @@ export const ITK_FORM_DEFAULTS: ITKFormState = {
   typeTravailDuSol: 1,
   departement: 31,
   sdcTypeAgriculture: 0,
+  fertiNTot: 150,
 };
 
 export const itkFormAtom = atom<ITKFormState>(ITK_FORM_DEFAULTS);
