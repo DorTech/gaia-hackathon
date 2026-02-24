@@ -21,15 +21,19 @@ export const Section: React.FC<SectionProps> = ({
     <Accordion
       defaultExpanded={defaultExpanded}
       className={'fsec' + (className ? ` ${className}` : '')}
-      sx={{ boxShadow: 'none', '&::before': { display: 'none' } }}
+      sx={{
+        boxShadow: 'none',
+        '&::before': { display: 'none' },
+        borderRadius: 2,
+      }}
       style={style}
     >
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography className="fsec-title" sx={{ fontSize: '.78rem', fontWeight: 800 }}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ px: 1.5, minHeight: 44 }}>
+        <Typography variant="subtitle2" className="fsec-title" sx={{ fontWeight: 700 }}>
           {title}
         </Typography>
       </AccordionSummary>
-      <AccordionDetails>
+      <AccordionDetails sx={{ px: 1.5, pt: 0.5 }}>
         <Box>{children}</Box>
       </AccordionDetails>
     </Accordion>

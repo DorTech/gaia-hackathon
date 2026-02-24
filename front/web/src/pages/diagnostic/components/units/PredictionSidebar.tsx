@@ -17,28 +17,29 @@ export const PredictionSidebar: React.FC<PredictionSidebarProps> = ({ predictedI
   return (
     <Box sx={{ position: 'sticky', top: 16 }}>
       <Paper className="ift-card" elevation={0} sx={{ p: 2, borderRadius: 2, mb: 1.25 }}>
-        <Typography className="ift-card-lbl" sx={{ fontSize: '.7rem', color: 'var(--text2)' }}>
+        <Typography variant="caption" className="ift-card-lbl" sx={{ color: 'var(--text2)' }}>
           IFT total prédit
         </Typography>
         <Typography
           className="ift-card-val"
           sx={{
             color: getIFTColor(predictedIFT, iftMedian),
-            fontSize: '1.55rem',
-            fontWeight: 900,
+            typography: 'h5',
+            fontWeight: 800,
           }}
         >
           {predicting ? (
             <CircularProgress size={20} sx={{ color: 'var(--green)', mr: 1 }} />
           ) : null}
           {predictedIFT.toFixed(2)}
-          <Box
+          <Typography
             component="span"
+            variant="body2"
             className="ift-card-unit"
-            sx={{ ml: 0.5, fontSize: '.78rem', fontWeight: 700, opacity: predicting ? 0.5 : 1 }}
+            sx={{ ml: 0.5, fontWeight: 700, opacity: predicting ? 0.5 : 1 }}
           >
             IFT
-          </Box>
+          </Typography>
         </Typography>
         <Box className="gauge-wrap" sx={{ mt: 1 }}>
           <LinearProgress
@@ -54,25 +55,19 @@ export const PredictionSidebar: React.FC<PredictionSidebarProps> = ({ predictedI
               },
             }}
           />
-          <Box
-            className="gauge-tks"
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              mt: 0.5,
-              fontSize: '.62rem',
-              color: 'var(--text3)',
-            }}
-          >
-            <span>0</span>
-            <span>Méd {iftMedian.toFixed(1).replace('.', ',')}</span>
-            <span>{iftMax}+</span>
+          <Box className="gauge-tks" sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}>
+            <Typography variant="caption" sx={{ color: 'var(--text3)' }}>
+              0
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'var(--text3)' }}>
+              Méd {iftMedian.toFixed(1).replace('.', ',')}
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'var(--text3)' }}>
+              {iftMax}+
+            </Typography>
           </Box>
         </Box>
-        <Typography
-          className="ift-card-sub"
-          sx={{ mt: 1, fontSize: '.68rem', color: 'var(--text2)' }}
-        >
+        <Typography variant="caption" className="ift-card-sub" sx={{ mt: 1, color: 'var(--text2)' }}>
           {predicting ? 'Calcul en cours…' : 'Prédiction via modèle ML'}
         </Typography>
       </Paper>

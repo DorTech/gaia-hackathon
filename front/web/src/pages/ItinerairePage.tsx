@@ -1,10 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Typography,
-  Paper,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   TextField,
   Button,
   Stack,
@@ -12,8 +8,8 @@ import {
   CircularProgress,
   Alert,
 } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { generateRotation } from '../api/rotation';
+import { SectionPanel } from './diagnostic/components/units/SectionPanel';
 
 export const ItineraireComponent: React.FC = () => {
   const [prompt, setPrompt] = useState('');
@@ -70,65 +66,52 @@ export const ItineraireComponent: React.FC = () => {
   }, [rotationData]);
 
   return (
-    <Box sx={{ px: { xs: 1, md: 2 }, py: { xs: 2, md: 3 } }}>
+    <Box>
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
         Ma ferme
       </Typography>
 
-      <Accordion defaultExpanded sx={{ mb: 3 }}>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography variant="h6">Description de votre itinéraire technique</Typography>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Paper
-            elevation={0}
+      <SectionPanel
+        title="🌾 Description de votre itinéraire technique"
+        className="itk-last-section"
+        cardSx={{ background: 'linear-gradient(180deg, #ffffff 0%, #fafafa 100%)' }}
+      >
+        <Stack spacing={2}>
+          <TextField
+            multiline
+            minRows={4}
+            maxRows={10}
+            label="Décrivez votre itinéraire techique..."
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            fullWidth
+            disabled={loading}
             sx={{
-              p: { xs: 2.5, md: 3 },
-              borderRadius: 2.5,
-              border: '1px solid rgba(0, 0, 0, 0.06)',
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.06)',
-              background: 'linear-gradient(180deg, #ffffff 0%, #fafafa 100%)',
+              '& .MuiInputBase-root': {
+                borderRadius: 2,
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              },
             }}
-          >
-            <Stack spacing={2}>
-              <TextField
-                multiline
-                minRows={4}
-                maxRows={10}
-                label="Décrivez votre itinéraire techique..."
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                fullWidth
-                disabled={loading}
-                sx={{
-                  '& .MuiInputBase-root': {
-                    borderRadius: 2,
-                    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                  },
-                }}
-              />
-              <Box>
-                <Button
-                  variant="contained"
-                  onClick={handleGenerate}
-                  disabled={loading || !prompt.trim()}
-                  startIcon={loading ? <CircularProgress size={20} /> : undefined}
-                  sx={{
-                    textTransform: 'none',
-                    px: 3,
-                    py: 1,
-                    borderRadius: 2,
-                    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.12)',
-                  }}
-                >
-                  {loading ? 'Génération en cours...' : "Générer l'itinéraire"}
-                </Button>
-              </Box>
-            </Stack>
-          </Paper>
-        </AccordionDetails>
-      </Accordion>
-
+          />
+          <Box>
+            <Button
+              variant="contained"
+              onClick={handleGenerate}
+              disabled={loading || !prompt.trim()}
+              startIcon={loading ? <CircularProgress size={20} /> : undefined}
+              sx={{
+                textTransform: 'none',
+                px: 3,
+                py: 1,
+                borderRadius: 2,
+                boxShadow: '0 6px 16px rgba(0, 0, 0, 0.12)',
+              }}
+            >
+              {loading ? 'Génération en cours...' : "Générer l'itinéraire"}
+            </Button>
+          </Box>
+        </Stack>
+      </SectionPanel>
       {error && (
         <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
           {error}
@@ -136,34 +119,19 @@ export const ItineraireComponent: React.FC = () => {
       )}
 
       {rotationData && (
-        <Accordion defaultExpanded>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography variant="h6">Itinéraire généré</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Paper
-              elevation={0}
-              sx={{
-                p: { xs: 2.5, md: 3 },
-                borderRadius: 2.5,
-                border: '1px solid rgba(0, 0, 0, 0.06)',
-                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.06)',
-              }}
-            >
-              <Box
-                id="rotation-chart"
-                ref={chartRef}
-                sx={{
-                  width: '100%',
-                  minHeight: 500,
-                  borderRadius: 2,
-                  border: '1px dashed rgba(0, 0, 0, 0.12)',
-                  backgroundColor: 'rgba(0, 0, 0, 0.02)',
-                }}
-              />
-            </Paper>
-          </AccordionDetails>
-        </Accordion>
+        <SectionPanel title="🌾 Itinéraire généré" defaultExpanded>
+          <Box
+            id="rotation-chart"
+            ref={chartRef}
+            sx={{
+              width: '100%',
+              minHeight: 500,
+              borderRadius: 2,
+              border: '1px dashed rgba(0, 0, 0, 0.12)',
+              backgroundColor: 'rgba(0, 0, 0, 0.02)',
+            }}
+          />
+        </SectionPanel>
       )}
     </Box>
   );

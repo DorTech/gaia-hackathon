@@ -1,5 +1,5 @@
 import React from 'react';
-import { Stack, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Stack, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 
 interface ChipGroupProps {
   options: readonly string[];
@@ -56,7 +56,9 @@ export const ChipGroup: React.FC<ChipGroupProps> = ({
               },
             }}
           >
-            {label}
+            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+              {label}
+            </Typography>
           </ToggleButton>
         ))}
       </Stack>
