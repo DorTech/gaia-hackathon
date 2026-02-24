@@ -1,5 +1,5 @@
 import { alpha } from '@mui/material/styles';
-import { AppBar, Button, Toolbar } from '@mui/material';
+import { AppBar, Toolbar } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
@@ -31,27 +31,25 @@ export default function BottomBar() {
       }}
     >
       <Toolbar sx={{ justifyContent: 'flex-end', minHeight: 56 }}>
-        <Button
-          variant="contained"
-          endIcon={<ArrowForwardIcon />}
+        <button
+          className="btn"
           onClick={() => navigate(next.path)}
-          sx={{
-            borderRadius: 999,
-            px: 3,
-            py: 1,
-            textTransform: 'none',
-            fontWeight: 700,
-            fontSize: '0.9rem',
-            backgroundColor: (t) => t.palette.secondary.dark,
-            color: (t) => t.palette.common.white,
-            boxShadow: (t) => `0 2px 10px ${alpha(t.palette.secondary.dark, 0.3)}`,
-            '&:hover': {
-              backgroundColor: (t) => t.palette.secondary.main,
-            },
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            background: 'linear-gradient(135deg, #b8d966 0%, #99cc33 100%)',
+            border: '1px solid rgba(255,255,255,0.45)',
+            color: '#1b4a12',
+            borderRadius: 10,
+            padding: '8px 20px',
+            fontSize: '0.85rem',
+            fontWeight: 800,
+            boxShadow: '0 2px 10px rgba(27,74,18,0.18)',
           }}
         >
-          {next.label}
-        </Button>
+          {next.label} <ArrowForwardIcon sx={{ fontSize: 18 }} />
+        </button>
       </Toolbar>
     </AppBar>
   );
