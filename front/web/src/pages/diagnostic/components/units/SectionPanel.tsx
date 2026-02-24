@@ -10,6 +10,7 @@ interface SectionPanelProps {
   className?: string;
   defaultExpanded?: boolean;
   cardSx?: SxProps<Theme>;
+  displayCard?: boolean;
 }
 
 export const SectionPanel: React.FC<SectionPanelProps> = ({
@@ -18,11 +19,12 @@ export const SectionPanel: React.FC<SectionPanelProps> = ({
   children,
   className,
   defaultExpanded = true,
+  displayCard = true,
   cardSx,
 }) => {
   return (
     <Section title={title} summary={summary} className={className} defaultExpanded={defaultExpanded}>
-      <SectionCard sx={cardSx}>{children}</SectionCard>
+      {displayCard ? <SectionCard sx={cardSx}>{children}</SectionCard> : children}
     </Section>
   );
 };

@@ -77,7 +77,7 @@ export const ItineraireComponent: React.FC = () => {
         title="📝 Description de votre itinéraire technique"
         summary={prompt.trim() || 'Ajoutez une description pour générer un itinéraire'}
         className="itk-last-section"
-        cardSx={{ background: 'linear-gradient(180deg, #ffffff 0%, #fafafa 100%)' }}
+        displayCard={false}
       >
         <Stack spacing={2}>
           <TextField

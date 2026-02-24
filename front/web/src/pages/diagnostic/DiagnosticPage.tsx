@@ -81,7 +81,7 @@ export const DiagnosticPage: React.FC = () => {
           title="🌾 Variables"
           summary={variablesSummary}
           className="itk-last-section"
-          cardSx={{ p: '20px 24px' }}
+          displayCard={false}
         >
           <div className="fgrid">
             {DIAGNOSTIC_VARIABLES.map((v) => (
