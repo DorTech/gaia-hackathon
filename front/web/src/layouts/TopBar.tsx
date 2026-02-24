@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { alpha } from '@mui/material/styles';
 import { AppBar, Box, ToggleButton, ToggleButtonGroup, Toolbar, Typography } from '@mui/material';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -11,6 +12,7 @@ const NAV_ITEMS = [
 export default function TopBar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const currentIndex = NAV_ITEMS.findIndex((item) => item.path === location.pathname);
 
   return (
     <AppBar
@@ -74,26 +76,25 @@ export default function TopBar() {
             aria-label="top navigation"
             sx={{
               backgroundColor: (t) => alpha(t.palette.common.white, 0.32),
-              borderRadius: 999,
+              borderRadius: 14,
               p: 0.45,
               border: (t) => `1px solid ${alpha(t.palette.common.white, 0.45)}`,
               boxShadow: (t) => `inset 0 1px 0 ${alpha(t.palette.common.white, 0.5)}`,
               '& .MuiToggleButtonGroup-grouped': {
-                border: 0,
-                borderRadius: 999,
-                px: 2,
-                py: 0.7,
+                border: (t) => `1px solid ${alpha(t.palette.common.white, 0.34)}`,
+                borderRadius: 10,
+                px: 1.35,
+                py: 0.55,
                 textTransform: 'none',
                 color: (t) => alpha(t.palette.secondary.dark, 0.86),
                 fontWeight: 700,
                 fontSize: '0.84rem',
                 lineHeight: 1.2,
-                '&:not(:first-of-type)': {
-                  ml: 0.5,
-                },
+                transition: 'all 180ms ease',
                 '&.Mui-selected': {
-                  backgroundColor: "#dcedb6",
+                  backgroundColor: '#dcedb6',
                   fontWeight: 800,
+                  borderColor: (t) => alpha(t.palette.secondary.dark, 0.22),
                   boxShadow: (t) => `0 2px 10px ${alpha(t.palette.secondary.dark, 0.2)}`,
                 },
                 '&:hover': {
@@ -102,10 +103,64 @@ export default function TopBar() {
               },
             }}
           >
-            {NAV_ITEMS.map((item) => (
-              <ToggleButton key={item.path} value={item.path} aria-label={item.label}>
-                {item.label}
-              </ToggleButton>
+            {NAV_ITEMS.map((item, index) => (
+              <Fragment key={item.path}>
+                <ToggleButton
+                  value={item.path}
+                  aria-label={item.label}
+                  sx={{
+                    ...(index < currentIndex
+                      ? {
+                          backgroundColor: (t) => alpha(t.palette.common.white, 0.5),
+                          color: (t) => alpha(t.palette.secondary.dark, 0.95),
+                        }
+                      : {}),
+                  }}
+                >
+                  <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.8 }}>
+                    <Box
+                      sx={{
+                        width: 18,
+                        height: 18,
+                        borderRadius: '50%',
+                        display: 'grid',
+                        placeItems: 'center',
+                        fontSize: '0.64rem',
+                        fontWeight: 800,
+                        backgroundColor:
+                          index < currentIndex
+                            ? (t) => alpha(t.palette.secondary.dark, 0.9)
+                            : index === currentIndex
+                              ? (t) => t.palette.secondary.dark
+                              : (t) => alpha(t.palette.secondary.dark, 0.2),
+                        color:
+                          index <= currentIndex
+                            ? (t) => t.palette.common.white
+                            : (t) => alpha(t.palette.secondary.dark, 0.8),
+                      }}
+                    >
+                      {index < currentIndex ? '✓' : index + 1}
+                    </Box>
+                    <span>{item.label}</span>
+                  </Box>
+                </ToggleButton>
+                {index < NAV_ITEMS.length - 1 ? (
+                  <Box
+                    component="span"
+                    sx={{
+                      mx: 0.9,
+                      width: 10,
+                      height: 10,
+                      borderTop: (t) => `2.2px solid ${alpha(t.palette.secondary.dark, 0.62)}`,
+                      borderRight: (t) => `2.2px solid ${alpha(t.palette.secondary.dark, 0.62)}`,
+                      transform: 'rotate(45deg)',
+                      alignSelf: 'center',
+                      flexShrink: 0,
+                      userSelect: 'none',
+                    }}
+                  />
+                ) : null}
+              </Fragment>
             ))}
           </ToggleButtonGroup>
         </Box>
