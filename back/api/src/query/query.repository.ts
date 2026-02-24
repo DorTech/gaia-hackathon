@@ -16,7 +16,12 @@ import {
 } from "drizzle-orm";
 import { PgTable } from "drizzle-orm/pg-core";
 import { DephyService } from "../dephy/dephy.service";
-import { JoinFilterDto, FilterDto, NewFilterDB } from "./dto/query.dto";
+import {
+  JoinFilterDto,
+  FilterDto,
+  NewFilterDB,
+  NewFilterDto,
+} from "./dto/query.dto";
 import { getTableEntry } from "./table-registry";
 
 @Injectable()
@@ -177,7 +182,7 @@ WHERE sac.culture_nom IN (${query.culture.join(", ")})
   async medianFertilisationNTot(
     query: NewFilterDto,
   ): Promise<{ median: number | null }> {
-        const result = await this.dephyService.db.execute(sql`
+    const result = await this.dephyService.db.execute(sql`
 SELECT
     PERCENTILE_CONT(0.5) 
         WITHIN GROUP (ORDER BY spmc.ferti_n_tot) AS median_fertilisation_n_tot
@@ -195,7 +200,7 @@ WHERE unaccent(sac.culture_nom) ILIKE unaccent('%' || ${query.culture} || '%')
   AND sdc.type_agriculture LIKE ${query.agricultureType};
  `);
 
-     if (result.rows.length === 0) {
+    if (result.rows.length === 0) {
       console.warn(
         `No data found for culture="${query.culture}", department="${query.department}", agricultureType="${query.agricultureType}"`,
       );
