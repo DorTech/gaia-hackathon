@@ -44,7 +44,10 @@ const QualitativeItem: React.FC<QualitativeItemProps> = ({ item }) => {
       {item.frequencies.map((frequency) => {
         const isMyPosition = item.note && frequency.label === item.note.value;
         return (
-          <Box key={frequency.label} className="fr">
+          <Box
+            key={frequency.label}
+            className="fr"
+          >
             <Tooltip title={frequency.label} arrow enterDelay={300} placement="top">
               <Box
                 className="fr-lbl"
@@ -55,22 +58,11 @@ const QualitativeItem: React.FC<QualitativeItemProps> = ({ item }) => {
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap',
+                  fontWeight: isMyPosition ? 700 : undefined,
+                  color: isMyPosition ? 'rgba(0, 179, 255, 1)' : undefined,
                 }}
               >
                 {frequency.label}
-                {isMyPosition && (
-                  <Box
-                    component="span"
-                    sx={{
-                      marginLeft: '6px',
-                      color: 'var(--green-d)',
-                      fontSize: '1.3rem',
-                      fontWeight: 700,
-                    }}
-                  >
-                    ←
-                  </Box>
-                )}
               </Box>
             </Tooltip>
             <Box className="fr-trk" sx={{ flex: '1 1 auto' }}>
