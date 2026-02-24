@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   Typography,
   Paper,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
   TextField,
   Button,
   Stack,
@@ -9,6 +12,7 @@ import {
   CircularProgress,
   Alert,
 } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { generateRotation } from '../api/rotation';
 
 export const ItineraireComponent: React.FC = () => {
@@ -72,33 +76,37 @@ export const ItineraireComponent: React.FC = () => {
         Itinéraire Technique
       </Typography>
 
-      <Paper sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          Description de votre itinéraire technique
-        </Typography>
-        <Stack spacing={2}>
-          <TextField
-            multiline
-            minRows={4}
-            maxRows={10}
-            label="Décrivez votre itinéraire techique..."
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            fullWidth
-            disabled={loading}
-          />
-          <Box>
-            <Button
-              variant="contained"
-              onClick={handleGenerate}
-              disabled={loading || !prompt.trim()}
-              startIcon={loading ? <CircularProgress size={20} /> : undefined}
-            >
-              {loading ? 'Génération en cours...' : "Générer l'itinéraire"}
-            </Button>
-          </Box>
-        </Stack>
-      </Paper>
+      <Accordion defaultExpanded sx={{ mb: 3 }}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+          <Typography variant="h6">Description de votre itinéraire technique</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <Paper elevation={0}>
+            <Stack spacing={2}>
+              <TextField
+                multiline
+                minRows={4}
+                maxRows={10}
+                label="Décrivez votre itinéraire techique..."
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                fullWidth
+                disabled={loading}
+              />
+              <Box>
+                <Button
+                  variant="contained"
+                  onClick={handleGenerate}
+                  disabled={loading || !prompt.trim()}
+                  startIcon={loading ? <CircularProgress size={20} /> : undefined}
+                >
+                  {loading ? 'Génération en cours...' : "Générer l'itinéraire"}
+                </Button>
+              </Box>
+            </Stack>
+          </Paper>
+        </AccordionDetails>
+      </Accordion>
 
       {error && (
         <Alert severity="error" sx={{ mb: 3 }}>
@@ -107,12 +115,16 @@ export const ItineraireComponent: React.FC = () => {
       )}
 
       {rotationData && (
-        <Paper sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Itinéraire généré
-          </Typography>
-          <Box id="rotation-chart" ref={chartRef} sx={{ width: '100%', minHeight: 500 }} />
-        </Paper>
+        <Accordion defaultExpanded>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <Typography variant="h6">Itinéraire généré</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Paper elevation={0}>
+              <Box id="rotation-chart" ref={chartRef} sx={{ width: '100%', minHeight: 500 }} />
+            </Paper>
+          </AccordionDetails>
+        </Accordion>
       )}
     </>
   );

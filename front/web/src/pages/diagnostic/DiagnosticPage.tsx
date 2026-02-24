@@ -54,7 +54,7 @@ export const DiagnosticPage: React.FC = () => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [form, setPredictedIFT, setPredicting]);
+  }, [agricultureTypes, form, setPredictedIFT, setPredicting]);
 
   const handleFieldChange = <K extends keyof ITKFormState>(field: K, value: ITKFormState[K]) => {
     setForm((prev) => ({
