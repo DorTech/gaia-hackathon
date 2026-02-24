@@ -182,47 +182,39 @@ export const BenchmarkPage: React.FC = () => {
           fetchDistinctAgricultureTypes(),
         ]);
 
-        // Store raw species for flattening
         setRawSpecies(species);
 
         setFilterOptions((prev) => ({
           ...prev,
-          species, // Keep raw for now, we'll use flattened in the combobox
+          species,
           department: departments,
           agricultureType: agricultureTypes,
         }));
-
-        // Prefill from diagnostic form values, or keep existing if already set
-        const deptCode = String(diagnosticForm.departement);
-        const deptName = DEPT_NAMES[deptCode];
-        const deptFormatted = deptName ? `${deptCode} — ${deptName}` : deptCode;
-        const matchedDept = departments.find((d) => d === deptFormatted) ?? '';
-
-        const diagAgriType = agricultureTypes[diagnosticForm.sdcTypeAgriculture] ?? '';
-        const matchedAgriType = agricultureTypes.find((t) =>
-          t.toLowerCase().includes(diagAgriType.toLowerCase()),
-        ) ?? '';
-
-        setAppliedFilters(
-          (prev: { species: string; department: string; agricultureType: string }) => ({
-            ...prev,
-            species: prev.species && species.includes(prev.species) ? prev.species : '',
-            department:
-              prev.department && departments.includes(prev.department)
-                ? prev.department
-                : matchedDept,
-            agricultureType:
-              prev.agricultureType && agricultureTypes.includes(prev.agricultureType)
-                ? prev.agricultureType
-                : matchedAgriType,
-          }),
-        );
       } catch (err) {
         console.error('Failed to load filter options:', err);
       }
     }
     loadFilterOptions();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // One-way sync: diagnostic form → benchmark filters for department & agriculture type
+  useEffect(() => {
+    const deptCode = String(diagnosticForm.departement);
+    const deptName = DEPT_NAMES[deptCode];
+    const deptFormatted = deptName ? `${deptCode} — ${deptName}` : deptCode;
+    const matchedDept = filterOptions.department.find((d) => d === deptFormatted) ?? deptFormatted;
+
+    const diagAgriType = agricultureTypes[diagnosticForm.sdcTypeAgriculture] ?? '';
+    const matchedAgriType = filterOptions.agricultureType.find((t) =>
+      t.toLowerCase().includes(diagAgriType.toLowerCase()),
+    ) ?? '';
+
+    setAppliedFilters((prev) => ({
+      ...prev,
+      department: matchedDept,
+      agricultureType: matchedAgriType,
+    }));
+  }, [diagnosticForm.departement, diagnosticForm.sdcTypeAgriculture, agricultureTypes, filterOptions]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleApplyFilters = useCallback(
     (filters: BenchmarkFiltersState) => {
