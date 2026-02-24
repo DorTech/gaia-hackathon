@@ -33,7 +33,7 @@ export const leversAtom = atom<Lever[]>((get) => {
       options: [],
       slider: {
         min: 1,
-        max: 8,
+        max: 10,
         currentValue: form.nbCulturesRotation,
         unit: 'cultures',
         referenceValue: parseFloat((profile.find(p => p.id === 'rotation-count')?.quantitative?.value ?? '0').replace(',', '.')),
@@ -52,7 +52,7 @@ export const leversAtom = atom<Lever[]>((get) => {
         const refLabel = freqs.filter(f => f.label !== 'Autres').sort((a, b) => b.pct - a.pct)[0]?.label;
         return freqs.map(f => ({
           label: f.label,
-          formOverrides: { sequenceCultures: f.label },
+          formOverrides: { sequenceCultures: f.label, nbCulturesRotation: f.label.split(/\s*>\s*/).length },
           isReference: f.label === refLabel,
         }));
       })(),

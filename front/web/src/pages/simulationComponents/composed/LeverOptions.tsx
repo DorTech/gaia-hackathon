@@ -20,10 +20,14 @@ export const LeverOptions: React.FC<LeverOptionsProps> = ({
   const currentSliderValue = s ? ((activeOverrides?.[s.formKey] as number) ?? s.currentValue) : 0;
   const [sliderValue, setSliderValue] = useState(currentSliderValue);
 
-  // Reset slider when current value changes (diagnostic form update)
+  // Sync slider when overrides change (e.g. seq lever updating rot) or when reset
   useEffect(() => {
-    if (s && !activeOverrides) {
-      setSliderValue(s.currentValue);
+    if (s) {
+      if (activeOverrides?.[s.formKey] != null) {
+        setSliderValue(activeOverrides[s.formKey] as number);
+      } else if (!activeOverrides) {
+        setSliderValue(s.currentValue);
+      }
     }
   }, [s, s?.currentValue, activeOverrides]);
 
