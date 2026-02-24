@@ -7,6 +7,7 @@ import {
   LeversList,
 } from "./simulationComponents";
 import { predictedIFTAtom, agricultureTypesAtom } from "../store/diagnosticAtoms";
+import { fetchDistinctAgricultureTypes } from "../api/benchmark";
 import type { ITKFormState } from "../store/diagnosticAtoms";
 import {
   leversAtom,
@@ -25,7 +26,14 @@ export const SimulationPage: React.FC = () => {
   const setSimulating = useSetAtom(simulatingAtom);
   const simulating = useAtomValue(simulatingAtom);
   const simulatedForm = useAtomValue(simulatedFormAtom);
-  const agricultureTypes = useAtomValue(agricultureTypesAtom);
+  const [agricultureTypes, setAgricultureTypes] = useAtom(agricultureTypesAtom);
+
+  // Fetch agriculture types if not already loaded (e.g. direct navigation)
+  useEffect(() => {
+    if (agricultureTypes.length === 0) {
+      fetchDistinctAgricultureTypes().then(setAgricultureTypes).catch(() => {});
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Initialize simulatedIFT with baseIFT on first render
   const initialized = useRef(false);
