@@ -383,9 +383,28 @@ export class QueryService {
     }
 
     const total = rows.reduce((sum, r) => sum + r.count, 0);
-    const data = rows.map((r) => ({
+    if (total === 0) return { total: 0, data: [] };
+
+    const threshold = 3;
+    let otherCount = 0;
+    const significant: typeof rows = [];
+
+    for (const r of rows) {
+      const pct = (r.count / total) * 100;
+      if (pct >= threshold) {
+        significant.push(r);
+      } else {
+        otherCount += r.count;
+      }
+    }
+
+    if (otherCount > 0) {
+      significant.push({ value: "Autre", count: otherCount });
+    }
+
+    const data = significant.map((r) => ({
       ...r,
-      percentage: total > 0 ? Math.round((r.count / total) * 10000) / 100 : 0,
+      percentage: Math.round((r.count / total) * 10000) / 100,
     }));
 
     return { total, data };
