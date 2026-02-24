@@ -69,9 +69,20 @@ export const SimulationPage: React.FC = () => {
       if (!formOverrides) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { [leverId]: _, ...rest } = prev;
+        // If resetting seq, also remove the nbCulturesRotation it pushed to rot
+        if (leverId === 'seq' && rest['rot']) {
+          const { nbCulturesRotation: __, ...rotRest } = rest['rot'];
+          rest['rot'] = Object.keys(rotRest).length > 0 ? rotRest : undefined!;
+          if (!rest['rot']) delete rest['rot'];
+        }
         return rest;
       }
-      return { ...prev, [leverId]: formOverrides };
+      const next = { ...prev, [leverId]: formOverrides };
+      // When sequence changes, sync nbCulturesRotation to the rot slider
+      if (leverId === 'seq' && formOverrides.nbCulturesRotation != null) {
+        next['rot'] = { ...prev['rot'], nbCulturesRotation: formOverrides.nbCulturesRotation };
+      }
+      return next;
     });
   };
 
