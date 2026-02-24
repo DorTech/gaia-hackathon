@@ -387,7 +387,11 @@ export class QueryService {
       rows = await this.queryRepository.frequencyMacroorganismes(dbFilters);
     } else if (dto.field === "soilWork") {
       rows = await this.queryRepository.frequencySoilWork(dbFilters);
-      console.log("soilWork rows:", rows);
+      rows = rows.map((r) => ({
+        ...r,
+        value: !r.value || (typeof r.value === "string" && r.value.trim() === "") ? "Aucun" : r.value,
+      }));
+      rows = this.aggregateFrequencyRows(rows);
     } else if (dto.field === "agricultureType") {
       rows = await this.queryRepository.frequencyAgricultureType(dbFilters);
     }
