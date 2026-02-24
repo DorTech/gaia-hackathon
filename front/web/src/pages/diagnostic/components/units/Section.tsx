@@ -27,9 +27,14 @@ export const Section: React.FC<SectionProps> = ({
       onChange={(_, expanded) => setIsExpanded(expanded)}
       className={'fsec' + (className ? ` ${className}` : '')}
       sx={{
+        mb: 1.75,
         boxShadow: 'none',
         '&::before': { display: 'none' },
         borderRadius: 2,
+        '&.Mui-expanded': {
+          mb: 1.75,
+          mt: 0,
+        },
       }}
       style={style}
     >
