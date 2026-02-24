@@ -85,11 +85,18 @@ div.mainITKContainer.withTranscript .bottom-transcript {
   font-size: .73rem; font-weight: 700; cursor: pointer; transition: all .14s;
   display: inline-flex; align-items: center; gap: 5px;
 }
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 .btn-green { background: var(--green); border-color: var(--green-d); color: white; }
 .btn-green:hover { background: var(--green-d); }
+.btn-green:disabled:hover { background: var(--green); }
 .btn-teal { background: var(--teal); border-color: #2A9A9A; color: white; }
+.btn-teal:disabled:hover { background: var(--teal); }
 .btn-outline { background: white; border-color: var(--border2); color: var(--text2); }
 .btn-outline:hover { border-color: var(--green); color: var(--green-d); }
+.btn-outline:disabled:hover { border-color: var(--border2); color: var(--text2); }
 
 /* ══ FILTERS ══ */
 .filters {

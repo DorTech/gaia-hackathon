@@ -74,7 +74,7 @@ export const BenchmarkPage: React.FC = () => {
               variant: 'violet',
               sub: `${count} exploitations · ${filters.species}`,
               delta: `${deltaSign}${Math.abs(parseFloat(deltaPct)).toFixed(1)}% vs votre exploitation (${userIFT.toFixed(2).replace('.', ',')})`,
-              deltaClass: parseFloat(deltaPct) > 0 ? 'warn' : 'good',
+              deltaClass: parseFloat(deltaPct) > 0 ? 'good' : 'warn',
             },
           ]);
         } else {
@@ -132,7 +132,8 @@ export const BenchmarkPage: React.FC = () => {
                 const frequencies = res.data
                   .filter((r) => r.value !== null)
                   .map((r, idx) => ({
-                    label: typeof r.value === 'boolean' ? (r.value ? 'Oui' : 'Non') : String(r.value),
+                    label:
+                      typeof r.value === 'boolean' ? (r.value ? 'Oui' : 'Non') : String(r.value),
                     pct: Math.round((r.count / total) * 100),
                     top: idx === 0,
                   }));

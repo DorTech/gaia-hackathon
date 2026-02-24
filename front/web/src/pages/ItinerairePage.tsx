@@ -1,24 +1,16 @@
-import React, { useEffect, useRef, useState } from 'react';
-import {
-  Typography,
-  TextField,
-  Button,
-  Stack,
-  Box,
-  CircularProgress,
-  Alert,
-} from '@mui/material';
+import { Alert, Box, Stack, TextField, Typography } from '@mui/material';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import React, { useEffect, useRef, useState } from 'react';
 import { generateRotation } from '../api/rotation';
-import { SectionPanel } from './diagnostic/components/units/SectionPanel';
 import {
   agricultureTypesAtom,
-  itkFormAtom,
   itinerairePromptAtom,
   itineraireRotationDataAtom,
+  itkFormAtom,
   mapDiagnosticVariablesToForm,
   prefilledKeysAtom,
 } from '../store/diagnosticAtoms';
+import { SectionPanel } from './diagnostic/components/units/SectionPanel';
 
 export const ItineraireComponent: React.FC = () => {
   const [prompt, setPrompt] = useAtom(itinerairePromptAtom);
@@ -119,21 +111,14 @@ export const ItineraireComponent: React.FC = () => {
             }}
           />
           <Box>
-            <Button
-              variant="contained"
+            <button
+              className="btn btn-green"
               onClick={handleGenerate}
               disabled={loading || !prompt.trim()}
-              startIcon={loading ? <CircularProgress size={20} /> : undefined}
-              sx={{
-                textTransform: 'none',
-                px: 3,
-                py: 1,
-                borderRadius: 2,
-                boxShadow: '0 6px 16px rgba(0, 0, 0, 0.12)',
-              }}
+              style={{ height: '40px' }}
             >
               {loading ? 'Génération en cours...' : "Générer l'itinéraire"}
-            </Button>
+            </button>
           </Box>
         </Stack>
       </SectionPanel>

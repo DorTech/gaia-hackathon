@@ -45,24 +45,32 @@ export const leversAtom = atom<Lever[]>((get) => {
       name: 'Séquence des cultures',
       type: 'Qualitatif',
       current: `${form.sequenceCultures} · actuel`,
-      options: (profile.find(p => p.id === 'sequence-cultures')?.frequencies ?? [])
-        .filter(f => f.label !== form.sequenceCultures)
-        .map(f => ({
+      options: (() => {
+        const freqs = (profile.find(p => p.id === 'sequence-cultures')?.frequencies ?? [])
+          .filter(f => f.label !== form.sequenceCultures);
+        const refLabel = freqs.filter(f => f.label !== 'Autres').sort((a, b) => b.pct - a.pct)[0]?.label;
+        return freqs.map(f => ({
           label: f.label,
           formOverrides: { sequenceCultures: f.label },
-        })),
+          isReference: f.label === refLabel,
+        }));
+      })(),
     },
     {
       id: 'sol',
       name: 'Type de travail du sol',
       type: 'Qualitatif',
       current: `${CHIP_OPTIONS.soilWork[form.typeTravailDuSol]} · actuel`,
-      options: (profile.find(p => p.id === 'soil-work')?.frequencies ?? [])
-        .filter(f => (CHIP_OPTIONS.soilWork as readonly string[]).indexOf(f.label) !== form.typeTravailDuSol)
-        .map(f => ({
+      options: (() => {
+        const freqs = (profile.find(p => p.id === 'soil-work')?.frequencies ?? [])
+          .filter(f => (CHIP_OPTIONS.soilWork as readonly string[]).indexOf(f.label) !== form.typeTravailDuSol);
+        const refLabel = freqs.filter(f => f.label !== 'Autres').sort((a, b) => b.pct - a.pct)[0]?.label;
+        return freqs.map(f => ({
           label: f.label,
           formOverrides: { typeTravailDuSol: (CHIP_OPTIONS.soilWork as readonly string[]).indexOf(f.label) },
-        })),
+          isReference: f.label === refLabel,
+        }));
+      })(),
     },
     {
       id: 'desh',
@@ -85,12 +93,18 @@ export const leversAtom = atom<Lever[]>((get) => {
       name: 'Recours aux macro-organismes',
       type: 'Qualitatif',
       current: `${CHIP_OPTIONS.yesNo[form.recoursMacroorganismes]} · actuel`,
-      options: (profile.find(p => p.id === 'macroorganisms')?.frequencies ?? [])
-        .filter(f => f.label !== CHIP_OPTIONS.yesNo[form.recoursMacroorganismes])
-        .map(f => ({
-          label: f.label,
-          formOverrides: { recoursMacroorganismes: (CHIP_OPTIONS.yesNo as readonly string[]).indexOf(f.label) },
-        })),
+      options: (() => {
+        const freqs = profile.find(p => p.id === 'macroorganisms')?.frequencies ?? [];
+        const refLabel = freqs.filter(f => f.label !== 'Autres').sort((a, b) => b.pct - a.pct)[0]?.label;
+        return CHIP_OPTIONS.yesNo
+          .map((label, idx) => ({ label, idx }))
+          .filter(({ idx }) => idx !== form.recoursMacroorganismes)
+          .map(({ label, idx }) => ({
+            label,
+            formOverrides: { recoursMacroorganismes: idx } as Partial<ITKFormState>,
+            isReference: label === refLabel,
+          }));
+      })(),
     },
     {
       id: 'ferti',
