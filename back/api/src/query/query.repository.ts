@@ -16,7 +16,7 @@ import {
 } from "drizzle-orm";
 import { PgTable } from "drizzle-orm/pg-core";
 import { DephyService } from "../dephy/dephy.service";
-import { NewFilterDto, JoinFilterDto, FilterDto } from "./dto/query.dto";
+import { JoinFilterDto, FilterDto, NewFilterDB } from "./dto/query.dto";
 import { getTableEntry } from "./table-registry";
 
 @Injectable()
@@ -71,7 +71,7 @@ export class QueryRepository {
   }
 
   async medianNbRotation(
-    query: NewFilterDto,
+    query: NewFilterDB,
   ): Promise<{ median: number | null }> {
     const result = await this.dephyService.db.execute(sql`
 WITH rotation_cte AS (
@@ -123,7 +123,7 @@ WHERE unaccent(sac.culture_nom) ILIKE unaccent('%' || ${query.culture} || '%')
   }
 
   async medianNbWeedingPasses(
-    query: NewFilterDto,
+    query: NewFilterDB,
   ): Promise<{ median: number | null }> {
     const result = await this.dephyService.db.execute(sql`
 WITH rotation_cte AS (
@@ -150,7 +150,7 @@ JOIN domain
     ON domain.id = dispositif.domaine_id
 JOIN succession_assolee_synthetise_magasin_can sac
     ON sac.sdc_id = sdc.id
-WHERE unaccent(sac.culture_nom) ILIKE unaccent('%' || ${query.culture} || '%')
+WHERE sac.culture_nom IN (${query.culture.join(", ")})
   AND domain.departement LIKE ${query.department}
   AND sdc.type_agriculture LIKE ${query.agricultureType};
  `);
@@ -169,6 +169,47 @@ WHERE unaccent(sac.culture_nom) ILIKE unaccent('%' || ${query.culture} || '%')
       );
       return { median: null };
     }
+    return {
+      median: Number(row.median_nb_weeding),
+    };
+  }
+
+  async medianFertilisationNTot(
+    query: NewFilterDto,
+  ): Promise<{ median: number | null }> {
+        const result = await this.dephyService.db.execute(sql`
+SELECT
+    PERCENTILE_CONT(0.5) 
+        WITHIN GROUP (ORDER BY spmc.ferti_n_tot) AS median_fertilisation_n_tot
+FROM synthetise_perf_magasin_can spmc
+JOIN sdc
+    ON sdc.id = spmc.sdc_id
+JOIN dispositif
+    ON dispositif.id = sdc.dispositif_id
+JOIN domain
+    ON domain.id = dispositif.domaine_id
+JOIN succession_assolee_synthetise_magasin_can sac
+    ON sac.sdc_id = sdc.id
+WHERE unaccent(sac.culture_nom) ILIKE unaccent('%' || ${query.culture} || '%')
+  AND domain.departement LIKE ${query.department}
+  AND sdc.type_agriculture LIKE ${query.agricultureType};
+ `);
+
+     if (result.rows.length === 0) {
+      console.warn(
+        `No data found for culture="${query.culture}", department="${query.department}", agricultureType="${query.agricultureType}"`,
+      );
+      return { median: null };
+    }
+
+    const row = result.rows[0];
+    if (!row || row?.median_nb_weeding === null) {
+      console.warn(
+        `Median number of weeding passes is null for culture="${query.culture}", department="${query.department}", agricultureType="${query.agricultureType}"`,
+      );
+      return { median: null };
+    }
+
     return {
       median: Number(row.median_nb_weeding),
     };

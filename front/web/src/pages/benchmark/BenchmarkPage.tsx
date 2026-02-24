@@ -247,7 +247,7 @@ export const BenchmarkPage: React.FC = () => {
     diagnosticForm.sdcTypeAgriculture,
     agricultureTypes,
     filterOptions,
-  ]); // eslint-disable-line react-hooks/exhaustive-deps
+  ]);
 
   const handleApplyFilters = useCallback(
     (filters: BenchmarkFiltersState) => {

@@ -17,6 +17,7 @@ export async function predictIFT(form: ITKFormState, agricultureTypes: string[])
     type_de_travail_du_sol: CHIP_API_VALUES.typeTravailDuSol[form.typeTravailDuSol] ?? 'Labour',
     departement: form.departement,
     sdc_type_agriculture: agricultureTypes[form.sdcTypeAgriculture] ?? 'Agriculture conventionnelle',
+    ferti_n_tot: form.fertiNTot,
   };
 
   const { data } = await mlClient.post<PredictResponse>('/predict', payload);
