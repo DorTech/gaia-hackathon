@@ -2,6 +2,7 @@ import { atom } from 'jotai';
 import type { Lever, LeverOverrides } from '../pages/simulationComponents/types';
 import { agricultureTypesAtom, itkFormAtom, CHIP_OPTIONS } from './diagnosticAtoms';
 import type { ITKFormState } from './diagnosticAtoms';
+import { benchmarkPracticeProfileAtom } from './benchmarkAtoms';
 
 /**
  * Derived atom: builds lever definitions from the current ITK form state.
@@ -10,6 +11,7 @@ import type { ITKFormState } from './diagnosticAtoms';
 export const leversAtom = atom<Lever[]>((get) => {
   const form = get(itkFormAtom);
   const agriTypes = get(agricultureTypesAtom);
+  const profile = get(benchmarkPracticeProfileAtom);
 
   // Build agriculture type options from dynamic atom, excluding the current selection
   const agriOptions = agriTypes
@@ -43,27 +45,24 @@ export const leversAtom = atom<Lever[]>((get) => {
       name: 'Séquence des cultures',
       type: 'Qualitatif',
       current: `${form.sequenceCultures} · actuel`,
-      options: [
-        {
-          label: 'Rotation diversifiée (4+ familles)',
-          formOverrides: { sequenceCultures: 'Rotation diversifiée (4+ familles)' },
-        },
-        {
-          label: 'Rotation longue avec légumineuses',
-          formOverrides: { sequenceCultures: 'Rotation longue avec légumineuses' },
-          isReference: true,
-        },
-      ],
+      options: (profile.find(p => p.id === 'sequence-cultures')?.frequencies ?? [])
+        .filter(f => f.label !== form.sequenceCultures)
+        .map(f => ({
+          label: f.label,
+          formOverrides: { sequenceCultures: f.label },
+        })),
     },
     {
       id: 'sol',
       name: 'Type de travail du sol',
       type: 'Qualitatif',
       current: `${CHIP_OPTIONS.soilWork[form.typeTravailDuSol]} · actuel`,
-      options: [
-        { label: 'TCS', formOverrides: { typeTravailDuSol: 1 } },
-        { label: 'Semis direct', formOverrides: { typeTravailDuSol: 2 }, isReference: true },
-      ],
+      options: (profile.find(p => p.id === 'soil-work')?.frequencies ?? [])
+        .filter(f => (CHIP_OPTIONS.soilWork as readonly string[]).indexOf(f.label) !== form.typeTravailDuSol)
+        .map(f => ({
+          label: f.label,
+          formOverrides: { typeTravailDuSol: (CHIP_OPTIONS.soilWork as readonly string[]).indexOf(f.label) },
+        })),
     },
     {
       id: 'desh',

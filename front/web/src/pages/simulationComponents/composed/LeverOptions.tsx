@@ -42,6 +42,8 @@ export const LeverOptions: React.FC<LeverOptionsProps> = ({
 
     // Reference marker position as percentage
     const refPct = ((s.referenceValue - s.min) / (s.max - s.min)) * 100;
+    // Current value (ma ferme) marker position as percentage
+    const curPct = ((s.currentValue - s.min) / (s.max - s.min)) * 100;
 
     return (
       <Box sx={{ width: "100%", px: 0.5 }}>
@@ -89,6 +91,20 @@ export const LeverOptions: React.FC<LeverOptionsProps> = ({
               },
             }}
           />
+          {/* Current value (ma ferme) marker */}
+          <Box
+            sx={{
+              position: "absolute",
+              left: `${curPct}%`,
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "2px",
+              height: "16px",
+              backgroundColor: "var(--orange)",
+              opacity: 0.6,
+              pointerEvents: "none",
+            }}
+          />
           {/* Reference marker */}
           <Box
             sx={{
@@ -105,16 +121,27 @@ export const LeverOptions: React.FC<LeverOptionsProps> = ({
           />
         </Box>
 
-        <Typography
-          sx={{
-            fontSize: "0.62rem",
-            color: "var(--green-d)",
-            fontWeight: 600,
-            mt: -0.5,
-          }}
-        >
-          Ref: {s.referenceLabel}
-        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: "6px", mt: -0.5 }}>
+          <Typography
+            sx={{
+              fontSize: "0.62rem",
+              color: "var(--orange)",
+              fontWeight: 600,
+            }}
+          >
+            Actuel: {s.currentValue} {s.unit}
+          </Typography>
+          <Typography sx={{ fontSize: "0.62rem", color: "var(--text3)" }}>—</Typography>
+          <Typography
+            sx={{
+              fontSize: "0.62rem",
+              color: "var(--green-d)",
+              fontWeight: 600,
+            }}
+          >
+            Ref: {s.referenceLabel}
+          </Typography>
+        </Box>
       </Box>
     );
   }
