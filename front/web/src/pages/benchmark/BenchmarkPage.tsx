@@ -22,7 +22,8 @@ import {
   rawSpeciesListAtom,
   PRACTICE_PROFILE_TEMPLATE,
 } from '../../store/benchmarkAtoms';
-import { predictedIFTAtom } from '../../store/diagnosticAtoms';
+import { itkFormAtom, predictedIFTAtom } from '../../store/diagnosticAtoms';
+import { DEPT_NAMES } from '../../config/departments';
 import { iftMedianValueAtom } from '../../store/referenceAtoms';
 import type { BenchmarkFiltersState, PracticeProfileItem } from '../../types/benchmark';
 import { BenchmarkFilters } from './BenchmarkFilters';
@@ -45,6 +46,7 @@ export const BenchmarkPage: React.FC = () => {
   const setReferenceFarms = useSetAtom(benchmarkReferenceFarmsAtom);
   const setMedianIft = useSetAtom(iftMedianValueAtom);
   const setRawSpecies = useSetAtom(rawSpeciesListAtom);
+  const diagnosticForm = useAtomValue(itkFormAtom);
 
   const loadBenchmarkData = useCallback(
     async (filters: BenchmarkFiltersState) => {
@@ -189,17 +191,29 @@ export const BenchmarkPage: React.FC = () => {
           agricultureType: agricultureTypes,
         }));
 
-        // Update default filters if current values aren't in the fetched lists
+        // Prefill from diagnostic form values, or keep existing if already set
+        const deptCode = String(diagnosticForm.departement);
+        const deptName = DEPT_NAMES[deptCode];
+        const deptFormatted = deptName ? `${deptCode} — ${deptName}` : deptCode;
+        const matchedDept = departments.find((d) => d === deptFormatted) ?? '';
+
+        const diagAgriType = ['Conventionnelle', 'Biologique', 'Conversion bio'][diagnosticForm.sdcTypeAgriculture] ?? '';
+        const matchedAgriType = agricultureTypes.find((t) =>
+          t.toLowerCase().includes(diagAgriType.toLowerCase()),
+        ) ?? '';
+
         setAppliedFilters(
           (prev: { species: string; department: string; agricultureType: string }) => ({
             ...prev,
             species: prev.species && species.includes(prev.species) ? prev.species : '',
             department:
-              prev.department && departments.includes(prev.department) ? prev.department : '',
+              prev.department && departments.includes(prev.department)
+                ? prev.department
+                : matchedDept,
             agricultureType:
               prev.agricultureType && agricultureTypes.includes(prev.agricultureType)
                 ? prev.agricultureType
-                : '',
+                : matchedAgriType,
           }),
         );
       } catch (err) {
