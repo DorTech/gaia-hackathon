@@ -23,6 +23,7 @@ class PredictionRequest(BaseModel):
     type_de_travail_du_sol: str
     departement: int
     sdc_type_agriculture: str
+    ferti_n_tot: float
 
 
 def load_model_and_metadata():
@@ -69,7 +70,8 @@ async def predict(payload: PredictionRequest):
         "nbre_de_passages_desherbage_meca": payload.nbre_de_passages_desherbage_meca,
         "type_de_travail_du_sol": payload.type_de_travail_du_sol,
         "departement": payload.departement,
-        "sdc_type_agriculture": payload.sdc_type_agriculture
+        "sdc_type_agriculture": payload.sdc_type_agriculture,
+        "ferti_n_tot": payload.ferti_n_tot,
     }
     
     # Add binary features for each known crop

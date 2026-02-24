@@ -13,7 +13,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-NUMERIC_COLS = ["nb_cultures_rotation", "nbre_de_passages_desherbage_meca", "sequence_length", "departement"]
+NUMERIC_COLS = ["nb_cultures_rotation", "nbre_de_passages_desherbage_meca", "sequence_length", "departement", "ferti_n_tot"]
 CATEGORICAL_COLS = ["recours_macroorganismes", "type_de_travail_du_sol", "sdc_type_agriculture"]
 SEQUENCE_COL = "sequence_cultures"
 TARGET_COL = "ift_histo_chimique_tot"
@@ -128,7 +128,7 @@ join domain
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     df = df.dropna(subset=[TARGET_COL, SEQUENCE_COL] + CATEGORICAL_COLS)
     # Convert numeric columns to numeric type
-    for col in ["nb_cultures_rotation", "nbre_de_passages_desherbage_meca"]:
+    for col in ["nb_cultures_rotation", "nbre_de_passages_desherbage_meca", "ferti_n_tot"]:
         df[col] = pd.to_numeric(df[col], errors="coerce")
     # Convert categorical columns to string
     for col in CATEGORICAL_COLS:
