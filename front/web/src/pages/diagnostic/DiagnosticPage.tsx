@@ -14,7 +14,7 @@ import {
   predictingAtom,
   type ITKFormState,
 } from '../../store/diagnosticAtoms';
-import { Box } from '@mui/material';
+import { FormControl, MenuItem, Select, type SelectChangeEvent } from '@mui/material';
 import { DIAGNOSTIC_VARIABLES } from '../../config/variables';
 import { predictIFT } from '../../api/predict';
 import { ItineraireComponent } from '../ItinerairePage';
@@ -89,6 +89,34 @@ export const DiagnosticPage: React.FC = () => {
                         handleFieldChange(v.formKey, index as ITKFormState[typeof v.formKey])
                       }
                     />
+                  ) : v.select ? (
+                    <FormControl size="small" fullWidth>
+                      <Select
+                        value={String(form[v.formKey])}
+                        onChange={(e: SelectChangeEvent) => {
+                          const num = parseInt(e.target.value, 10);
+                          if (!isNaN(num)) {
+                            handleFieldChange(v.formKey, num as ITKFormState[typeof v.formKey]);
+                          }
+                        }}
+                        displayEmpty
+                        renderValue={(selected) => {
+                          if (!selected) {
+                            return <span style={{ color: 'var(--text3)' }}>{v.select!.placeholder}</span>;
+                          }
+                          const name = v.select!.options[selected];
+                          return name ? `${selected} — ${name}` : selected;
+                        }}
+                      >
+                        {Object.entries(v.select.options)
+                          .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+                          .map(([code, name]) => (
+                            <MenuItem key={code} value={code}>
+                              {code} — {name}
+                            </MenuItem>
+                          ))}
+                      </Select>
+                    </FormControl>
                   ) : v.input ? (
                     <InputControl
                       type={v.input.type}

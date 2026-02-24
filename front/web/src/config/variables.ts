@@ -1,5 +1,6 @@
 import type { ITKFormState } from '../store/diagnosticAtoms';
 import type { PracticeProfileItem } from '../types/benchmark';
+import { DEPT_NAMES } from './departments';
 
 /**
  * Single source of truth for diagnostic / benchmark variables.
@@ -24,6 +25,11 @@ export interface InputConfig {
   max?: number;
 }
 
+export interface SelectConfig {
+  options: Record<string, string>;
+  placeholder?: string;
+}
+
 export interface VariableConfig {
   id: string;
   formKey: keyof ITKFormState;
@@ -34,6 +40,7 @@ export interface VariableConfig {
   slider?: SliderConfig;
   chips?: ChipConfig;
   input?: InputConfig;
+  select?: SelectConfig;
   benchmarkApi?: {
     type: 'frequency' | 'median';
     field: string;
@@ -93,7 +100,7 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     label: 'Département',
     dbVariable: 'departement',
     type: 'Quantitatif',
-    input: { type: 'number', placeholder: '31', min: 1, max: 976 },
+    select: { options: DEPT_NAMES, placeholder: 'Choisir un département' },
   },
   {
     id: 'agriculture-type',
