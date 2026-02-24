@@ -268,7 +268,6 @@ export class QueryService {
       lentille: ["lentille", "LENTILLE", "Lentille", "Lentilles", "lentilles"],
       Lin: ["Lin", "LIN TEXTILE"],
       Luzerne: ["luzerne", "LUZERNE", "Luzerne", "luzerne deshydratéé"],
-      Mâche: ["MACHE", "mache"],
       Maïs: ["MAIS", "Mais", "mais", "MAÎS", "Maïs", "maïs", "MAÏS"],
       "Maïs ensilage": [
         "Mais ensilage",
@@ -297,7 +296,7 @@ export class QueryService {
       Melon: ["MELON", "melon", "Melon"],
       Millet: ["Millet"],
       Moutarde: ["Moutarde"],
-      Mâche: ["Mâche", "mâche"],
+      Mâche: ["Mâche", "mâche", "MACHE", "mache"],
       "Mélange céréalier": [
         "Mélange céréalier",
         "mélange céréalier",
