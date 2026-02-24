@@ -220,6 +220,35 @@ WHERE sac.culture_nom IN (${query.culture.map((c) => `'${c}'`).join(", ")})
     };
   }
 
+  async medianIft(
+    query: NewFilterDB,
+  ): Promise<{ median: number | null; count: number }> {
+    const result = await this.dephyService.db.execute(`
+SELECT
+    PERCENTILE_CONT(0.5)
+        WITHIN GROUP (ORDER BY spmc.ift_histo_chimique_tot) AS median_ift,
+    COUNT(DISTINCT spmc.domaine_id)::int AS farm_count
+FROM synthetise_perf_magasin_can spmc
+JOIN sdc ON sdc.id = spmc.sdc_id
+JOIN dispositif ON dispositif.id = sdc.dispositif_id
+JOIN domain ON domain.id = dispositif.domaine_id
+JOIN succession_assolee_synthetise_magasin_can sac ON sac.sdc_id = sdc.id
+WHERE sac.culture_nom IN (${query.culture.map((c) => `'${c}'`).join(", ")})
+  AND domain.departement LIKE '${query.department}'
+  AND sdc.type_agriculture LIKE '${query.agricultureType}'
+  AND spmc.ift_histo_chimique_tot IS NOT NULL;
+    `);
+
+    if (result.rows.length === 0 || result.rows[0]?.median_ift === null) {
+      return { median: null, count: 0 };
+    }
+
+    return {
+      median: Number(result.rows[0].median_ift),
+      count: Number(result.rows[0].farm_count),
+    };
+  }
+
   async frequency(
     table: PgTable,
     column: any,

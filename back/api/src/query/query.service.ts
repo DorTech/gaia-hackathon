@@ -422,9 +422,8 @@ export class QueryService {
   async getMedianIft(
     dto: NewFilterDto,
   ): Promise<{ median: number | null; count: number }> {
-    // TODO add median for IFT
-    // COUNT IS NB OF FARM IN THE MEDIAN
-    return { median: null, count: 0 };
+    const dbFilters: NewFilterDB = this.buildDbFilters(dto);
+    return this.queryRepository.medianIft(dbFilters);
   }
 
   // Provides a mapping of culture names to their known aliases in the dataset, to help standardize user input and improve matching with database entries - hackathon workaround
