@@ -30,28 +30,21 @@ export default function TopBar() {
           <img src="/logo.png" alt="Logo" style={{ height: 50 }} />
 
           <Typography
-            variant="h6"
+            variant="h5"
             noWrap
             sx={{
-              fontWeight: 800,
-              letterSpacing: '-0.03em',
-              color: (t) => t.palette.common.white,
-              textShadow: (t) => `0 1px 2px ${alpha(t.palette.secondary.dark, 0.28)}`,
+              fontFamily: '"Fredoka", sans-serif',
+              fontWeight: 700,
+              letterSpacing: '0.01em',
+              textShadow: (t) => `0 1px 3px ${alpha(t.palette.secondary.dark, 0.2)}`,
             }}
           >
-            Opti
-          </Typography>
-          <Typography
-            variant="h6"
-            noWrap
-            sx={{
-              fontWeight: 800,
-              letterSpacing: '-0.03em',
-              color: (t) => alpha(t.palette.secondary.dark, 0.95),
-              marginLeft: -1.1,
-            }}
-          >
-            meo
+            <Box component="span" sx={{ color: (t) => t.palette.common.white }}>
+              Opti
+            </Box>
+            <Box component="span" sx={{ color: (t) => alpha(t.palette.secondary.dark, 0.9) }}>
+              meo
+            </Box>
           </Typography>
         </Box>
 
