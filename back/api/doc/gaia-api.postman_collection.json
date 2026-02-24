@@ -1,0 +1,220 @@
+{
+	"info": {
+		"name": "GAIA Hackathon API",
+		"description": "API for the GAIA 2026 hackathon - Dephy dataset",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3001/api"
+		}
+	],
+	"item": [
+		{
+			"name": "Query",
+			"item": [
+				{
+					"name": "List tables",
+					"request": {
+						"method": "GET",
+						"url": {
+							"raw": "{{baseUrl}}/query/tables",
+							"host": ["{{baseUrl}}"],
+							"path": ["query", "tables"]
+						}
+					}
+				},
+				{
+					"name": "Domaines filtered by species, dept, agriculture, IFT",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/query/data",
+							"host": ["{{baseUrl}}"],
+							"path": ["query", "data"]
+						},
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"domaine\",\n  \"filters\": [\n    { \"field\": \"departement\", \"operator\": \"eq\", \"value\": \"35\" }\n  ],\n  \"joins\": [\n    {\n      \"table\": \"sdc_realise_perf_magasin_can\",\n      \"field\": \"domaineId\",\n      \"targetField\": \"id\",\n      \"filters\": [\n        { \"field\": \"especes\", \"operator\": \"eq\", \"value\": \"Blé tendre\" },\n        { \"field\": \"sdcTypeAgriculture\", \"operator\": \"eq\", \"value\": \"Agriculture conventionnelle\" },\n        { \"field\": \"iftHistoChimiqueTot\", \"operator\": \"lte\", \"value\": 5 }\n      ]\n    }\n  ]\n}"
+						}
+					}
+				},
+				{
+					"name": "Median IFT filtered by species, dept, agriculture",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/query/median",
+							"host": ["{{baseUrl}}"],
+							"path": ["query", "median"]
+						},
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"sdc_realise_perf_magasin_can\",\n  \"field\": \"iftHistoChimiqueTot\",\n  \"filters\": [\n    { \"field\": \"especes\", \"operator\": \"eq\", \"value\": \"Blé tendre\" },\n    { \"field\": \"departement\", \"operator\": \"eq\", \"value\": \"35\" },\n    { \"field\": \"sdcTypeAgriculture\", \"operator\": \"eq\", \"value\": \"Agriculture conventionnelle\" }\n  ]\n}"
+						}
+					}
+				},
+				{
+					"name": "Median temps travail total filtered by species, dept, agriculture",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/query/median",
+							"host": ["{{baseUrl}}"],
+							"path": ["query", "median"]
+						},
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"sdc_realise_perf_magasin_can\",\n  \"field\": \"tpsTravailTotal\",\n  \"filters\": [\n    { \"field\": \"especes\", \"operator\": \"eq\", \"value\": \"Blé tendre\" },\n    { \"field\": \"departement\", \"operator\": \"eq\", \"value\": \"35\" },\n    { \"field\": \"sdcTypeAgriculture\", \"operator\": \"eq\", \"value\": \"Agriculture conventionnelle\" }\n  ]\n}"
+						}
+					}
+				},
+				{
+					"name": "Median ferti N total filtered by species, dept, agriculture",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/query/median",
+							"host": ["{{baseUrl}}"],
+							"path": ["query", "median"]
+						},
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"sdc_realise_perf_magasin_can\",\n  \"field\": \"fertiNTot\",\n  \"filters\": [\n    { \"field\": \"especes\", \"operator\": \"eq\", \"value\": \"Blé tendre\" },\n    { \"field\": \"departement\", \"operator\": \"eq\", \"value\": \"35\" },\n    { \"field\": \"sdcTypeAgriculture\", \"operator\": \"eq\", \"value\": \"Agriculture conventionnelle\" }\n  ]\n}"
+						}
+					}
+				},
+				{
+					"name": "Median marge brute filtered by species, dept, agriculture",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/query/median",
+							"host": ["{{baseUrl}}"],
+							"path": ["query", "median"]
+						},
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"sdc_realise_perf_magasin_can\",\n  \"field\": \"mbReelleAvecAutoconso\",\n  \"filters\": [\n    { \"field\": \"especes\", \"operator\": \"eq\", \"value\": \"Blé tendre\" },\n    { \"field\": \"departement\", \"operator\": \"eq\", \"value\": \"35\" },\n    { \"field\": \"sdcTypeAgriculture\", \"operator\": \"eq\", \"value\": \"Agriculture conventionnelle\" }\n  ]\n}"
+						}
+					}
+				},
+				{
+					"name": "Frequency desherbage meca filtered by species, dept, agriculture",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/query/frequency",
+							"host": ["{{baseUrl}}"],
+							"path": ["query", "frequency"]
+						},
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"sdc_realise_perf_magasin_can\",\n  \"field\": \"utiliDesherbageMeca\",\n  \"filters\": [\n    { \"field\": \"especes\", \"operator\": \"eq\", \"value\": \"Blé tendre\" },\n    { \"field\": \"departement\", \"operator\": \"eq\", \"value\": \"35\" },\n    { \"field\": \"sdcTypeAgriculture\", \"operator\": \"eq\", \"value\": \"Agriculture conventionnelle\" }\n  ]\n}"
+						}
+					}
+				},
+				{
+					"name": "Frequency type travail du sol filtered by species, dept, agriculture",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/query/frequency",
+							"host": ["{{baseUrl}}"],
+							"path": ["query", "frequency"]
+						},
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"sdc_realise_perf_magasin_can\",\n  \"field\": \"typeDeTravailDuSol\",\n  \"filters\": [\n    { \"field\": \"especes\", \"operator\": \"eq\", \"value\": \"Blé tendre\" },\n    { \"field\": \"departement\", \"operator\": \"eq\", \"value\": \"35\" },\n    { \"field\": \"sdcTypeAgriculture\", \"operator\": \"eq\", \"value\": \"Agriculture conventionnelle\" }\n  ]\n}"
+						}
+					}
+				},
+				{
+					"name": "Frequency recours biocontrole (as boolean) filtered by species, dept, agriculture",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/query/frequency",
+							"host": ["{{baseUrl}}"],
+							"path": ["query", "frequency"]
+						},
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"sdc_realise_perf_magasin_can\",\n  \"field\": \"recoursAuxMoyensBiologiques\",\n  \"asBoolean\": true,\n  \"filters\": [\n    { \"field\": \"especes\", \"operator\": \"eq\", \"value\": \"Blé tendre\" },\n    { \"field\": \"departement\", \"operator\": \"eq\", \"value\": \"35\" },\n    { \"field\": \"sdcTypeAgriculture\", \"operator\": \"eq\", \"value\": \"Agriculture conventionnelle\" }\n  ]\n}"
+						}
+					}
+				},
+				{
+					"name": "Median conso carburant filtered by species, dept, agriculture",
+					"request": {
+						"method": "POST",
+						"url": {
+							"raw": "{{baseUrl}}/query/median",
+							"host": ["{{baseUrl}}"],
+							"path": ["query", "median"]
+						},
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"table\": \"sdc_realise_perf_magasin_can\",\n  \"field\": \"consoCarburant\",\n  \"filters\": [\n    { \"field\": \"especes\", \"operator\": \"eq\", \"value\": \"Blé tendre\" },\n    { \"field\": \"departement\", \"operator\": \"eq\", \"value\": \"35\" },\n    { \"field\": \"sdcTypeAgriculture\", \"operator\": \"eq\", \"value\": \"Agriculture conventionnelle\" }\n  ]\n}"
+						}
+					}
+				}
+			]
+		}
+	]
+}

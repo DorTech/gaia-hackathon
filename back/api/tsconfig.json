@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "rootDir": "./src",
+    "baseUrl": "./src",
+    "outDir": "./build",
+
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+
+    "noImplicitAny": false,
+
+    "module": "commonjs",
+    "target": "es2017",
+    "removeComments": true,
+    "allowSyntheticDefaultImports": true,
+    "incremental": true,
+    "strictPropertyInitialization": false,
+    "strict": true
+  },
+  "references": [
+    { "path": "../../libs/shared-type" }
+  ],
+  "include": ["src"]
+}
