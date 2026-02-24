@@ -1,12 +1,8 @@
-# GAIA Hackathon
-
-Monorepo skeleton for the GAIA 2026 hackathon
-
-![Screenshot](screenshot.png)
+# Monorepo
 
 ## Prerequisites
 
-- Node.js 20+
+- Node.js 22.17
 - Docker & Docker Compose
 
 ## Quick Start
@@ -40,7 +36,7 @@ yarn web:dev
 ## Project Structure
 
 ```
-hackathon-gaia-bloomeo/
+monorepo/
 ├── back/api/          # NestJS backend (port 3001)
 ├── front/web/         # React + Vite frontend (port 3000)
 ├── libs/shared-type/  # Shared TypeScript types
