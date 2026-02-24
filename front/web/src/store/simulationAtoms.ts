@@ -63,14 +63,16 @@ export const leversAtom = atom<Lever[]>((get) => {
       type: 'Qualitatif',
       current: `${soilWorkTypes[form.typeTravailDuSol] ?? '—'} · actuel`,
       options: (() => {
-        const freqs = (profile.find(p => p.id === 'soil-work')?.frequencies ?? [])
-          .filter(f => soilWorkTypes.indexOf(f.label) !== form.typeTravailDuSol);
-        const refLabel = freqs.filter(f => f.label !== 'Autres').sort((a, b) => b.pct - a.pct)[0]?.label;
-        return freqs.map(f => ({
-          label: f.label,
-          formOverrides: { typeTravailDuSol: soilWorkTypes.indexOf(f.label) },
-          isReference: f.label === refLabel,
-        }));
+        const freqs = profile.find(p => p.id === 'soil-work')?.frequencies ?? [];
+        const refRaw = freqs.filter(f => f.label !== 'Autres').sort((a, b) => b.pct - a.pct)[0]?.label;
+        const refNorm = refRaw?.replace(/_/g, ' ').toLowerCase();
+        return soilWorkTypes
+          .filter((_, idx) => idx !== form.typeTravailDuSol)
+          .map(label => ({
+            label,
+            formOverrides: { typeTravailDuSol: soilWorkTypes.indexOf(label) },
+            isReference: label.toLowerCase() === refNorm,
+          }));
       })(),
     },
     {
