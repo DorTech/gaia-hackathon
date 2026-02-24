@@ -18,7 +18,7 @@ export const ITK_FORM_DEFAULTS: ITKFormState = {
   sequenceCultures: 'Blé tendre > Maïs > Colza',
   recoursMacroorganismes: 0,
   nbrePassagesDesherbageMeca: 2,
-  typeTravailDuSol: 1,
+  typeTravailDuSol: 2,
   departement: 31,
   sdcTypeAgriculture: 0,
   fertiNTot: 150,
@@ -33,13 +33,13 @@ export const predictedIFTAtom = atom<number>(2.5);
 export const predictingAtom = atom<boolean>(false);
 
 export const CHIP_OPTIONS = {
-  soilWork: ['Labour', 'TCS', 'Semis direct'] as const,
+  soilWork: ['Aucun', 'Labour', 'TCS', 'Semis direct'] as const,
   yesNo: ['Non', 'Oui'] as const,
 } as const;
 
 /** API string values for chip indices */
 export const CHIP_API_VALUES = {
-  typeTravailDuSol: ['Labour', 'TCS', 'Semis direct'] as const,
+  typeTravailDuSol: ['Aucun', 'Labour', 'TCS', 'Semis direct'] as const,
   recoursMacroorganismes: ['Non', 'Oui'] as const,
 } as const;
 

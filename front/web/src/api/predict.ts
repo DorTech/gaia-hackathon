@@ -14,7 +14,7 @@ export async function predictIFT(form: ITKFormState, agricultureTypes: string[])
     sequence_cultures: form.sequenceCultures,
     recours_macroorganismes: CHIP_API_VALUES.recoursMacroorganismes[form.recoursMacroorganismes] ?? 'Non',
     nbre_de_passages_desherbage_meca: form.nbrePassagesDesherbageMeca,
-    type_de_travail_du_sol: CHIP_API_VALUES.typeTravailDuSol[form.typeTravailDuSol] ?? 'Labour',
+    type_de_travail_du_sol: CHIP_API_VALUES.typeTravailDuSol[form.typeTravailDuSol] === 'Aucun' ? '' : (CHIP_API_VALUES.typeTravailDuSol[form.typeTravailDuSol] ?? 'Labour'),
     departement: form.departement,
     sdc_type_agriculture: agricultureTypes[form.sdcTypeAgriculture] ?? 'Agriculture conventionnelle',
     ferti_n_tot: form.fertiNTot,
