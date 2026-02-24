@@ -72,7 +72,7 @@ export const DiagnosticPage: React.FC = () => {
 
   return (
     <div className="page active" id="page-itk">
-      <div>
+      <div style={{ marginBottom: '14px' }}>
         <ItineraireComponent />
       </div>
 
