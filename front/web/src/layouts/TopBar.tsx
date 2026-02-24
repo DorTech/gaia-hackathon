@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 const NAV_ITEMS = [
   { label: 'Ma ferme', path: '/diagnostic' },
-  { label: 'Benchmark', path: '/benchmark' },
+  { label: 'Comparateur', path: '/benchmark' },
   { label: 'Simulation leviers', path: '/simulation' },
 ];
 

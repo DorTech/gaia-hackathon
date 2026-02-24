@@ -1,5 +1,5 @@
-import { Typography, Paper, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Typography, Paper, Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 export default function NotFoundPage() {
   const navigate = useNavigate();
@@ -13,8 +13,8 @@ export default function NotFoundPage() {
         <Typography color="text.secondary" gutterBottom>
           The page you are looking for does not exist.
         </Typography>
-        <Button variant="contained" onClick={() => navigate("/benchmark")}>
-          Go to Benchmark
+        <Button variant="contained" onClick={() => navigate('/benchmark')}>
+          Go to Comparateur
         </Button>
       </Paper>
     </>

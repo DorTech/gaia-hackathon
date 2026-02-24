@@ -11,7 +11,7 @@ export const BenchmarkHeader: React.FC<BenchmarkHeaderProps> = ({ departmentCode
     <Box className="page-hd">
       <Box>
         <Typography component="h1">
-          Benchmark — Dép. {departmentCode} · {species}
+          Comparateur — Dép. {departmentCode} · {species}
         </Typography>
         <Typography component="p">
           Identification des fermes les plus performantes sur l&apos;IFT
