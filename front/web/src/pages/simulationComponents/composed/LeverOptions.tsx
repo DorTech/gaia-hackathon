@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { Box, Button, Slider, Stack, Typography } from "@mui/material";
-import { Lever } from "../types";
-import type { ITKFormState } from "../../../store/diagnosticAtoms";
+import React, { useState, useEffect } from 'react';
+import { Box, Button, Slider, Stack, Typography } from '@mui/material';
+import { Lever } from '../types';
+import type { ITKFormState } from '../../../store/diagnosticAtoms';
 
 interface LeverOptionsProps {
   lever: Lever;
@@ -16,18 +16,19 @@ export const LeverOptions: React.FC<LeverOptionsProps> = ({
 }) => {
   const s = lever.slider;
 
+  // Always call hooks at the top level
+  const currentSliderValue = s ? ((activeOverrides?.[s.formKey] as number) ?? s.currentValue) : 0;
+  const [sliderValue, setSliderValue] = useState(currentSliderValue);
+
+  // Reset slider when current value changes (diagnostic form update)
+  useEffect(() => {
+    if (s && !activeOverrides) {
+      setSliderValue(s.currentValue);
+    }
+  }, [s, s?.currentValue, activeOverrides]);
+
   // Slider mode for quantitative levers
   if (s) {
-    const currentSliderValue = (activeOverrides?.[s.formKey] as number) ?? s.currentValue;
-    const [sliderValue, setSliderValue] = useState(currentSliderValue);
-
-    // Reset slider when current value changes (diagnostic form update)
-    useEffect(() => {
-      if (!activeOverrides) {
-        setSliderValue(s.currentValue);
-      }
-    }, [s.currentValue, activeOverrides]);
-
     const handleSliderChange = (_: unknown, value: number | number[]) => {
       const v = Array.isArray(value) ? value[0] : value;
       setSliderValue(v);
@@ -46,26 +47,26 @@ export const LeverOptions: React.FC<LeverOptionsProps> = ({
     const curPct = ((s.currentValue - s.min) / (s.max - s.min)) * 100;
 
     return (
-      <Box sx={{ width: "100%", px: 0.5 }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 0.5 }}>
-          <Typography sx={{ fontSize: "0.67rem", color: "var(--text3)" }}>
+      <Box sx={{ width: '100%', px: 0.5 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+          <Typography sx={{ fontSize: '0.67rem', color: 'var(--text3)' }}>
             {s.min} {s.unit}
           </Typography>
           <Typography
             sx={{
-              fontSize: "0.78rem",
+              fontSize: '0.78rem',
               fontWeight: 800,
-              color: isActive ? "var(--green-d)" : "var(--orange)",
+              color: isActive ? 'var(--green-d)' : 'var(--orange)',
             }}
           >
             {sliderValue} {s.unit}
           </Typography>
-          <Typography sx={{ fontSize: "0.67rem", color: "var(--text3)" }}>
+          <Typography sx={{ fontSize: '0.67rem', color: 'var(--text3)' }}>
             {s.max} {s.unit}
           </Typography>
         </Box>
 
-        <Box sx={{ position: "relative" }}>
+        <Box sx={{ position: 'relative' }}>
           <Slider
             min={s.min}
             max={s.max}
@@ -75,67 +76,67 @@ export const LeverOptions: React.FC<LeverOptionsProps> = ({
             valueLabelFormat={(v) => `${v} ${s.unit}`}
             size="small"
             sx={{
-              color: isActive ? "var(--green)" : "var(--orange)",
-              "& .MuiSlider-rail": {
+              color: isActive ? 'var(--green)' : 'var(--orange)',
+              '& .MuiSlider-rail': {
                 opacity: 1,
-                backgroundColor: "var(--border2)",
+                backgroundColor: 'var(--border2)',
               },
-              "& .MuiSlider-track": {
-                border: "none",
+              '& .MuiSlider-track': {
+                border: 'none',
               },
-              "& .MuiSlider-thumb": {
+              '& .MuiSlider-thumb': {
                 width: 14,
                 height: 14,
-                backgroundColor: "var(--white)",
-                border: `2px solid ${isActive ? "var(--green)" : "var(--orange)"}`,
+                backgroundColor: 'var(--white)',
+                border: `2px solid ${isActive ? 'var(--green)' : 'var(--orange)'}`,
               },
             }}
           />
           {/* Current value (ma ferme) marker */}
           <Box
             sx={{
-              position: "absolute",
+              position: 'absolute',
               left: `${curPct}%`,
-              top: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "2px",
-              height: "16px",
-              backgroundColor: "var(--orange)",
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '2px',
+              height: '16px',
+              backgroundColor: 'var(--orange)',
               opacity: 0.6,
-              pointerEvents: "none",
+              pointerEvents: 'none',
             }}
           />
           {/* Reference marker */}
           <Box
             sx={{
-              position: "absolute",
+              position: 'absolute',
               left: `${refPct}%`,
-              top: "50%",
-              transform: "translate(-50%, -50%)",
-              width: "2px",
-              height: "16px",
-              backgroundColor: "var(--green-d)",
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '2px',
+              height: '16px',
+              backgroundColor: 'var(--green-d)',
               opacity: 0.6,
-              pointerEvents: "none",
+              pointerEvents: 'none',
             }}
           />
         </Box>
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: "6px", mt: -0.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: '6px', mt: -0.5 }}>
           <Typography
             sx={{
-              fontSize: "0.62rem",
-              color: "var(--orange)",
+              fontSize: '0.62rem',
+              color: 'var(--orange)',
               fontWeight: 600,
             }}
           >
             Actuel: {s.currentValue} {s.unit}
           </Typography>
-          <Typography sx={{ fontSize: "0.62rem", color: "var(--text3)" }}>—</Typography>
+          <Typography sx={{ fontSize: '0.62rem', color: 'var(--text3)' }}>—</Typography>
           <Typography
             sx={{
-              fontSize: "0.62rem",
-              color: "var(--green-d)",
+              fontSize: '0.62rem',
+              color: 'var(--green-d)',
               fontWeight: 600,
             }}
           >
@@ -152,37 +153,31 @@ export const LeverOptions: React.FC<LeverOptionsProps> = ({
   const isOptionSelected = (optOverrides: Partial<ITKFormState>) => {
     if (!activeOverrides) return false;
     return Object.entries(optOverrides).every(
-      ([k, v]) => activeOverrides[k as keyof ITKFormState] === v
+      ([k, v]) => activeOverrides[k as keyof ITKFormState] === v,
     );
   };
 
   return (
-    <Stack direction="row" spacing={0.5} sx={{ flexWrap: "wrap" }}>
+    <Stack direction="row" spacing={0.5} sx={{ flexWrap: 'wrap', gap: '6px' }}>
       <Button
         onClick={() => onPickOption(lever.id, null)}
         sx={{
-          padding: "5px 10px",
-          borderRadius: "6px",
-          border: "2px solid",
-          fontSize: "0.69rem",
+          padding: '5px 10px',
+          borderRadius: '6px',
+          border: '2px solid',
+          fontSize: '0.69rem',
           fontWeight: 600,
-          textTransform: "none",
-          lineHeight: "1.3",
-          transition: "all 0.2s ease",
-          borderColor: isCurrentSelected ? "var(--orange)" : "var(--border2)",
-          color: isCurrentSelected ? "white" : "var(--orange)",
-          backgroundColor: isCurrentSelected
-            ? "var(--orange)"
-            : "var(--orange-l)",
-          boxShadow: isCurrentSelected
-            ? "0 0 8px rgba(232, 146, 58, 0.3)"
-            : "none",
-          "&:hover": {
-            backgroundColor: isCurrentSelected
-              ? "var(--orange)"
-              : "var(--orange)",
-            color: "white",
-            borderColor: "var(--orange)",
+          textTransform: 'none',
+          lineHeight: '1.3',
+          transition: 'all 0.2s ease',
+          borderColor: isCurrentSelected ? 'var(--orange)' : 'var(--border2)',
+          color: isCurrentSelected ? 'white' : 'var(--orange)',
+          backgroundColor: isCurrentSelected ? 'var(--orange)' : 'var(--orange-l)',
+          boxShadow: isCurrentSelected ? '0 0 8px rgba(232, 146, 58, 0.3)' : 'none',
+          '&:hover': {
+            backgroundColor: isCurrentSelected ? 'var(--orange)' : 'var(--orange)',
+            color: 'white',
+            borderColor: 'var(--orange)',
           },
         }}
       >
@@ -196,27 +191,25 @@ export const LeverOptions: React.FC<LeverOptionsProps> = ({
             key={idx}
             onClick={() => onPickOption(lever.id, opt.formOverrides)}
             sx={{
-              padding: "5px 10px",
-              borderRadius: "6px",
-              border: "2px solid",
-              fontSize: "0.69rem",
+              padding: '5px 10px',
+              borderRadius: '6px',
+              border: '2px solid',
+              fontSize: '0.69rem',
               fontWeight: 600,
-              textTransform: "none",
-              lineHeight: "1.3",
-              transition: "all 0.2s ease",
-              borderColor: isSelected ? "var(--green)" : "var(--border2)",
-              color: isSelected ? "white" : "var(--text2)",
-              backgroundColor: isSelected ? "var(--green)" : "white",
-              boxShadow: isSelected
-                ? "0 0 8px rgba(122, 229, 140, 0.3)"
-                : "none",
-              display: "flex",
-              alignItems: "center",
-              gap: "4px",
-              "&:hover": {
-                borderColor: "var(--green)",
-                color: isSelected ? "white" : "var(--green-d)",
-                backgroundColor: isSelected ? "var(--green)" : "#f5f7fa",
+              textTransform: 'none',
+              lineHeight: '1.3',
+              transition: 'all 0.2s ease',
+              borderColor: isSelected ? 'var(--green)' : 'var(--border2)',
+              color: isSelected ? 'white' : 'var(--text2)',
+              backgroundColor: isSelected ? 'var(--green)' : 'white',
+              boxShadow: isSelected ? '0 0 8px rgba(122, 229, 140, 0.3)' : 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              '&:hover': {
+                borderColor: 'var(--green)',
+                color: isSelected ? 'white' : 'var(--green-d)',
+                backgroundColor: isSelected ? 'var(--green)' : '#f5f7fa',
               },
             }}
           >
@@ -224,12 +217,12 @@ export const LeverOptions: React.FC<LeverOptionsProps> = ({
             {opt.isReference && (
               <Box
                 sx={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "0.7rem",
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '0.7rem',
                   fontWeight: 800,
-                  color: "inherit",
+                  color: 'inherit',
                 }}
               >
                 ★
