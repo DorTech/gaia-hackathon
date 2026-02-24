@@ -12,6 +12,7 @@ import {
   itkFormAtom,
   predictedIFTAtom,
   predictingAtom,
+  prefilledKeysAtom,
   type ITKFormState,
 } from '../../store/diagnosticAtoms';
 import { fetchDistinctAgricultureTypes } from '../../api/benchmark';
@@ -26,6 +27,7 @@ export const DiagnosticPage: React.FC = () => {
   const setPredictedIFT = useSetAtom(predictedIFTAtom);
   const setPredicting = useSetAtom(predictingAtom);
   const [agricultureTypes, setAgricultureTypes] = useAtom(agricultureTypesAtom);
+  const prefilledKeys = useAtomValue(prefilledKeysAtom);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -85,7 +87,7 @@ export const DiagnosticPage: React.FC = () => {
         >
           <div className="fgrid">
             {DIAGNOSTIC_VARIABLES.map((v) => (
-              <Field key={v.id} label={v.label}>
+              <Field key={v.id} label={v.label} prefilled={prefilledKeys.has(v.formKey)}>
                 {v.slider ? (
                   <SliderControl
                     minLabel={v.slider.minLabel}
