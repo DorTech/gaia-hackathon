@@ -26,16 +26,9 @@ export default function TopBar() {
       }}
     >
       <Toolbar sx={{ justifyContent: 'space-between', gap: 2, minHeight: 64 }}>
-        <Box display="flex" alignItems="center" gap={0.6}>
-          <Box
-            sx={{
-              width: 10,
-              height: 10,
-              borderRadius: '50%',
-              background: (t) => t.palette.secondary.dark,
-              boxShadow: (t) => `0 0 0 4px ${alpha(t.palette.common.white, 0.35)}`,
-            }}
-          />
+        <Box display="flex" alignItems="center" gap={1.2}>
+          <img src="/logo.png" alt="Logo" style={{ height: 50 }} />
+
           <Typography
             variant="h6"
             noWrap
@@ -55,6 +48,7 @@ export default function TopBar() {
               fontWeight: 800,
               letterSpacing: '-0.03em',
               color: (t) => alpha(t.palette.secondary.dark, 0.95),
+              marginLeft: -1.1,
             }}
           >
             meo
