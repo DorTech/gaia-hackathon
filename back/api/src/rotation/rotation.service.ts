@@ -14,7 +14,7 @@ export class RotationService {
   }
 
   async generate(dto: GenerateRotationDto): Promise<Record<string, any>> {
-    const systemPrompt = `You are an agricultural expert. Generate a JSON object describing a crop rotation plan.
+    const systemPrompt = `You are an agricultural expert. Generate a JSON object describing a crop rotation plan. Take a close care to the crop growth duration and period to ensure the rotation is realistic and coherent.
 
 The JSON MUST follow this exact schema:
 {
@@ -74,6 +74,19 @@ Rules:
 - Colors: use earth tones (#d2b48c) for cereals, greens (#2d9f6e, #4caf50) for legumes/forage, gold (#ffd700) for oilseeds, light blue (#a7c6ed) for cover crops, grey (#d6d6d6) for secondary crops
 - Generate valid UUID v4 for all id fields
 - Climate data should be realistic for the specified region (12 values, one per month Jan-Dec)
+- Crop duration constraints (MUST be respected):
+- Maïs grain: 5-7 months (April-October)
+- Maïs ensilage: 4-6 months
+- Blé tendre d’hiver: 9-11 months
+- Orge de printemps: 4-5 months
+- Colza: 10-11 months
+- Couverts végétaux / CIVE: 2-5 months
+- For every step:
+- duration (months) MUST match the difference between startDate and endDate (±1 month tolerance)
+- If duration exceeds the realistic maximum for the crop, the response is INVALID
+- Do NOT extend a crop beyond its biological growth cycle to avoid gaps. Use cover crops or fallow periods instead.
+
+If a period longer than the crop duration is needed, insert a secondary crop or cover crop step instead of extending the main crop.
 - Return ONLY the JSON object, no other text`;
 
     try {
@@ -98,9 +111,7 @@ Rules:
       return JSON.parse(content);
     } catch (error) {
       if (error instanceof SyntaxError) {
-        throw new InternalServerErrorException(
-          "OpenAI returned invalid JSON",
-        );
+        throw new InternalServerErrorException("OpenAI returned invalid JSON");
       }
       throw error;
     }
