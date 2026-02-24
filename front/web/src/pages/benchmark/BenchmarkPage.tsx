@@ -37,7 +37,7 @@ export const BenchmarkPage: React.FC = () => {
   const medianKpis = useAtomValue(benchmarkMedianKpisAtom);
   const practiceProfile = useAtomValue(enrichedPracticeProfileAtom);
   const [appliedFilters, setAppliedFilters] = useAtom(benchmarkFiltersAtom);
-  const userIFT = useAtomValue(predictedIFTAtom);
+  const userIFT = useAtomValue(predictedIFTAtom) ?? 0;
   const loading = useAtomValue(benchmarkLoadingAtom);
 
   const setLoading = useSetAtom(benchmarkLoadingAtom);

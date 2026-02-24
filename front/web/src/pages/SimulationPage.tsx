@@ -15,7 +15,7 @@ import {
 import { LeversList, PageHeader, SummarySidebar } from './simulationComponents';
 
 export const SimulationPage: React.FC = () => {
-  const baseIFT = useAtomValue(predictedIFTAtom);
+  const baseIFT = useAtomValue(predictedIFTAtom) ?? 0;
   const levers = useAtomValue(leversAtom);
   const [overrides, setOverrides] = useAtom(leverOverridesAtom);
   const [simulatedIFT, setSimulatedIFT] = useAtom(simulatedIFTAtom);

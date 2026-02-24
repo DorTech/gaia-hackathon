@@ -101,8 +101,8 @@ export function mapDiagnosticVariablesToForm(
   return { partial, filledKeys };
 }
 
-/** Writable atom updated by API calls to /predict */
-export const predictedIFTAtom = atom<number>(2.5);
+/** Writable atom updated by API calls to /predict. null = no prediction yet. */
+export const predictedIFTAtom = atom<number | null>(null);
 
 /** Loading state for the prediction API */
 export const predictingAtom = atom<boolean>(false);

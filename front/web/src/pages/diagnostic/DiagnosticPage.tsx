@@ -31,6 +31,7 @@ export const DiagnosticPage: React.FC = () => {
   const [soilWorkTypes, setSoilWorkTypes] = useAtom(soilWorkTypesAtom);
   const prefilledKeys = useAtomValue(prefilledKeysAtom);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const userTouched = useRef(predictedIFT !== null);
 
   useEffect(() => {
     if (agricultureTypes.length === 0) {
@@ -45,7 +46,14 @@ export const DiagnosticPage: React.FC = () => {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Mark as touched when LLM prefills the form
   useEffect(() => {
+    if (prefilledKeys.size > 0) userTouched.current = true;
+  }, [prefilledKeys]);
+
+  useEffect(() => {
+    if (!userTouched.current) return;
+
     if (timerRef.current) clearTimeout(timerRef.current);
 
     timerRef.current = setTimeout(async () => {
@@ -66,6 +74,7 @@ export const DiagnosticPage: React.FC = () => {
   }, [agricultureTypes, soilWorkTypes, form, setPredictedIFT, setPredicting]);
 
   const handleFieldChange = <K extends keyof ITKFormState>(field: K, value: ITKFormState[K]) => {
+    userTouched.current = true;
     setForm((prev) => ({
       ...prev,
       [field]: value,
@@ -182,7 +191,7 @@ export const DiagnosticPage: React.FC = () => {
           </div>
         </SectionPanel>
 
-        <PredictionSidebar predictedIFT={predictedIFT} />
+        {predictedIFT !== null && <PredictionSidebar predictedIFT={predictedIFT} />}
       </div>
     </div>
   );
