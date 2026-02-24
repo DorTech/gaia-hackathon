@@ -83,7 +83,12 @@ export const leversAtom = atom<Lever[]>((get) => {
       name: 'Recours aux macro-organismes',
       type: 'Qualitatif',
       current: `${CHIP_OPTIONS.yesNo[form.recoursMacroorganismes]} · actuel`,
-      options: [{ label: 'Oui', formOverrides: { recoursMacroorganismes: 1 }, isReference: true }],
+      options: (profile.find(p => p.id === 'macroorganisms')?.frequencies ?? [])
+        .filter(f => f.label !== CHIP_OPTIONS.yesNo[form.recoursMacroorganismes])
+        .map(f => ({
+          label: f.label,
+          formOverrides: { recoursMacroorganismes: (CHIP_OPTIONS.yesNo as readonly string[]).indexOf(f.label) },
+        })),
     },
     {
       id: 'ferti',
