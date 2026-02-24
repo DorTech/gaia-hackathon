@@ -12,6 +12,7 @@ import {
   IQueryResponse,
   IMedianResponse,
   IFrequencyResponse,
+  INewFrequencyResponse,
 } from "@gaia/shared-type";
 
 @ApiTags("query")
@@ -50,25 +51,27 @@ export class QueryController {
     return this.queryService.getFrequency(body);
   }
 
-  @Post("median_nb_rotation")
-  @ApiOperation({
-    summary:
-      "Get the median number of rotations for a culture, department and type of agriculture",
-  })
-  async getNbRotation(
+  @Post("median_var")
+  async getMedianVar(
     @Body() body: NewFilterDto,
-  ): Promise<{ medianNbRotation: number | null }> {
-    return this.queryService.getMedianNbRotation(body);
+  ): Promise<{ median: number | null }> {
+    return this.queryService.getMedianVar(body);
   }
 
-  @Post("median_nb_weeding_passes")
+  @Post("frequency_var")
   @ApiOperation({
-    summary:
-      "Get the median number of mechanical weeding passes for a culture, department and type of agriculture",
+    summary: "Get value frequency distribution for a qualitative column",
   })
-  async getNbWeedingPasses(
+  async getFrequencyVar(
     @Body() body: NewFilterDto,
-  ): Promise<{ medianNbWeedingPasses: number | null }> {
-    return this.queryService.getMedianNbWeedingPasses(body);
+  ): Promise<INewFrequencyResponse> {
+    return this.queryService.getFrequencyVar(body);
+  }
+
+  @Post("median_ift")
+  async getMedianIft(
+    @Body() body: NewFilterDto,
+  ): Promise<{ median: number | null; count: number }> {
+    return this.queryService.getMedianIft(body);
   }
 }

@@ -12,6 +12,7 @@ import {
   IQueryResponse,
   IMedianResponse,
   IFrequencyResponse,
+  INewFrequencyResponse,
 } from "@gaia/shared-type";
 
 @Injectable()
@@ -148,19 +149,32 @@ export class QueryService {
     return { table: dto.table, field: dto.field, total, data };
   }
 
-  async getMedianNbRotation(
-    dto: NewFilterDto,
-  ): Promise<{ medianNbRotation: number | null }> {
-    const nbRotation = await this.queryRepository.medianNbRotation(dto);
-    return { medianNbRotation: nbRotation.median };
+  async getMedianVar(dto: NewFilterDto): Promise<{ median: number | null }> {
+    if (dto.field === "nbRotation") {
+      const nbRotation = await this.queryRepository.medianNbRotation(dto);
+      return { median: nbRotation.median };
+    }
+    if (dto.field === "nbWeedingPasses") {
+      const nbWeedingPasses =
+        await this.queryRepository.medianNbWeedingPasses(dto);
+      return { median: nbWeedingPasses.median };
+    }
+    // TODO ADD FERTI
+
+    return { median: null };
   }
 
-  async getMedianNbWeedingPasses(
+  async getFrequencyVar(dto: NewFilterDto): Promise<INewFrequencyResponse> {
+    // TODO ADD ALL FREQUENCY VARS
+    return { total: 0, data: [] };
+  }
+
+  async getMedianIft(
     dto: NewFilterDto,
-  ): Promise<{ medianNbWeedingPasses: number | null }> {
-    const nbWeedingPasses =
-      await this.queryRepository.medianNbWeedingPasses(dto);
-    return { medianNbWeedingPasses: nbWeedingPasses.median };
+  ): Promise<{ median: number | null; count: number }> {
+    // TODO add median for IFT
+    // COUNT IS NB OF FARM IN THE MEDIAN
+    return { median: null, count: 0 };
   }
 
   // Provides a mapping of culture names to their known aliases in the dataset, to help standardize user input and improve matching with database entries - hackathon workaround

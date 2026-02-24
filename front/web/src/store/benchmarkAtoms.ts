@@ -7,7 +7,7 @@ import type {
   BenchmarkFiltersState,
 } from '../types/benchmark';
 import { buildPracticeProfileTemplate } from '../config/variables';
-import { itkFormAtom, CHIP_OPTIONS } from './diagnosticAtoms';
+import { agricultureTypesAtom, itkFormAtom, CHIP_OPTIONS } from './diagnosticAtoms';
 
 export const benchmarkLoadingAtom = atom<boolean>(false);
 
@@ -64,6 +64,7 @@ export const benchmarkFiltersAtom = atom<BenchmarkFiltersState>({
 export const enrichedPracticeProfileAtom = atom<PracticeProfileItem[]>((get) => {
   const profile = get(benchmarkPracticeProfileAtom);
   const form = get(itkFormAtom);
+  const agriTypes = get(agricultureTypesAtom);
 
   return profile.map((item) => {
     switch (item.id) {
@@ -104,7 +105,7 @@ export const enrichedPracticeProfileAtom = atom<PracticeProfileItem[]>((get) => 
       case 'agriculture-type':
         return {
           ...item,
-          note: { value: CHIP_OPTIONS.agricultureType[form.sdcTypeAgriculture] },
+          note: { value: agriTypes[form.sdcTypeAgriculture] ?? '—' },
         };
       case 'sequence-cultures':
         return {

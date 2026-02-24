@@ -1,6 +1,8 @@
 import { atom } from 'jotai';
-import type { Lever, LeverDeltas } from '../pages/simulationComponents/types';
-import { itkFormAtom, predictedIFTAtom, CHIP_OPTIONS } from './diagnosticAtoms';
+import type { Lever, LeverOverrides } from '../pages/simulationComponents/types';
+import { agricultureTypesAtom, itkFormAtom, CHIP_OPTIONS } from './diagnosticAtoms';
+import type { ITKFormState } from './diagnosticAtoms';
+
 
 /**
  * Derived atom: builds lever definitions from the current ITK form state.
@@ -8,6 +10,9 @@ import { itkFormAtom, predictedIFTAtom, CHIP_OPTIONS } from './diagnosticAtoms';
  */
 export const leversAtom = atom<Lever[]>((get) => {
   const form = get(itkFormAtom);
+  const agriTypes = get(agricultureTypesAtom);
+
+  const bioIndex = agriTypes.indexOf('Agriculture biologique');
 
   return [
     {
@@ -15,9 +20,25 @@ export const leversAtom = atom<Lever[]>((get) => {
       name: '🌾 NB Rotation',
       type: 'Quantitatif',
       current: `${form.nbCulturesRotation} cultures · actuel`,
+      options: [],
+      slider: {
+        min: 1,
+        max: 8,
+        currentValue: form.nbCulturesRotation,
+        unit: 'cultures',
+        referenceValue: 5,
+        referenceLabel: '5+ cultures ★',
+        formKey: 'nbCulturesRotation',
+      },
+    },
+    {
+      id: 'seq',
+      name: '🔄 Séquence cultures',
+      type: 'Qualitatif',
+      current: `${form.sequenceCultures} · actuel`,
       options: [
-        { label: '4 cultures', delta: -0.22 },
-        { label: '5+ cultures', delta: -0.38, isReference: true },
+        { label: 'Rotation diversifiée (4+ familles)', formOverrides: { sequenceCultures: 'Rotation diversifiée (4+ familles)' } },
+        { label: 'Rotation longue avec légumineuses', formOverrides: { sequenceCultures: 'Rotation longue avec légumineuses' }, isReference: true },
       ],
     },
     {
@@ -26,8 +47,8 @@ export const leversAtom = atom<Lever[]>((get) => {
       type: 'Qualitatif',
       current: `${CHIP_OPTIONS.soilWork[form.typeTravailDuSol]} · actuel`,
       options: [
-        { label: 'TCS', delta: -0.28 },
-        { label: 'Semis direct', delta: -0.45, isReference: true },
+        { label: 'TCS', formOverrides: { typeTravailDuSol: 1 } },
+        { label: 'Semis direct', formOverrides: { typeTravailDuSol: 2 }, isReference: true },
       ],
     },
     {
@@ -36,8 +57,8 @@ export const leversAtom = atom<Lever[]>((get) => {
       type: 'Qualitatif',
       current: `${form.nbrePassagesDesherbageMeca} passages · actuel`,
       options: [
-        { label: 'Oui — partiel (2 pass.)', delta: -0.3 },
-        { label: 'Oui — complet', delta: -0.52, isReference: true },
+        { label: 'Oui — partiel (2 pass.)', formOverrides: { nbrePassagesDesherbageMeca: 2 } },
+        { label: 'Oui — complet (6 pass.)', formOverrides: { nbrePassagesDesherbageMeca: 6 }, isReference: true },
       ],
     },
     {
@@ -46,29 +67,61 @@ export const leversAtom = atom<Lever[]>((get) => {
       type: 'Qualitatif',
       current: `${CHIP_OPTIONS.yesNo[form.recoursMacroorganismes]} · actuel`,
       options: [
-        { label: 'Oui', delta: -0.15, isReference: true },
+        { label: 'Oui', formOverrides: { recoursMacroorganismes: 1 }, isReference: true },
       ],
+    },
+    {
+      id: 'ferti',
+      name: '🧪 Fertilisation N totale',
+      type: 'Quantitatif',
+      current: `${form.fertiNTot} kg N/ha · actuel`,
+      options: [],
+      slider: {
+        min: 0,
+        max: 300,
+        currentValue: form.fertiNTot,
+        unit: 'kg N/ha',
+        referenceValue: 50,
+        referenceLabel: '≤ 50 kg N/ha ★',
+        formKey: 'fertiNTot',
+      },
     },
     {
       id: 'agri',
       name: '🌱 Type d\'agriculture',
       type: 'Qualitatif',
-      current: `${CHIP_OPTIONS.agricultureType[form.sdcTypeAgriculture]} · actuel`,
+      current: `${agriTypes[form.sdcTypeAgriculture] ?? '—'} · actuel`,
       options: [
-        { label: 'Agriculture biologique', delta: -0.35, isReference: true },
+        {
+          label: 'Agriculture biologique',
+          formOverrides: { sdcTypeAgriculture: bioIndex >= 0 ? bioIndex : 0 },
+          isReference: true,
+        },
       ],
     },
   ];
 });
 
-export const leverDeltasAtom = atom<LeverDeltas>({});
+export const leverOverridesAtom = atom<LeverOverrides>({});
 
 /**
- * Derived atom: simulated IFT = predicted IFT + sum of selected deltas.
+ * Derived atom: merges the diagnostic form with all lever overrides
+ * to produce the simulated form that gets sent to /ml/predict.
  */
-export const simulatedIFTAtom = atom<number>((get) => {
-  const base = get(predictedIFTAtom);
-  const deltas = get(leverDeltasAtom);
-  const total = Object.values(deltas).reduce((sum: number, d: number) => sum + d, 0);
-  return Math.max(0.05, Math.round((base + total) * 100) / 100);
+export const simulatedFormAtom = atom<ITKFormState>((get) => {
+  const baseForm = get(itkFormAtom);
+  const overrides = get(leverOverridesAtom);
+  const merged = { ...baseForm };
+  for (const override of Object.values(overrides)) {
+    Object.assign(merged, override);
+  }
+  return merged;
 });
+
+/**
+ * Writable atom: simulated IFT updated by API response.
+ */
+export const simulatedIFTAtom = atom<number>(0);
+
+/** Loading state for the simulation prediction */
+export const simulatingAtom = atom<boolean>(false);

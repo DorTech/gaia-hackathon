@@ -7,6 +7,8 @@ interface SliderControlProps {
   value: number;
   min: number;
   max: number;
+  unit?: string;
+  disabled?: boolean;
   onChange: (value: number) => void;
 }
 
@@ -16,35 +18,47 @@ export const SliderControl: React.FC<SliderControlProps> = ({
   value,
   min,
   max,
+  unit,
+  disabled = false,
   onChange,
 }) => {
   return (
     <Box className="slider-w">
-      <Box className="slider-top" sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography component="span" className="cap" sx={{ fontSize: '.67rem', color: 'var(--muted)' }}>
+      <Box className="" sx={{ display: 'flex', justifyContent: 'space-between',  }}>
+        <Typography sx={{ fontSize: '0.67rem', color: 'var(--text3)' }}>
           {minLabel}
         </Typography>
-        <Typography component="span" className="slider-val" sx={{ fontSize: '.78rem', fontWeight: 800, color: 'var(--green-d)' }}>
-          {value}
+        <Typography   sx={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--green-d)' }}>
+          {value}{unit ? ` ${unit}` : ''}
         </Typography>
-        <Typography component="span" className="cap" sx={{ fontSize: '.67rem', color: 'var(--muted)' }}>
+        <Typography  sx={{ fontSize: '0.67rem', color: 'var(--text3)' }}>
           {maxLabel}
         </Typography>
       </Box>
       <Slider
-        className="fslider"
         min={min}
         max={max}
         value={value}
+        disabled={disabled}
         valueLabelDisplay="auto"
         size="small"
         onChange={(_, nextValue) => onChange(Array.isArray(nextValue) ? nextValue[0] : nextValue)}
         sx={{
           mt: 0.5,
-          color: 'var(--green)',
+          color: disabled ? 'var(--text3)' : 'var(--green)',
+          '& .MuiSlider-rail': {
+            opacity: 1,
+            backgroundColor: 'var(--border2)',
+          },
+          '& .MuiSlider-track': {
+            border: 'none',
+            backgroundColor: disabled ? 'var(--text3)' : 'var(--green)',
+          },
           '& .MuiSlider-thumb': {
             width: 14,
             height: 14,
+            backgroundColor: 'var(--white)',
+            border: `1px solid ${disabled ? 'var(--text3)' : 'var(--green)'}`,
           },
         }}
       />

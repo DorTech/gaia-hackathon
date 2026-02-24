@@ -11,6 +11,7 @@ export const SummaryBar: React.FC<SummaryBarProps> = ({
   gained,
   gainPct,
   activeLeverCount,
+  simulating,
 }) => {
   const iftMedian = useAtomValue(iftMedianValueAtom);
 
@@ -50,12 +51,12 @@ export const SummaryBar: React.FC<SummaryBarProps> = ({
             color: 'var(--orange)',
           }}
         >
-          {baseIFT}
+          {baseIFT.toFixed(2)}
         </Typography>
       </Box>
       <Typography sx={{ fontSize: '1.2rem', color: 'var(--text3)' }}>→</Typography>
 
-      <Box sx={{ textAlign: 'center' }}>
+      <Box sx={{ textAlign: 'center', opacity: simulating ? 0.5 : 1, transition: 'opacity 0.2s' }}>
         <Typography
           sx={{
             fontSize: '0.62rem',

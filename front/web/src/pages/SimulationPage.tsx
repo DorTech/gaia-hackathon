@@ -1,29 +1,70 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Box, Grid } from "@mui/material";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   PageHeader,
   SummaryBar,
   LeversList,
 } from "./simulationComponents";
-import { predictedIFTAtom } from "../store/diagnosticAtoms";
-import { leversAtom, leverDeltasAtom, simulatedIFTAtom } from "../store/simulationAtoms";
+import { predictedIFTAtom, agricultureTypesAtom } from "../store/diagnosticAtoms";
+import type { ITKFormState } from "../store/diagnosticAtoms";
+import {
+  leversAtom,
+  leverOverridesAtom,
+  simulatedFormAtom,
+  simulatedIFTAtom,
+  simulatingAtom,
+} from "../store/simulationAtoms";
+import { predictIFT } from "../api/predict";
 
 export const SimulationPage: React.FC = () => {
   const baseIFT = useAtomValue(predictedIFTAtom);
   const levers = useAtomValue(leversAtom);
-  const [deltas, setDeltas] = useAtom(leverDeltasAtom);
-  const simulatedIFT = useAtomValue(simulatedIFTAtom);
+  const [overrides, setOverrides] = useAtom(leverOverridesAtom);
+  const [simulatedIFT, setSimulatedIFT] = useAtom(simulatedIFTAtom);
+  const setSimulating = useSetAtom(simulatingAtom);
+  const simulating = useAtomValue(simulatingAtom);
+  const simulatedForm = useAtomValue(simulatedFormAtom);
+  const agricultureTypes = useAtomValue(agricultureTypesAtom);
 
-  const handlePickOption = (leverId: string, delta: number) => {
-    setDeltas((prev) => ({
-      ...prev,
-      [leverId]: delta,
-    }));
+  // Initialize simulatedIFT with baseIFT on first render
+  const initialized = useRef(false);
+  useEffect(() => {
+    if (!initialized.current) {
+      setSimulatedIFT(baseIFT);
+      initialized.current = true;
+    }
+  }, [baseIFT, setSimulatedIFT]);
+
+  // Debounced API call when simulated form changes
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      setSimulating(true);
+      try {
+        const result = await predictIFT(simulatedForm, agricultureTypes);
+        setSimulatedIFT(Math.round(result * 100) / 100);
+      } catch (err) {
+        console.error('Simulation predict failed:', err);
+      } finally {
+        setSimulating(false);
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [simulatedForm, agricultureTypes, setSimulatedIFT, setSimulating]);
+
+  const handlePickOption = (leverId: string, formOverrides: Partial<ITKFormState> | null) => {
+    setOverrides((prev) => {
+      if (!formOverrides) {
+        const { [leverId]: _, ...rest } = prev;
+        return rest;
+      }
+      return { ...prev, [leverId]: formOverrides };
+    });
   };
 
-  const activeLeverCount = Object.values(deltas).filter((d) => d !== 0).length;
-  const gained = baseIFT - simulatedIFT;
+  const activeLeverCount = Object.keys(overrides).length;
+  const displayIFT = simulatedIFT || baseIFT;
+  const gained = baseIFT - displayIFT;
   const gainPct = gained > 0 ? ((gained / baseIFT) * 100).toFixed(1) : "0";
 
   return (
@@ -41,10 +82,11 @@ export const SimulationPage: React.FC = () => {
 
       <SummaryBar
         baseIFT={baseIFT}
-        simulatedIFT={simulatedIFT}
+        simulatedIFT={displayIFT}
         gained={gained}
         gainPct={gainPct}
         activeLeverCount={activeLeverCount}
+        simulating={simulating}
       />
 
       <Grid
@@ -59,7 +101,7 @@ export const SimulationPage: React.FC = () => {
         <Grid item xs={12}>
           <LeversList
             levers={levers}
-            deltas={deltas}
+            overrides={overrides}
             onPickOption={handlePickOption}
           />
         </Grid>

@@ -1,4 +1,3 @@
-import AgricultureIcon from '@mui/icons-material/Agriculture';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';

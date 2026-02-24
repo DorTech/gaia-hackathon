@@ -74,6 +74,11 @@ export interface IFrequencyResponse {
   data: IFrequencyItem[];
 }
 
+export interface INewFrequencyResponse {
+  total: number;
+  data: IFrequencyItem[];
+}
+
 export interface ITableInfo {
   name: string;
   columns: string[];

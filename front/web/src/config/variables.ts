@@ -1,5 +1,6 @@
 import type { ITKFormState } from '../store/diagnosticAtoms';
 import type { PracticeProfileItem } from '../types/benchmark';
+import { DEPT_NAMES } from './departments';
 
 /**
  * Single source of truth for diagnostic / benchmark variables.
@@ -24,6 +25,11 @@ export interface InputConfig {
   max?: number;
 }
 
+export interface SelectConfig {
+  options: Record<string, string>;
+  placeholder?: string;
+}
+
 export interface VariableConfig {
   id: string;
   formKey: keyof ITKFormState;
@@ -33,7 +39,10 @@ export interface VariableConfig {
   unit?: string;
   slider?: SliderConfig;
   chips?: ChipConfig;
+  /** When true, chip options come from agricultureTypesAtom instead of static config */
+  dynamicChips?: boolean;
   input?: InputConfig;
+  select?: SelectConfig;
   benchmarkApi?: {
     type: 'frequency' | 'median';
     field: string;
@@ -50,7 +59,7 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     type: 'Quantitatif',
     unit: 'cultures',
     slider: { min: 1, max: 8, minLabel: '1 culture', maxLabel: '8+' },
-    benchmarkApi: { type: 'median', field: 'nbCulturesRotation' },
+    benchmarkApi: { type: 'median', field: 'nbRotation' },
   },
   {
     id: 'sequence-cultures',
@@ -59,6 +68,7 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     dbVariable: 'sequence_cultures',
     type: 'Qualitatif',
     input: { type: 'text', placeholder: 'Blé tendre > Maïs > Colza' },
+    benchmarkApi: { type: 'frequency', field: 'sequenceCultures' },
   },
   {
     id: 'macroorganisms',
@@ -67,6 +77,7 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     dbVariable: 'recours_macroorganismes',
     type: 'Qualitatif',
     chips: { options: ['Non', 'Oui'] },
+    benchmarkApi: { type: 'frequency', field: 'macroorganismes', asBoolean: true },
   },
   {
     id: 'weeding-passages',
@@ -85,7 +96,7 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     dbVariable: 'type_de_travail_du_sol',
     type: 'Qualitatif',
     chips: { options: ['Labour', 'TCS', 'Semis direct'] },
-    benchmarkApi: { type: 'frequency', field: 'typeDeTravailDuSol' },
+    benchmarkApi: { type: 'frequency', field: 'soilWork' },
   },
   {
     id: 'departement',
@@ -93,7 +104,17 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     label: 'Département',
     dbVariable: 'departement',
     type: 'Quantitatif',
-    input: { type: 'number', placeholder: '31', min: 1, max: 976 },
+    select: { options: DEPT_NAMES, placeholder: 'Choisir un département' },
+  },
+  {
+    id: 'fertilization',
+    formKey: 'fertiNTot',
+    label: 'Fertilisation N totale',
+    dbVariable: 'ferti_n_tot',
+    type: 'Quantitatif',
+    unit: 'kg N/ha',
+    slider: { min: 0, max: 300, minLabel: '0', maxLabel: '300' },
+    benchmarkApi: { type: 'median', field: 'fertilisation' },
   },
   {
     id: 'agriculture-type',
@@ -101,7 +122,8 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     label: "Type d'agriculture",
     dbVariable: 'sdc_type_agriculture',
     type: 'Qualitatif',
-    chips: { options: ['Conventionnelle', 'Biologique', 'Conversion bio'] },
+    benchmarkApi: { type: 'frequency', field: 'agricultureType' },
+    dynamicChips: true,
   },
 ];
 

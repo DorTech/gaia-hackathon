@@ -22,7 +22,8 @@ import {
   rawSpeciesListAtom,
   PRACTICE_PROFILE_TEMPLATE,
 } from '../../store/benchmarkAtoms';
-import { predictedIFTAtom } from '../../store/diagnosticAtoms';
+import { agricultureTypesAtom, itkFormAtom, predictedIFTAtom } from '../../store/diagnosticAtoms';
+import { DEPT_NAMES } from '../../config/departments';
 import { iftMedianValueAtom } from '../../store/referenceAtoms';
 import type { BenchmarkFiltersState, PracticeProfileItem } from '../../types/benchmark';
 import { BenchmarkFilters } from './BenchmarkFilters';
@@ -45,6 +46,8 @@ export const BenchmarkPage: React.FC = () => {
   const setReferenceFarms = useSetAtom(benchmarkReferenceFarmsAtom);
   const setMedianIft = useSetAtom(iftMedianValueAtom);
   const setRawSpecies = useSetAtom(rawSpeciesListAtom);
+  const diagnosticForm = useAtomValue(itkFormAtom);
+  const agricultureTypes = useAtomValue(agricultureTypesAtom);
 
   const loadBenchmarkData = useCallback(
     async (filters: BenchmarkFiltersState) => {
@@ -122,7 +125,7 @@ export const BenchmarkPage: React.FC = () => {
 
             try {
               if (apiConfig.type === 'frequency') {
-                const res = await fetchFrequency(apiConfig.field, filters, apiConfig.asBoolean);
+                const res = await fetchFrequency(apiConfig.field, filters);
                 const total = res.data.reduce((sum, r) => sum + r.count, 0);
                 if (total === 0) return profile;
 
@@ -179,27 +182,39 @@ export const BenchmarkPage: React.FC = () => {
           fetchDistinctAgricultureTypes(),
         ]);
 
-        // Store raw species for flattening
         setRawSpecies(species);
 
         setFilterOptions((prev) => ({
           ...prev,
-          species, // Keep raw for now, we'll use flattened in the combobox
+          species,
           department: departments,
           agricultureType: agricultureTypes,
         }));
 
-        // Update default filters if current values aren't in the fetched lists
+        // Prefill from diagnostic form values, or keep existing if already set
+        const deptCode = String(diagnosticForm.departement);
+        const deptName = DEPT_NAMES[deptCode];
+        const deptFormatted = deptName ? `${deptCode} — ${deptName}` : deptCode;
+        const matchedDept = departments.find((d) => d === deptFormatted) ?? '';
+
+        const diagAgriType =
+          ['Conventionnelle', 'Biologique', 'Conversion bio'][diagnosticForm.sdcTypeAgriculture] ??
+          '';
+        const matchedAgriType =
+          agricultureTypes.find((t) => t.toLowerCase().includes(diagAgriType.toLowerCase())) ?? '';
+
         setAppliedFilters(
           (prev: { species: string; department: string; agricultureType: string }) => ({
             ...prev,
             species: prev.species && species.includes(prev.species) ? prev.species : '',
             department:
-              prev.department && departments.includes(prev.department) ? prev.department : '',
+              prev.department && departments.includes(prev.department)
+                ? prev.department
+                : matchedDept,
             agricultureType:
               prev.agricultureType && agricultureTypes.includes(prev.agricultureType)
                 ? prev.agricultureType
-                : '',
+                : matchedAgriType,
           }),
         );
       } catch (err) {
@@ -209,10 +224,38 @@ export const BenchmarkPage: React.FC = () => {
     loadFilterOptions();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Fetch on mount and when filters change
+  // One-way sync: diagnostic form → benchmark filters for department & agriculture type
   useEffect(() => {
-    loadBenchmarkData(appliedFilters);
-  }, [appliedFilters]); // eslint-disable-line react-hooks/exhaustive-deps
+    const deptCode = String(diagnosticForm.departement);
+    const deptName = DEPT_NAMES[deptCode];
+    const deptFormatted = deptName ? `${deptCode} — ${deptName}` : deptCode;
+    const matchedDept = filterOptions.department.find((d) => d === deptFormatted) ?? deptFormatted;
+
+    const diagAgriType = agricultureTypes[diagnosticForm.sdcTypeAgriculture] ?? '';
+    const matchedAgriType =
+      filterOptions.agricultureType.find((t) =>
+        t.toLowerCase().includes(diagAgriType.toLowerCase()),
+      ) ?? '';
+
+    setAppliedFilters((prev) => ({
+      ...prev,
+      department: matchedDept,
+      agricultureType: matchedAgriType,
+    }));
+  }, [
+    diagnosticForm.departement,
+    diagnosticForm.sdcTypeAgriculture,
+    agricultureTypes,
+    filterOptions,
+  ]);
+
+  const handleApplyFilters = useCallback(
+    (filters: BenchmarkFiltersState) => {
+      setAppliedFilters(filters);
+      loadBenchmarkData(filters);
+    },
+    [setAppliedFilters, loadBenchmarkData],
+  );
 
   const departmentCode = appliedFilters.department.split(' ')[0];
   const hasAllFilters =
@@ -224,7 +267,7 @@ export const BenchmarkPage: React.FC = () => {
       {/* FILTRES */}
       <BenchmarkFilters
         initialValues={appliedFilters}
-        onApply={setAppliedFilters}
+        onApply={handleApplyFilters}
         options={{
           ...filterOptions,
           species: flattenedSpecies,

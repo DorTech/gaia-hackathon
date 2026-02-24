@@ -8,6 +8,7 @@ export interface ITKFormState {
   typeTravailDuSol: number;
   departement: number;
   sdcTypeAgriculture: number;
+  fertiNTot: number;
 }
 
 export const ITK_FORM_DEFAULTS: ITKFormState = {
@@ -18,6 +19,7 @@ export const ITK_FORM_DEFAULTS: ITKFormState = {
   typeTravailDuSol: 1,
   departement: 31,
   sdcTypeAgriculture: 0,
+  fertiNTot: 150,
 };
 
 export const itkFormAtom = atom<ITKFormState>(ITK_FORM_DEFAULTS);
@@ -31,16 +33,13 @@ export const predictingAtom = atom<boolean>(false);
 export const CHIP_OPTIONS = {
   soilWork: ['Labour', 'TCS', 'Semis direct'] as const,
   yesNo: ['Non', 'Oui'] as const,
-  agricultureType: ['Conventionnelle', 'Biologique', 'Conversion bio'] as const,
 } as const;
 
 /** API string values for chip indices */
 export const CHIP_API_VALUES = {
   typeTravailDuSol: ['Labour', 'TCS', 'Semis direct'] as const,
   recoursMacroorganismes: ['Non', 'Oui'] as const,
-  sdcTypeAgriculture: [
-    'Agriculture conventionnelle',
-    'Agriculture biologique',
-    "En conversion vers l'agriculture biologique",
-  ] as const,
 } as const;
+
+/** Agriculture types fetched from backend — writable atom populated on app load */
+export const agricultureTypesAtom = atom<string[]>([]);
