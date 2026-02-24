@@ -370,8 +370,25 @@ export class QueryService {
   }
 
   async getFrequencyVar(dto: NewFilterDto): Promise<INewFrequencyResponse> {
-    // TODO ADD ALL FREQUENCY VARS
-    return { total: 0, data: [] };
+    let rows: { value: string | boolean | null; count: number }[] = [];
+
+    if (dto.field === "sequenceCultures") {
+      rows = await this.queryRepository.frequencySequenceCultures(dto);
+    } else if (dto.field === "macroorganismes") {
+      rows = await this.queryRepository.frequencyMacroorganismes(dto);
+    } else if (dto.field === "soilWork") {
+      rows = await this.queryRepository.frequencySoilWork(dto);
+    } else if (dto.field === "agricultureType") {
+      rows = await this.queryRepository.frequencyAgricultureType(dto);
+    }
+
+    const total = rows.reduce((sum, r) => sum + r.count, 0);
+    const data = rows.map((r) => ({
+      ...r,
+      percentage: total > 0 ? Math.round((r.count / total) * 10000) / 100 : 0,
+    }));
+
+    return { total, data };
   }
 
   async getMedianIft(

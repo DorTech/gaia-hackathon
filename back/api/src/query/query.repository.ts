@@ -260,6 +260,112 @@ WHERE unaccent(sac.culture_nom) ILIKE unaccent('%' || ${query.culture} || '%')
     }));
   }
 
+  async frequencySequenceCultures(
+    query: NewFilterDto,
+  ): Promise<{ value: string | boolean | null; count: number }[]> {
+    const result = await this.dephyService.db.execute(sql`
+WITH filtered_sdc AS (
+    SELECT DISTINCT sdc.id
+    FROM sdc
+    JOIN dispositif ON dispositif.id = sdc.dispositif_id
+    JOIN domain ON domain.id = dispositif.domaine_id
+    JOIN succession_assolee_synthetise_magasin_can sac ON sac.sdc_id = sdc.id
+    WHERE sac.culture_nom ILIKE '%' || ${query.culture} || '%'
+      AND domain.departement LIKE ${query.department}
+      AND sdc.type_agriculture LIKE ${query.agricultureType}
+),
+sequence_cte AS (
+    SELECT
+        sac.sdc_id,
+        STRING_AGG(DISTINCT sac.culture_nom, ' > ') AS sequence_cultures
+    FROM succession_assolee_synthetise_magasin_can sac
+    WHERE sac.sdc_id IN (SELECT id FROM filtered_sdc)
+    GROUP BY sac.sdc_id
+)
+SELECT
+    sequence_cultures AS value,
+    COUNT(*)::int AS count
+FROM sequence_cte
+GROUP BY sequence_cultures
+ORDER BY count DESC;
+    `);
+    return result.rows.map((r: any) => ({
+      value: r.value ?? null,
+      count: Number(r.count),
+    }));
+  }
+
+  async frequencyMacroorganismes(
+    query: NewFilterDto,
+  ): Promise<{ value: string | boolean | null; count: number }[]> {
+    const result = await this.dephyService.db.execute(sql`
+SELECT
+    CASE WHEN spmc.recours_macroorganismes > 0 THEN true ELSE false END AS value,
+    COUNT(*)::int AS count
+FROM synthetise_perf_magasin_can spmc
+JOIN sdc ON sdc.id = spmc.sdc_id
+JOIN dispositif ON dispositif.id = sdc.dispositif_id
+JOIN domain ON domain.id = dispositif.domaine_id
+JOIN succession_assolee_synthetise_magasin_can sac ON sac.sdc_id = sdc.id
+WHERE sac.culture_nom ILIKE '%' || ${query.culture} || '%'
+  AND domain.departement LIKE ${query.department}
+  AND sdc.type_agriculture LIKE ${query.agricultureType}
+GROUP BY (CASE WHEN spmc.recours_macroorganismes > 0 THEN true ELSE false END)
+ORDER BY count DESC;
+    `);
+    return result.rows.map((r: any) => ({
+      value: r.value ?? null,
+      count: Number(r.count),
+    }));
+  }
+
+  async frequencySoilWork(
+    query: NewFilterDto,
+  ): Promise<{ value: string | boolean | null; count: number }[]> {
+    const result = await this.dephyService.db.execute(sql`
+SELECT
+    spmc.type_de_travail_du_sol AS value,
+    COUNT(*)::int AS count
+FROM synthetise_perf_magasin_can spmc
+JOIN sdc ON sdc.id = spmc.sdc_id
+JOIN dispositif ON dispositif.id = sdc.dispositif_id
+JOIN domain ON domain.id = dispositif.domaine_id
+JOIN succession_assolee_synthetise_magasin_can sac ON sac.sdc_id = sdc.id
+WHERE sac.culture_nom ILIKE '%' || ${query.culture} || '%'
+  AND domain.departement LIKE ${query.department}
+  AND sdc.type_agriculture LIKE ${query.agricultureType}
+GROUP BY spmc.type_de_travail_du_sol
+ORDER BY count DESC;
+    `);
+    return result.rows.map((r: any) => ({
+      value: r.value ?? null,
+      count: Number(r.count),
+    }));
+  }
+
+  async frequencyAgricultureType(
+    query: NewFilterDto,
+  ): Promise<{ value: string | boolean | null; count: number }[]> {
+    const result = await this.dephyService.db.execute(sql`
+SELECT
+    sdc.type_agriculture AS value,
+    COUNT(*)::int AS count
+FROM sdc
+JOIN dispositif ON dispositif.id = sdc.dispositif_id
+JOIN domain ON domain.id = dispositif.domaine_id
+JOIN succession_assolee_synthetise_magasin_can sac ON sac.sdc_id = sdc.id
+WHERE sac.culture_nom ILIKE '%' || ${query.culture} || '%'
+  AND domain.departement LIKE ${query.department}
+  AND sdc.type_agriculture LIKE ${query.agricultureType}
+GROUP BY sdc.type_agriculture
+ORDER BY count DESC;
+    `);
+    return result.rows.map((r: any) => ({
+      value: r.value ?? null,
+      count: Number(r.count),
+    }));
+  }
+
   buildWhere(
     filters: FilterDto[],
     columns: Record<string, any>,
