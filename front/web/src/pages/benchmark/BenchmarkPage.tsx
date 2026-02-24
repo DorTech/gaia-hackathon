@@ -302,7 +302,7 @@ export const BenchmarkPage: React.FC = () => {
           {/* PROFIL PRATIQUES */}
           <PracticeProfileCard
             title={"Liste des pratiques les plus performantes sur l'IFT"}
-            items={practiceProfile.filter((item) => item.id !== 'agriculture-type')}
+            items={practiceProfile.filter((item) => item.id !== 'agriculture-type' && item.id !== 'departement')}
           />
         </>
       )}
