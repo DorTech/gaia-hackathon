@@ -186,6 +186,7 @@ export const LeverOptions: React.FC<LeverOptionsProps> = ({
 
       {lever.options.map((opt, idx) => {
         const isSelected = isOptionSelected(opt.formOverrides);
+        const isRef = !!opt.isReference;
         return (
           <Button
             key={idx}
@@ -199,8 +200,12 @@ export const LeverOptions: React.FC<LeverOptionsProps> = ({
               textTransform: 'none',
               lineHeight: '1.3',
               transition: 'all 0.2s ease',
-              borderColor: isSelected ? 'var(--green)' : 'var(--border2)',
-              color: isSelected ? 'white' : 'var(--text2)',
+              borderColor: isSelected
+                ? 'var(--green)'
+                : isRef
+                  ? 'var(--green)'
+                  : 'var(--border2)',
+              color: isSelected ? 'white' : isRef ? 'var(--green-d)' : 'var(--text2)',
               backgroundColor: isSelected ? 'var(--green)' : 'white',
               boxShadow: isSelected ? '0 0 8px rgba(122, 229, 140, 0.3)' : 'none',
               display: 'flex',
@@ -213,21 +218,7 @@ export const LeverOptions: React.FC<LeverOptionsProps> = ({
               },
             }}
           >
-            {opt.label}
-            {opt.isReference && (
-              <Box
-                sx={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '0.7rem',
-                  fontWeight: 800,
-                  color: 'inherit',
-                }}
-              >
-                ★
-              </Box>
-            )}
+            {isRef && '* '}{opt.label}
           </Button>
         );
       })}
