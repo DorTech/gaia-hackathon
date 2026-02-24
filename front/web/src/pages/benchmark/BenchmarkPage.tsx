@@ -132,7 +132,7 @@ export const BenchmarkPage: React.FC = () => {
                 const frequencies = res.data
                   .filter((r) => r.value !== null)
                   .map((r, idx) => ({
-                    label: String(r.value),
+                    label: typeof r.value === 'boolean' ? (r.value ? 'Oui' : 'Non') : String(r.value),
                     pct: Math.round((r.count / total) * 100),
                     top: idx === 0,
                   }));
@@ -302,7 +302,9 @@ export const BenchmarkPage: React.FC = () => {
           {/* PROFIL PRATIQUES */}
           <PracticeProfileCard
             title={"Liste des pratiques les plus performantes sur l'IFT"}
-            items={practiceProfile.filter((item) => item.id !== 'agriculture-type' && item.id !== 'departement')}
+            items={practiceProfile.filter(
+              (item) => item.id !== 'agriculture-type' && item.id !== 'departement',
+            )}
           />
         </>
       )}
