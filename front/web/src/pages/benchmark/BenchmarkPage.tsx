@@ -223,10 +223,13 @@ export const BenchmarkPage: React.FC = () => {
     loadFilterOptions();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Fetch on mount and when filters change
-  useEffect(() => {
-    loadBenchmarkData(appliedFilters);
-  }, [appliedFilters]); // eslint-disable-line react-hooks/exhaustive-deps
+  const handleApplyFilters = useCallback(
+    (filters: BenchmarkFiltersState) => {
+      setAppliedFilters(filters);
+      loadBenchmarkData(filters);
+    },
+    [setAppliedFilters, loadBenchmarkData],
+  );
 
   const departmentCode = appliedFilters.department.split(' ')[0];
   const hasAllFilters =
@@ -238,7 +241,7 @@ export const BenchmarkPage: React.FC = () => {
       {/* FILTRES */}
       <BenchmarkFilters
         initialValues={appliedFilters}
-        onApply={setAppliedFilters}
+        onApply={handleApplyFilters}
         options={{
           ...filterOptions,
           species: flattenedSpecies,
