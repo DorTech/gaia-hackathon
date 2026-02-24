@@ -1,7 +1,6 @@
-import React from 'react';
 import { Box, Card, Typography } from '@mui/material';
+import React from 'react';
 import { LeverCardProps } from '../types';
-import { BadgeType } from '../atomic';
 import { LeverOptions } from './LeverOptions';
 
 export const LeverCard: React.FC<LeverCardProps> = ({ lever, activeOverrides, onPickOption }) => {
@@ -44,7 +43,6 @@ export const LeverCard: React.FC<LeverCardProps> = ({ lever, activeOverrides, on
           >
             {lever.name}
           </Typography>
-          <BadgeType type={lever.type} />
         </Box>
         <LeverOptions lever={lever} activeOverrides={activeOverrides} onPickOption={onPickOption} />
       </Box>

@@ -3,7 +3,6 @@ import type { Lever, LeverOverrides } from '../pages/simulationComponents/types'
 import { agricultureTypesAtom, itkFormAtom, CHIP_OPTIONS } from './diagnosticAtoms';
 import type { ITKFormState } from './diagnosticAtoms';
 
-
 /**
  * Derived atom: builds lever definitions from the current ITK form state.
  * The "current" label for each lever reflects the user's actual form values.
@@ -25,7 +24,7 @@ export const leversAtom = atom<Lever[]>((get) => {
   return [
     {
       id: 'rot',
-      name: '🌾 NB Rotation',
+      name: 'Nombre de cultures en rotation',
       type: 'Quantitatif',
       current: `${form.nbCulturesRotation} cultures · actuel`,
       options: [],
@@ -41,17 +40,24 @@ export const leversAtom = atom<Lever[]>((get) => {
     },
     {
       id: 'seq',
-      name: '🔄 Séquence cultures',
+      name: 'Séquence des cultures',
       type: 'Qualitatif',
       current: `${form.sequenceCultures} · actuel`,
       options: [
-        { label: 'Rotation diversifiée (4+ familles)', formOverrides: { sequenceCultures: 'Rotation diversifiée (4+ familles)' } },
-        { label: 'Rotation longue avec légumineuses', formOverrides: { sequenceCultures: 'Rotation longue avec légumineuses' }, isReference: true },
+        {
+          label: 'Rotation diversifiée (4+ familles)',
+          formOverrides: { sequenceCultures: 'Rotation diversifiée (4+ familles)' },
+        },
+        {
+          label: 'Rotation longue avec légumineuses',
+          formOverrides: { sequenceCultures: 'Rotation longue avec légumineuses' },
+          isReference: true,
+        },
       ],
     },
     {
       id: 'sol',
-      name: '🚜 Travail du sol',
+      name: 'Type de travail du sol',
       type: 'Qualitatif',
       current: `${CHIP_OPTIONS.soilWork[form.typeTravailDuSol]} · actuel`,
       options: [
@@ -61,26 +67,28 @@ export const leversAtom = atom<Lever[]>((get) => {
     },
     {
       id: 'desh',
-      name: '⚙️ Désherbage mécanique',
+      name: 'Nombre de passages de désherbage mécanique',
       type: 'Qualitatif',
       current: `${form.nbrePassagesDesherbageMeca} passages · actuel`,
       options: [
         { label: 'Oui — partiel (2 pass.)', formOverrides: { nbrePassagesDesherbageMeca: 2 } },
-        { label: 'Oui — complet (6 pass.)', formOverrides: { nbrePassagesDesherbageMeca: 6 }, isReference: true },
+        {
+          label: 'Oui — complet (6 pass.)',
+          formOverrides: { nbrePassagesDesherbageMeca: 6 },
+          isReference: true,
+        },
       ],
     },
     {
       id: 'macro',
-      name: '🪱 Recours macroorganismes',
+      name: 'Recours aux macro-organismes',
       type: 'Qualitatif',
       current: `${CHIP_OPTIONS.yesNo[form.recoursMacroorganismes]} · actuel`,
-      options: [
-        { label: 'Oui', formOverrides: { recoursMacroorganismes: 1 }, isReference: true },
-      ],
+      options: [{ label: 'Oui', formOverrides: { recoursMacroorganismes: 1 }, isReference: true }],
     },
     {
       id: 'ferti',
-      name: '🧪 Fertilisation N totale',
+      name: 'Fertilisation azotée totale',
       type: 'Quantitatif',
       current: `${form.fertiNTot} kg/ha · actuel`,
       options: [],
@@ -96,7 +104,7 @@ export const leversAtom = atom<Lever[]>((get) => {
     },
     {
       id: 'agri',
-      name: '🌱 Type d\'agriculture',
+      name: "Type d'agriculture",
       type: 'Qualitatif',
       current: `${agriTypes[form.sdcTypeAgriculture] ?? '—'} · actuel`,
       options: agriOptions,
