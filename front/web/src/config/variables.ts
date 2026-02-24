@@ -112,7 +112,7 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     label: 'Type de travail du sol',
     dbVariable: 'type_de_travail_du_sol',
     type: 'Qualitatif',
-    chips: { options: ['Labour', 'TCS', 'Semis direct'] },
+    chips: { options: ['Aucun', 'Labour', 'TCS', 'Semis direct'] },
     benchmarkApi: { type: 'frequency', field: 'soilWork' },
   },
 

@@ -23,7 +23,7 @@ export const SummarySidebar: React.FC<SummaryBarProps> = ({
         borderRadius: '10px',
         padding: '16px',
         position: 'sticky',
-        top: '20px',
+        top: '84px',
         height: 'fit-content',
       }}
     >
