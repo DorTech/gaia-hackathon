@@ -362,7 +362,7 @@ export class QueryService {
     }
     if (dto.field === "fertilisation") {
       const fertilisation =
-        await this.queryRepository.medianFertilisationNTot(dto);
+        await this.queryRepository.medianFertilisationNTot(dbFilters);
       return { median: fertilisation.median };
     }
 

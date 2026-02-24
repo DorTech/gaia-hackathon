@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
+import { Box, Tooltip, Typography } from '@mui/material';
 import type { PracticeProfileItem } from '../../types/benchmark';
 
 interface PracticeProfileCardProps {
@@ -45,22 +45,34 @@ const QualitativeItem: React.FC<QualitativeItemProps> = ({ item }) => {
         const isMyPosition = item.note && frequency.label === item.note.value;
         return (
           <Box key={frequency.label} className="fr">
-            <Box className="fr-lbl" sx={{ fontSize: '1rem', minWidth: '120px', flex: '0 0 120px' }}>
-              {frequency.label}
-              {isMyPosition && (
-                <Box
-                  component="span"
-                  sx={{
-                    marginLeft: '6px',
-                    color: 'var(--green-d)',
-                    fontSize: '1.3rem',
-                    fontWeight: 700,
-                  }}
-                >
-                  ←
-                </Box>
-              )}
-            </Box>
+            <Tooltip title={frequency.label} arrow enterDelay={300} placement="top">
+              <Box
+                className="fr-lbl"
+                sx={{
+                  fontSize: '1rem',
+                  minWidth: '120px',
+                  flex: '0 0 120px',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {frequency.label}
+                {isMyPosition && (
+                  <Box
+                    component="span"
+                    sx={{
+                      marginLeft: '6px',
+                      color: 'var(--green-d)',
+                      fontSize: '1.3rem',
+                      fontWeight: 700,
+                    }}
+                  >
+                    ←
+                  </Box>
+                )}
+              </Box>
+            </Tooltip>
             <Box className="fr-trk" sx={{ flex: '1 1 auto' }}>
               <Box
                 className={`fr-fil ${frequency.top ? 'top' : ''}`}
