@@ -162,21 +162,20 @@ export const LeverOptions: React.FC<LeverOptionsProps> = ({
       <Button
         onClick={() => onPickOption(lever.id, null)}
         sx={{
-          padding: '5px 10px',
-          borderRadius: '6px',
-          border: '2px solid',
-          fontSize: '0.69rem',
-          fontWeight: 600,
+          px: 1.25,
+          py: 0.5,
+          borderRadius: '999px',
+          border: '1.5px solid',
+          fontSize: '.72rem',
+          fontWeight: 700,
           textTransform: 'none',
           lineHeight: '1.3',
           transition: 'all 0.2s ease',
-          borderColor: isCurrentSelected ? 'var(--orange)' : 'var(--border2)',
+          borderColor: 'var(--orange)',
           color: isCurrentSelected ? 'white' : 'var(--orange)',
-          backgroundColor: isCurrentSelected ? 'var(--orange)' : 'var(--orange-l)',
-          boxShadow: isCurrentSelected ? '0 0 8px rgba(232, 146, 58, 0.3)' : 'none',
+          backgroundColor: isCurrentSelected ? 'var(--orange)' : 'white',
           '&:hover': {
-            backgroundColor: isCurrentSelected ? 'var(--orange)' : 'var(--orange)',
-            color: 'white',
+            backgroundColor: isCurrentSelected ? 'var(--orange)' : 'var(--orange-l)',
             borderColor: 'var(--orange)',
           },
         }}
@@ -192,33 +191,32 @@ export const LeverOptions: React.FC<LeverOptionsProps> = ({
             key={idx}
             onClick={() => onPickOption(lever.id, opt.formOverrides)}
             sx={{
-              padding: '5px 10px',
-              borderRadius: '6px',
-              border: '2px solid',
-              fontSize: '0.69rem',
-              fontWeight: 600,
+              px: 1.25,
+              py: 0.5,
+              borderRadius: '999px',
+              border: '1.5px solid',
+              fontSize: '.72rem',
+              fontWeight: 700,
               textTransform: 'none',
               lineHeight: '1.3',
               transition: 'all 0.2s ease',
               borderColor: isSelected
                 ? 'var(--green)'
                 : isRef
-                  ? 'var(--green)'
+                  ? 'var(--green-d)'
                   : 'var(--border2)',
               color: isSelected ? 'white' : isRef ? 'var(--green-d)' : 'var(--text2)',
               backgroundColor: isSelected ? 'var(--green)' : 'white',
-              boxShadow: isSelected ? '0 0 8px rgba(122, 229, 140, 0.3)' : 'none',
               display: 'flex',
               alignItems: 'center',
               gap: '4px',
               '&:hover': {
-                borderColor: 'var(--green)',
-                color: isSelected ? 'white' : 'var(--green-d)',
-                backgroundColor: isSelected ? 'var(--green)' : '#f5f7fa',
+                backgroundColor: isSelected ? 'var(--green)' : isRef ? 'var(--green-l)' : '#f5f7fa',
               },
             }}
           >
-            {isRef && '* '}{opt.label}
+            {isRef && '⭐ '}
+            {opt.label}
           </Button>
         );
       })}
