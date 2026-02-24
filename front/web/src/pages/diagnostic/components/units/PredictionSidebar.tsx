@@ -33,7 +33,7 @@ export const PredictionSidebar: React.FC<PredictionSidebarProps> = ({ predictedI
           className="ift-card-lbl"
           sx={{ color: 'var(--text2)', transition: 'opacity 180ms ease', opacity: predicting ? 0.9 : 1 }}
         >
-          IFT total prédit
+          IFT total estimé
         </Typography>
         <Box
           sx={{
