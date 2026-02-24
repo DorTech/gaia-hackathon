@@ -12,7 +12,15 @@ export const leversAtom = atom<Lever[]>((get) => {
   const form = get(itkFormAtom);
   const agriTypes = get(agricultureTypesAtom);
 
-  const bioIndex = agriTypes.indexOf('Agriculture biologique');
+  // Build agriculture type options from dynamic atom, excluding the current selection
+  const agriOptions = agriTypes
+    .map((label, idx) => ({ label, idx }))
+    .filter(({ idx }) => idx !== form.sdcTypeAgriculture)
+    .map(({ label, idx }) => ({
+      label,
+      formOverrides: { sdcTypeAgriculture: idx } as Partial<ITKFormState>,
+      isReference: label === 'Agriculture biologique',
+    }));
 
   return [
     {
@@ -91,13 +99,7 @@ export const leversAtom = atom<Lever[]>((get) => {
       name: '🌱 Type d\'agriculture',
       type: 'Qualitatif',
       current: `${agriTypes[form.sdcTypeAgriculture] ?? '—'} · actuel`,
-      options: [
-        {
-          label: 'Agriculture biologique',
-          formOverrides: { sdcTypeAgriculture: bioIndex >= 0 ? bioIndex : 0 },
-          isReference: true,
-        },
-      ],
+      options: agriOptions,
     },
   ];
 });
