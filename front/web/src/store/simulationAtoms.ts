@@ -67,16 +67,18 @@ export const leversAtom = atom<Lever[]>((get) => {
     {
       id: 'desh',
       name: 'Nombre de passages de désherbage mécanique',
-      type: 'Qualitatif',
+      type: 'Quantitatif',
       current: `${form.nbrePassagesDesherbageMeca} passages · actuel`,
-      options: [
-        { label: 'Oui — partiel (2 pass.)', formOverrides: { nbrePassagesDesherbageMeca: 2 } },
-        {
-          label: 'Oui — complet (6 pass.)',
-          formOverrides: { nbrePassagesDesherbageMeca: 6 },
-          isReference: true,
-        },
-      ],
+      options: [],
+      slider: {
+        min: 0,
+        max: 6,
+        currentValue: form.nbrePassagesDesherbageMeca,
+        unit: 'passages',
+        referenceValue: 4,
+        referenceLabel: '4+ passages ★',
+        formKey: 'nbrePassagesDesherbageMeca',
+      },
     },
     {
       id: 'macro',
