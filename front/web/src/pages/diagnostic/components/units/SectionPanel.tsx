@@ -5,6 +5,7 @@ import { SectionCard } from './SectionCard';
 
 interface SectionPanelProps {
   title: string;
+  summary?: string;
   children: React.ReactNode;
   className?: string;
   defaultExpanded?: boolean;
@@ -13,13 +14,14 @@ interface SectionPanelProps {
 
 export const SectionPanel: React.FC<SectionPanelProps> = ({
   title,
+  summary,
   children,
   className,
   defaultExpanded = true,
   cardSx,
 }) => {
   return (
-    <Section title={title} className={className} defaultExpanded={defaultExpanded}>
+    <Section title={title} summary={summary} className={className} defaultExpanded={defaultExpanded}>
       <SectionCard sx={cardSx}>{children}</SectionCard>
     </Section>
   );

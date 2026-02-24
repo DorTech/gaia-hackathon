@@ -63,6 +63,13 @@ export const DiagnosticPage: React.FC = () => {
     }));
   };
 
+  const soilWorkOptions =
+    DIAGNOSTIC_VARIABLES.find((v) => v.formKey === 'typeTravailDuSol')?.chips?.options ?? [];
+  const selectedSoilWork = soilWorkOptions[form.typeTravailDuSol] ?? 'Travail du sol non défini';
+  const selectedAgricultureType =
+    agricultureTypes[form.sdcTypeAgriculture] ?? 'Type d’agriculture non défini';
+  const variablesSummary = `${form.nbCulturesRotation} cultures • ${selectedSoilWork} • Dépt. ${form.departement} • ${selectedAgricultureType}`;
+
   return (
     <div className="page active" id="page-itk">
       <div>
@@ -70,7 +77,12 @@ export const DiagnosticPage: React.FC = () => {
       </div>
 
       <div className="itk-layout">
-        <SectionPanel title="🌾 Variables" className="itk-last-section" cardSx={{ p: '20px 24px' }}>
+        <SectionPanel
+          title="🌾 Variables"
+          summary={variablesSummary}
+          className="itk-last-section"
+          cardSx={{ p: '20px 24px' }}
+        >
           <div className="fgrid">
             {DIAGNOSTIC_VARIABLES.map((v) => (
               <Field key={v.id} label={v.label}>

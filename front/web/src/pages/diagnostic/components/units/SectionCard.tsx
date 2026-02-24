@@ -1,9 +1,9 @@
 import React from 'react';
-import { Paper } from '@mui/material';
+import { Paper, SxProps, Theme } from '@mui/material';
 
 interface SectionCardProps {
   children: React.ReactNode;
-  sx?: Record<string, unknown>;
+  sx?: SxProps<Theme>;
 }
 
 export const SectionCard: React.FC<SectionCardProps> = ({ children, sx }) => {

@@ -75,6 +75,7 @@ export const ItineraireComponent: React.FC = () => {
 
       <SectionPanel
         title="📝 Description de votre itinéraire technique"
+        summary={prompt.trim() || 'Ajoutez une description pour générer un itinéraire'}
         className="itk-last-section"
         cardSx={{ background: 'linear-gradient(180deg, #ffffff 0%, #fafafa 100%)' }}
       >
@@ -121,7 +122,11 @@ export const ItineraireComponent: React.FC = () => {
       )}
 
       {rotationData && (
-        <SectionPanel title="🗺️ Itinéraire généré" defaultExpanded>
+        <SectionPanel
+          title="🗺️ Itinéraire généré"
+          summary="Dépliez pour afficher l’itinéraire généré"
+          defaultExpanded
+        >
           <Box
             id="rotation-chart"
             ref={chartRef}
