@@ -50,25 +50,10 @@ export class QueryController {
     return this.queryService.getFrequency(body);
   }
 
-  @Post("median_nb_rotation")
-  @ApiOperation({
-    summary:
-      "Get the median number of rotations for a culture, department and type of agriculture",
-  })
-  async getNbRotation(
+  @Post("median_var")
+  async getMedianVar(
     @Body() body: NewFilterDto,
-  ): Promise<{ medianNbRotation: number | null }> {
-    return this.queryService.getMedianNbRotation(body);
-  }
-
-  @Post("median_nb_weeding_passes")
-  @ApiOperation({
-    summary:
-      "Get the median number of mechanical weeding passes for a culture, department and type of agriculture",
-  })
-  async getNbWeedingPasses(
-    @Body() body: NewFilterDto,
-  ): Promise<{ medianNbWeedingPasses: number | null }> {
-    return this.queryService.getMedianNbWeedingPasses(body);
+  ): Promise<{ median: number | null }> {
+    return this.queryService.getMedianVar(body);
   }
 }

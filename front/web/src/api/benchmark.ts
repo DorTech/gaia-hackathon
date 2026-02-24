@@ -98,37 +98,14 @@ export async function fetchMedianField(
   filters: BenchmarkFiltersState,
 ): Promise<number> {
   // Special route for nbCulturesRotation
-  if (field === 'nbCulturesRotation') {
-    const deptCode = filters.department.split(' ')[0];
-    const { data } = await apiClient.post<{ medianNbRotation: number }>(
-      '/query/median_nb_rotation',
-      {
-        culture: filters.species,
-        department: deptCode,
-        agricultureType: filters.agricultureType,
-      },
-    );
-    return data.medianNbRotation;
-  }
-  if (field === 'nbWeedingPasses') {
-    const deptCode = filters.department.split(' ')[0];
-    const { data } = await apiClient.post<{ medianNbWeedingPasses: number }>(
-      '/query/median_nb_weeding_passes',
-      {
-        culture: filters.species,
-        department: deptCode,
-        agricultureType: filters.agricultureType,
-      },
-    );
-    return data.medianNbWeedingPasses;
-  }
-
-  const { data } = await apiClient.post<MedianResponse>('/query/median', {
-    table: TABLE,
-    field,
-    filters: buildFilters(filters),
+  const deptCode = filters.department.split(' ')[0];
+  const { data } = await apiClient.post<{ median: number }>('/query/median_var', {
+    field: field,
+    culture: filters.species,
+    department: deptCode,
+    agricultureType: filters.agricultureType,
   });
-  return data.median ?? 0;
+  return data.median ?? -1;
 }
 
 export async function fetchTopFarms(filters: BenchmarkFiltersState): Promise<
@@ -188,10 +165,7 @@ export async function fetchDistinctAgricultureTypes(): Promise<string[]> {
     table: 'sdc',
     field: 'typeAgriculture',
   });
-  return data.data
-    .filter((r) => r.value != null && r.value !== '')
-    .map((r) => String(r.value))
-    .concat('Tous (Bio + Conv.)'); // Add combined option
+  return data.data.filter((r) => r.value != null && r.value !== '').map((r) => String(r.value));
 }
 
 /** Maps practice IDs to their API config — derived from centralized variable definitions */

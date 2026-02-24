@@ -148,18 +148,17 @@ export class QueryService {
     return { table: dto.table, field: dto.field, total, data };
   }
 
-  async getMedianNbRotation(
-    dto: NewFilterDto,
-  ): Promise<{ medianNbRotation: number | null }> {
-    const nbRotation = await this.queryRepository.medianNbRotation(dto);
-    return { medianNbRotation: nbRotation.median };
-  }
+  async getMedianVar(dto: NewFilterDto): Promise<{ median: number | null }> {
+    if (dto.field === "nbRotation") {
+      const nbRotation = await this.queryRepository.medianNbRotation(dto);
+      return { median: nbRotation.median };
+    }
+    if (dto.field === "nbWeedingPasses") {
+      const nbWeedingPasses =
+        await this.queryRepository.medianNbWeedingPasses(dto);
+      return { median: nbWeedingPasses.median };
+    }
 
-  async getMedianNbWeedingPasses(
-    dto: NewFilterDto,
-  ): Promise<{ medianNbWeedingPasses: number | null }> {
-    const nbWeedingPasses =
-      await this.queryRepository.medianNbWeedingPasses(dto);
-    return { medianNbWeedingPasses: nbWeedingPasses.median };
+    return { median: null };
   }
 }

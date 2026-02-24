@@ -57,7 +57,7 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     type: 'Quantitatif',
     unit: 'cultures',
     slider: { min: 1, max: 8, minLabel: '1 culture', maxLabel: '8+' },
-    benchmarkApi: { type: 'median', field: 'nbCulturesRotation' },
+    benchmarkApi: { type: 'median', field: 'nbRotation' },
   },
   {
     id: 'sequence-cultures',
@@ -66,6 +66,7 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     dbVariable: 'sequence_cultures',
     type: 'Qualitatif',
     input: { type: 'text', placeholder: 'Blé tendre > Maïs > Colza' },
+    benchmarkApi: { type: 'frequency', field: 'sequenceCultures' },
   },
   {
     id: 'macroorganisms',
@@ -74,6 +75,7 @@ export const DIAGNOSTIC_VARIABLES: VariableConfig[] = [
     dbVariable: 'recours_macroorganismes',
     type: 'Qualitatif',
     chips: { options: ['Non', 'Oui'] },
+    benchmarkApi: { type: 'frequency', field: 'macroorganismes', asBoolean: true },
   },
   {
     id: 'weeding-passages',

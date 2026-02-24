@@ -17,7 +17,7 @@ const parseValue = (val: string): number | null => {
 const isValidQuantitativeValue = (value: string | undefined): boolean => {
   if (!value || value === '—') return false;
   const parsed = parseValue(value);
-  return parsed !== null;
+  return parsed !== null && parsed !== -1 && value !== '-1';
 };
 
 const calculateDiff = (refVal: number, myVal: number): number | null => {

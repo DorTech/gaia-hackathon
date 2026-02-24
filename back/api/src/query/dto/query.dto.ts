@@ -106,6 +106,10 @@ export class MedianDto implements IMedianRequest {
 }
 
 export class NewFilterDto {
+  @ApiProperty({ example: "nbRotation" })
+  @IsString()
+  field: string;
+
   @ApiProperty({ example: "blé", description: "Crop type" })
   @IsString()
   culture: string;
