@@ -6,7 +6,7 @@ import { SliderControl } from './components/atoms/SliderControl';
 
 import { Field } from './components/units/Field';
 import { PredictionSidebar } from './components/units/PredictionSidebar';
-import { Section } from './components/units/Section';
+import { SectionPanel } from './components/units/SectionPanel';
 import {
   agricultureTypesAtom,
   itkFormAtom,
@@ -15,7 +15,7 @@ import {
   type ITKFormState,
 } from '../../store/diagnosticAtoms';
 import { fetchDistinctAgricultureTypes } from '../../api/benchmark';
-import { FormControl, MenuItem, Select, type SelectChangeEvent } from '@mui/material';
+import { FormControl, MenuItem, Select, Typography, type SelectChangeEvent } from '@mui/material';
 import { DIAGNOSTIC_VARIABLES } from '../../config/variables';
 import { predictIFT } from '../../api/predict';
 import { ItineraireComponent } from '../ItinerairePage';
@@ -54,7 +54,7 @@ export const DiagnosticPage: React.FC = () => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [form, setPredictedIFT, setPredicting]);
+  }, [agricultureTypes, form, setPredictedIFT, setPredicting]);
 
   const handleFieldChange = <K extends keyof ITKFormState>(field: K, value: ITKFormState[K]) => {
     setForm((prev) => ({
@@ -70,89 +70,93 @@ export const DiagnosticPage: React.FC = () => {
       </div>
 
       <div className="itk-layout">
-        <div className="card" style={{ padding: '20px 24px' }}>
-          <Section title="🌾 Variables" className="itk-last-section">
-            <div className="fgrid">
-              {DIAGNOSTIC_VARIABLES.map((v) => (
-                <Field key={v.id} label={v.label}>
-                  {v.slider ? (
-                    <SliderControl
-                      minLabel={v.slider.minLabel}
-                      maxLabel={v.slider.maxLabel}
-                      value={form[v.formKey] as number}
-                      min={v.slider.min}
-                      max={v.slider.max}
-                      unit={v.unit}
-                      onChange={(value) =>
-                        handleFieldChange(
-                          v.formKey,
-                          Math.round(value) as ITKFormState[typeof v.formKey],
-                        )
-                      }
-                    />
-                  ) : v.dynamicChips ? (
-                    <ChipGroup
-                      options={agricultureTypes}
-                      selectedIndex={form[v.formKey] as number}
-                      onSelect={(index) =>
-                        handleFieldChange(v.formKey, index as ITKFormState[typeof v.formKey])
-                      }
-                    />
-                  ) : v.chips ? (
-                    <ChipGroup
-                      options={v.chips.options}
-                      selectedIndex={form[v.formKey] as number}
-                      onSelect={(index) =>
-                        handleFieldChange(v.formKey, index as ITKFormState[typeof v.formKey])
-                      }
-                    />
-                  ) : v.select ? (
-                    <FormControl size="small" fullWidth>
-                      <Select
-                        value={String(form[v.formKey])}
-                        onChange={(e: SelectChangeEvent) => {
-                          const num = parseInt(e.target.value, 10);
-                          if (!isNaN(num)) {
-                            handleFieldChange(v.formKey, num as ITKFormState[typeof v.formKey]);
-                          }
-                        }}
-                        displayEmpty
-                        renderValue={(selected) => {
-                          if (!selected) {
-                            return (
-                              <span style={{ color: 'var(--text3)' }}>{v.select!.placeholder}</span>
-                            );
-                          }
-                          const name = v.select!.options[selected];
-                          return name ? `${selected} — ${name}` : selected;
-                        }}
-                      >
-                        {Object.entries(v.select.options)
-                          .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
-                          .map(([code, name]) => (
-                            <MenuItem key={code} value={code}>
-                              {code} — {name}
-                            </MenuItem>
-                          ))}
-                      </Select>
-                    </FormControl>
-                  ) : v.input ? (
-                    <InputControl
-                      type={v.input.type}
-                      value={form[v.formKey]}
-                      placeholder={v.input.placeholder}
-                      min={v.input.min}
-                      max={v.input.max}
-                      onChange={(val) =>
-                        handleFieldChange(v.formKey, val as ITKFormState[typeof v.formKey])
-                      }
-                    />
-                  ) : null}
-                </Field>
-              ))}
-            </div>
-          </Section>
-        </div>
+        <SectionPanel title="🌾 Variables" className="itk-last-section" cardSx={{ p: '20px 24px' }}>
+          <div className="fgrid">
+            {DIAGNOSTIC_VARIABLES.map((v) => (
+              <Field key={v.id} label={v.label}>
+                {v.slider ? (
+                  <SliderControl
+                    minLabel={v.slider.minLabel}
+                    maxLabel={v.slider.maxLabel}
+                    value={form[v.formKey] as number}
+                    min={v.slider.min}
+                    max={v.slider.max}
+                    unit={v.unit}
+                    onChange={(value) =>
+                      handleFieldChange(
+                        v.formKey,
+                        Math.round(value) as ITKFormState[typeof v.formKey],
+                      )
+                    }
+                  />
+                ) : v.dynamicChips ? (
+                  <ChipGroup
+                    options={agricultureTypes}
+                    selectedIndex={form[v.formKey] as number}
+                    onSelect={(index) =>
+                      handleFieldChange(v.formKey, index as ITKFormState[typeof v.formKey])
+                    }
+                  />
+                ) : v.chips ? (
+                  <ChipGroup
+                    options={v.chips.options}
+                    selectedIndex={form[v.formKey] as number}
+                    onSelect={(index) =>
+                      handleFieldChange(v.formKey, index as ITKFormState[typeof v.formKey])
+                    }
+                  />
+                ) : v.select ? (
+                  <FormControl size="small" fullWidth>
+                    <Select
+                      value={String(form[v.formKey])}
+                      onChange={(e: SelectChangeEvent) => {
+                        const num = parseInt(e.target.value, 10);
+                        if (!isNaN(num)) {
+                          handleFieldChange(v.formKey, num as ITKFormState[typeof v.formKey]);
+                        }
+                      }}
+                      displayEmpty
+                      renderValue={(selected) => {
+                        if (!selected) {
+                          return (
+                            <Typography variant="body2" sx={{ color: 'var(--text3)' }}>
+                              {v.select!.placeholder}
+                            </Typography>
+                          );
+                        }
+                        const name = v.select!.options[selected];
+                        return (
+                          <Typography variant="body2">
+                            {name ? `${selected} — ${name}` : selected}
+                          </Typography>
+                        );
+                      }}
+                    >
+                      {Object.entries(v.select.options)
+                        .sort(([a], [b]) => a.localeCompare(b, undefined, { numeric: true }))
+                        .map(([code, name]) => (
+                          <MenuItem key={code} value={code}>
+                            <Typography variant="body2">{code} — {name}</Typography>
+                          </MenuItem>
+                        ))}
+                    </Select>
+                  </FormControl>
+                ) : v.input ? (
+                  <InputControl
+                    type={v.input.type}
+                    value={form[v.formKey]}
+                    placeholder={v.input.placeholder}
+                    min={v.input.min}
+                    max={v.input.max}
+                    onChange={(val) =>
+                      handleFieldChange(v.formKey, val as ITKFormState[typeof v.formKey])
+                    }
+                  />
+                ) : null}
+              </Field>
+            ))}
+          </div>
+        </SectionPanel>
 
         <PredictionSidebar predictedIFT={predictedIFT} />
       </div>

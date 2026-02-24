@@ -24,14 +24,14 @@ export const SliderControl: React.FC<SliderControlProps> = ({
 }) => {
   return (
     <Box className="slider-w">
-      <Box className="" sx={{ display: 'flex', justifyContent: 'space-between',  }}>
-        <Typography sx={{ fontSize: '0.67rem', color: 'var(--text3)' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Typography variant="caption" sx={{ color: 'var(--text3)' }}>
           {minLabel}
         </Typography>
-        <Typography   sx={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--green-d)' }}>
+        <Typography variant="body2" sx={{ fontWeight: 700, color: 'var(--green-d)' }}>
           {value}{unit ? ` ${unit}` : ''}
         </Typography>
-        <Typography  sx={{ fontSize: '0.67rem', color: 'var(--text3)' }}>
+        <Typography variant="caption" sx={{ color: 'var(--text3)' }}>
           {maxLabel}
         </Typography>
       </Box>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { TextField } from '@mui/material';
 
 interface InputControlProps {
   type: 'text' | 'number';
@@ -18,13 +19,13 @@ export const InputControl: React.FC<InputControlProps> = ({
   onChange,
 }) => {
   return (
-    <input
-      className="finp"
+    <TextField
+      size="small"
+      fullWidth
       type={type}
       value={value}
       placeholder={placeholder}
-      min={min}
-      max={max}
+      inputProps={{ min, max }}
       onChange={(e) => {
         if (type === 'number') {
           const n = parseInt(e.target.value, 10);
@@ -32,6 +33,11 @@ export const InputControl: React.FC<InputControlProps> = ({
         } else {
           onChange(e.target.value);
         }
+      }}
+      sx={{
+        '& .MuiInputBase-input': {
+          typography: 'body2',
+        },
       }}
     />
   );

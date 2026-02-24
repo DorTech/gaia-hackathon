@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   Typography,
-  Paper,
   TextField,
   Button,
   Stack,
@@ -10,6 +9,7 @@ import {
   Alert,
 } from '@mui/material';
 import { generateRotation } from '../api/rotation';
+import { SectionPanel } from './diagnostic/components/units/SectionPanel';
 
 export const ItineraireComponent: React.FC = () => {
   const [prompt, setPrompt] = useState('');
@@ -38,9 +38,10 @@ export const ItineraireComponent: React.FC = () => {
 
   useEffect(() => {
     if (!rotationData || !chartRef.current) return;
+    const chartElement = chartRef.current;
 
     // Clear previous render
-    chartRef.current.innerHTML = '';
+    chartElement.innerHTML = '';
 
     // RotationRenderer is a global from chart-render.js loaded in index.html
     type RotationRendererCtor = new (
@@ -60,31 +61,21 @@ export const ItineraireComponent: React.FC = () => {
     renderer.render();
 
     return () => {
-      if (chartRef.current) {
-        chartRef.current.innerHTML = '';
-      }
+      chartElement.innerHTML = '';
     };
   }, [rotationData]);
 
   return (
-    <Box sx={{ px: { xs: 1, md: 2 }, py: { xs: 2, md: 3 } }}>
+    <Box>
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 600 }}>
         Ma ferme
       </Typography>
 
-      <Paper
-        sx={{
-          p: { xs: 2.5, md: 3 },
-          mb: 3,
-          borderRadius: 2.5,
-          border: '1px solid rgba(0, 0, 0, 0.06)',
-          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.06)',
-          background: 'linear-gradient(180deg, #ffffff 0%, #fafafa 100%)',
-        }}
+      <SectionPanel
+        title="🌾 Description de votre itinéraire technique"
+        className="itk-last-section"
+        cardSx={{ background: 'linear-gradient(180deg, #ffffff 0%, #fafafa 100%)' }}
       >
-        <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-          Description de votre itinéraire technique
-        </Typography>
         <Stack spacing={2}>
           <TextField
             multiline
@@ -120,8 +111,7 @@ export const ItineraireComponent: React.FC = () => {
             </Button>
           </Box>
         </Stack>
-      </Paper>
-
+      </SectionPanel>
       {error && (
         <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }}>
           {error}
@@ -129,17 +119,7 @@ export const ItineraireComponent: React.FC = () => {
       )}
 
       {rotationData && (
-        <Paper
-          sx={{
-            p: { xs: 2.5, md: 3 },
-            borderRadius: 2.5,
-            border: '1px solid rgba(0, 0, 0, 0.06)',
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.06)',
-          }}
-        >
-          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-            Itinéraire généré
-          </Typography>
+        <SectionPanel title="🌾 Itinéraire généré" defaultExpanded>
           <Box
             id="rotation-chart"
             ref={chartRef}
@@ -151,7 +131,7 @@ export const ItineraireComponent: React.FC = () => {
               backgroundColor: 'rgba(0, 0, 0, 0.02)',
             }}
           />
-        </Paper>
+        </SectionPanel>
       )}
     </Box>
   );
